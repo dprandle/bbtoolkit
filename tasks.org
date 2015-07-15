@@ -1,0 +1,57 @@
+*  Resource Browser [5%]
+** DONE Dialog UI
+   CLOSED: [2015-07-05 Sun 22:10]
+** TODO Menubar
+** TODO Toolbar
+** TODO New Material Dialog
+** TODO New Mesh Dialog
+** TODO New Texture Dialog
+** TODO New Shader Dialog
+** TODO New Animation Dialog
+** TODO New Entity Dialog [0%]
+*** TODO New Skybox
+*** TODO New Light
+*** TODO New Character
+*** TODO New Static Object
+*** TODO New Tile
+** TODO Edit Material Dialog
+** TODO Edit Mesh Dialog
+** TODO Edit Texture Dialog
+** TODO Edit Shader Dialog
+** TODO Edit Animation Dialog
+** TODO Edit Entity Dialog
+** TODO Delete Item
+** TODO Context Menu
+
+
+* Manage Plugins Dialog [%]
+** TODO New Plugin
+** TODO Edit Plugin
+** TODO Delete Plugin
+** TODO Merge Plugins
+
+
+* Manage Maps Dialog [0%]
+** TODO New Map
+** TODO Edit Map
+** TODO Delete Map
+
+
+* Bugfixes [25%]
+** DONE Shift drag crashes game
+   CLOSED: [2015-07-09 Thu 00:03] This turned out to be because the brush as obtained from the build system could have some tiles that were not over entities in the scene while the brush center would be. This resulted in a crash that only occured when the brush has more than one tile and it is being used to shift select stuff at map edges.
+** TODO Expanding to large screen causes slow down for some reason
+
+** TODO Fix camera toolbar - need focus and free to both work again - they crash toolkit right now
+** TODO Layer hiding does not seems to be working anymore
+
+* Saving/Loading [0%]
+** TODO Make buildandbattle plugin avoided in save operation
+** TODO Save all callback function pointer called after each saved resource - res id, void pointer
+** TODO Mark resources changed or not
+
+
+
+* Notes
+
+Plugin is special type of resource - when calling plugin->save() or plugin->load() it will
