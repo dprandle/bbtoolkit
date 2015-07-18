@@ -101,12 +101,6 @@ void Toolkit::init()
 {
 	mUI.mMapView->init(this);
 
-// #ifdef NSDEBUG
-// 	nsengine.debug()->setMessageCallback(OutputView::debugCallback, mUI.mOutputView);
-// #else
-// 	mUI.mOutputView->hide();
-// #endif
-
 	mEntD->init(this);
 	mEntD->setModal(false);
 	mUI.mOutputView->init(this);

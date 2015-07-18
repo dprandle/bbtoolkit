@@ -95,6 +95,6 @@ void OutputView::clearScreen()
 
 void OutputView::debugCallback(const nsstring & pMessage, void * pThis)
 {
-	//OutputView * th = (OutputView*)pThis;
-	//th->writeToScreen(pMessage.c_str());
+	OutputView * th = (OutputView*)pThis;
+	th->writeToScreen(pMessage.c_str());
 }

@@ -48,18 +48,18 @@ void EntityEditorDialog::init(Toolkit * pTK)
 	mUI.setupUi(this);
 	mUI.mPreview->init(mTK);
 
-	mTypeToIndex[NSAnimComp::getTypeString().c_str()] = Animation;
-	mTypeToIndex[NSCamComp::getTypeString().c_str()] = Camera;
-	mTypeToIndex[NSInputComp::getTypeString().c_str()] = Input;
-	mTypeToIndex[NSLightComp::getTypeString().c_str()] = Light;
-	mTypeToIndex[NSOccupyComp::getTypeString().c_str()] = Occupy;
-	mTypeToIndex[NSParticleComp::getTypeString().c_str()] = Particle;
-	mTypeToIndex[NSRenderComp::getTypeString().c_str()] = Render;
-	mTypeToIndex[NSSelComp::getTypeString().c_str()] = Selection;
-	mTypeToIndex[NSTFormComp::getTypeString().c_str()] = Transform;
-	mTypeToIndex[NSTileBrushComp::getTypeString().c_str()] = Tilebrush;
-	mTypeToIndex[NSTileComp::getTypeString().c_str()] = Tile;
-
+	mTypeToIndex[nsengine.guid(std::type_index(typeid(NSAnimComp))).c_str()] = Animation;
+	mTypeToIndex[nsengine.guid(std::type_index(typeid(NSCamComp))).c_str()] = Camera;
+	mTypeToIndex[nsengine.guid(std::type_index(typeid(NSInputComp))).c_str()] = Input;
+	mTypeToIndex[nsengine.guid(std::type_index(typeid(NSLightComp))).c_str()] = Light;
+	mTypeToIndex[nsengine.guid(std::type_index(typeid(NSOccupyComp))).c_str()] = Occupy;
+	mTypeToIndex[nsengine.guid(std::type_index(typeid(NSParticleComp))).c_str()] = Particle;
+	mTypeToIndex[nsengine.guid(std::type_index(typeid(NSRenderComp))).c_str()] = Render;
+	mTypeToIndex[nsengine.guid(std::type_index(typeid(NSSelComp))).c_str()] = Selection;
+	mTypeToIndex[nsengine.guid(std::type_index(typeid(NSTFormComp))).c_str()] = Transform;
+	mTypeToIndex[nsengine.guid(std::type_index(typeid(NSTileBrushComp))).c_str()] = Tilebrush;
+	mTypeToIndex[nsengine.guid(std::type_index(typeid(NSTileComp))).c_str()] = Tile;
+	
 	// setup component widgets
 	mUI.mCompW->insertWidget(None,new QWidget());
 	mUI.mCompW->insertWidget(Animation, new AnimCompWidget());
@@ -106,10 +106,11 @@ void EntityEditorDialog::setEntity(NSEntity * pEnt)
 	
 	mUI.mNameLE->setText(mEnt->name().c_str());
 
-	auto compIter = mEnt->compBegin();
-	while (compIter != mEnt->compEnd())
+	auto compIter = mEnt->begin();
+	while (compIter != mEnt->end())
 	{
-		mUI.mCompLW->addItem(compIter->first.c_str());
+		nsstring guid = nsengine.guid(compIter->first);
+		mUI.mCompLW->addItem(guid.c_str());
 		++compIter;
 	}
 

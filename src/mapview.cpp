@@ -255,6 +255,11 @@ void MapView::initializeGL()
 //	plg->manager<NSSceneManager>()->setSaveMode(NSResManager::Text);
 //	plg->createTile("grasstile", nsengine.importdir() + "diffuseGrass.png", nsengine.importdir() + "normalGrass.png", fvec3(1, 1, 1), 16.0f, 0.2f, fvec3(1, 1, 1), false, true);
 
+#ifdef NSDEBUG
+	nsengine.debug()->setMessageCallback(OutputView::debugCallback, mTK->outputView());
+#else
+	mUI.mOutputView->hide();
+#endif
 
 	mTK->refreshViews();
 	mTK->statusBar()->setSizeGripEnabled(false);
