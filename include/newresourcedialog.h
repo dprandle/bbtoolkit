@@ -12,7 +12,9 @@
 #include <qdialog.h>
 #include <ui_newresourcedialog.h>
 #include <nsglobal.h>
+#include <nsengine.h>
 #include <nsmaterial.h>
+#include <nsfactory.h>
 
 class Toolkit;
 class QVBoxLayout;
@@ -43,7 +45,11 @@ class NewResourceDialog : public QDialog
 	template<class ResType>
 	void setResourceType()
 	{
-		_setResourceType(ResType::getManagerTypeString(), ResType::getTypeString());
+		auto fac = nsengine.factory<NSResFactory, ResType>();
+		auto restp = type_to_guid(ResType);
+		auto rmstr = hash_to_guid(nsengine.managerID(restp));
+		
+		_setResourceType(rmstr, restp);
 	}
 
   public slots:

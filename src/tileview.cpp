@@ -38,7 +38,7 @@ void TileView::onActionNew()
 	if (newTileDialog.exec() == QDialog::Accepted)
 	{
 		QListWidgetItem * item = new QListWidgetItem(newTileDialog.getEntityName());
-		NSEntity * ent = actplg->resource<NSEntity>(item->text().toStdString());
+		NSEntity * ent = actplg->get<NSEntity>(item->text().toStdString());
 		if (ent == NULL)
 			return;
 		

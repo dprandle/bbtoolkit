@@ -1,0 +1,491 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>LightCompWidget</class>
+ <widget class="QWidget" name="LightCompWidget">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>370</width>
+    <height>348</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Light Component</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <layout class="QFormLayout" name="formLayout">
+     <property name="fieldGrowthPolicy">
+      <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+     </property>
+     <item row="0" column="0">
+      <widget class="QLabel" name="label">
+       <property name="text">
+        <string>Light Type</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QComboBox" name="mLightTypeCB">
+       <item>
+        <property name="text">
+         <string>Directional</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Point</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Spot</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+     <item row="1" column="0">
+      <widget class="QLabel" name="label_5">
+       <property name="text">
+        <string>Falloff</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="QComboBox" name="mFalloffCB">
+       <item>
+        <property name="text">
+         <string>Linear</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Exponential</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+     <item row="2" column="0">
+      <widget class="QLabel" name="label_6">
+       <property name="text">
+        <string>Diffuse Intensity</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="1">
+      <widget class="QSlider" name="mDiffuseSldr">
+       <property name="maximum">
+        <number>100</number>
+       </property>
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="0">
+      <widget class="QLabel" name="label_7">
+       <property name="text">
+        <string>Ambient Intensity</string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="1">
+      <widget class="QSlider" name="mAmbientSldr">
+       <property name="maximum">
+        <number>100</number>
+       </property>
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="0">
+      <widget class="QLabel" name="label_4">
+       <property name="text">
+        <string>Cutoff Angle</string>
+       </property>
+      </widget>
+     </item>
+     <item row="5" column="0">
+      <widget class="QLabel" name="label_8">
+       <property name="text">
+        <string>Shadow Darkness</string>
+       </property>
+      </widget>
+     </item>
+     <item row="6" column="0">
+      <widget class="QLabel" name="label_2">
+       <property name="text">
+        <string>Distance</string>
+       </property>
+      </widget>
+     </item>
+     <item row="7" column="0">
+      <widget class="QLabel" name="label_3">
+       <property name="text">
+        <string>Radius</string>
+       </property>
+      </widget>
+     </item>
+     <item row="7" column="1">
+      <widget class="QDoubleSpinBox" name="mRadiusSB">
+       <property name="maximum">
+        <double>1000.000000000000000</double>
+       </property>
+      </widget>
+     </item>
+     <item row="8" column="0">
+      <widget class="QLabel" name="label_9">
+       <property name="text">
+        <string>Shadow Samples</string>
+       </property>
+      </widget>
+     </item>
+     <item row="8" column="1">
+      <widget class="QSpinBox" name="mShadowSamplesSB"/>
+     </item>
+     <item row="9" column="0">
+      <widget class="QLabel" name="label_11">
+       <property name="text">
+        <string>Causes Shadows</string>
+       </property>
+      </widget>
+     </item>
+     <item row="9" column="1">
+      <layout class="QHBoxLayout" name="horizontalLayout">
+       <item>
+        <spacer name="horizontalSpacer_2">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="mCastsShadowsCB">
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item row="10" column="0">
+      <widget class="QLabel" name="label_10">
+       <property name="text">
+        <string>Color</string>
+       </property>
+      </widget>
+     </item>
+     <item row="10" column="1">
+      <layout class="QHBoxLayout" name="horizontalLayout_4">
+       <item>
+        <spacer name="horizontalSpacer">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <widget class="ClickableFrame" name="mColorFrame">
+         <property name="minimumSize">
+          <size>
+           <width>40</width>
+           <height>40</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>40</width>
+           <height>40</height>
+          </size>
+         </property>
+         <property name="frameShape">
+          <enum>QFrame::Box</enum>
+         </property>
+         <property name="frameShadow">
+          <enum>QFrame::Sunken</enum>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout_7"/>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item row="6" column="1">
+      <layout class="QHBoxLayout" name="horizontalLayout_2">
+       <item>
+        <widget class="QSlider" name="mDistanceSldr">
+         <property name="maximum">
+          <number>100</number>
+         </property>
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QDoubleSpinBox" name="mDistanceSB">
+         <property name="maximum">
+          <double>1000.000000000000000</double>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item row="4" column="1">
+      <widget class="QSlider" name="mCutoffSldr">
+       <property name="maximum">
+        <number>180</number>
+       </property>
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+      </widget>
+     </item>
+     <item row="5" column="1">
+      <widget class="QSlider" name="mShadowSldr">
+       <property name="maximum">
+        <number>100</number>
+       </property>
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>ClickableFrame</class>
+   <extends>QFrame</extends>
+   <header>clickableframe.h</header>
+   <container>1</container>
+   <slots>
+    <signal>clicked()</signal>
+   </slots>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>mLightTypeCB</sender>
+   <signal>currentIndexChanged(QString)</signal>
+   <receiver>LightCompWidget</receiver>
+   <slot>onLightTypeChange(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>126</x>
+     <y>15</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>5</x>
+     <y>142</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>mFalloffCB</sender>
+   <signal>currentIndexChanged(QString)</signal>
+   <receiver>LightCompWidget</receiver>
+   <slot>onFalloffChange(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>184</x>
+     <y>52</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>213</x>
+     <y>111</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>mShadowSamplesSB</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>LightCompWidget</receiver>
+   <slot>onShadowSamplesChange(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>203</x>
+     <y>232</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>0</x>
+     <y>198</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>mColorFrame</sender>
+   <signal>clicked()</signal>
+   <receiver>LightCompWidget</receiver>
+   <slot>onColorChange()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>333</x>
+     <y>307</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>0</x>
+     <y>298</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>mCastsShadowsCB</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>LightCompWidget</receiver>
+   <slot>onCastShadowChange(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>355</x>
+     <y>255</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>238</x>
+     <y>216</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>mRadiusSB</sender>
+   <signal>valueChanged(double)</signal>
+   <receiver>LightCompWidget</receiver>
+   <slot>onRadiusChange(double)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>121</x>
+     <y>204</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>0</x>
+     <y>228</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>mDistanceSldr</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>LightCompWidget</receiver>
+   <slot>onDistanceChange(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>154</x>
+     <y>173</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>-59</x>
+     <y>370</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>mDiffuseSldr</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>LightCompWidget</receiver>
+   <slot>onDiffuseChange(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>110</x>
+     <y>72</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>-12</x>
+     <y>92</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>mAmbientSldr</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>LightCompWidget</receiver>
+   <slot>onAmbientChange(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>118</x>
+     <y>98</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>-44</x>
+     <y>124</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>mCutoffSldr</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>LightCompWidget</receiver>
+   <slot>onCutoffChange(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>110</x>
+     <y>117</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>-44</x>
+     <y>154</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>mShadowSldr</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>LightCompWidget</receiver>
+   <slot>onShadowDarknessChange(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>147</x>
+     <y>145</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>-92</x>
+     <y>208</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>mDistanceSB</sender>
+   <signal>valueChanged(double)</signal>
+   <receiver>LightCompWidget</receiver>
+   <slot>onDistanceChangeSB(double)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>302</x>
+     <y>165</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>371</x>
+     <y>167</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>onLightTypeChange(QString)</slot>
+  <slot>onFalloffChange(QString)</slot>
+  <slot>onDiffuseChange(int)</slot>
+  <slot>onAmbientChange(int)</slot>
+  <slot>onDistanceChange(int)</slot>
+  <slot>onRadiusChange(double)</slot>
+  <slot>onCutoffChange(int)</slot>
+  <slot>onShadowSamplesChange(int)</slot>
+  <slot>onCastShadowChange(bool)</slot>
+  <slot>onColorChange()</slot>
+  <slot>onShadowDarknessChange(int)</slot>
+  <slot>onDistanceChangeSB(double)</slot>
+ </slots>
+</ui>

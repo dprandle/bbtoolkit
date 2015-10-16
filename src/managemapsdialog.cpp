@@ -70,7 +70,7 @@ void ManageMapsDialog::onMapItemPressed(QTreeWidgetItem* pItem, int pColumn)
 
 	NSPlugin * aplg = nsengine.active();
 
-	NSScene * mMap = aplg->resource<NSScene>(pItem->text(pColumn).toStdString()); // Get the map that was clicked by looking up the name
+	NSScene * mMap = aplg->get<NSScene>(pItem->text(pColumn).toStdString()); // Get the map that was clicked by looking up the name
 
 	if (mMap == NULL) // Again do nothing if map not found
 		return;
@@ -103,13 +103,13 @@ void ManageMapsDialog::onDeleteMap()
 	if (ret != QMessageBox::Cancel)
 	{
 		nsstring mapName = mapNameQt.toStdString();
-		NSScene * map = nsengine.active()->resource<NSScene>(mapName);
+		NSScene * map = nsengine.active()->get<NSScene>(mapName);
 
 		bool remFromFile = (ret == QMessageBox::Yes);
 		if (remFromFile)
-			nsengine.delResource(map);
+			nsengine.active()->del(map);
 		else
-			nsengine.unloadResource(map);
+			nsengine.active()->destroy(map);
 
 		_rescanPluginMaps();
 	}
@@ -122,7 +122,7 @@ void ManageMapsDialog::onEditMap()
 		return;
 
 	nsstring mapName = items.first()->text(0).toStdString();
-	NSScene * map = nsengine.active()->resource<NSScene>(mapName);
+	NSScene * map = nsengine.active()->get<NSScene>(mapName);
 
 	mEditMapUI.mMapNameLE->setText(mapName.c_str());
 	mEditMapUI.mCreatorLE->setText(map->creator().c_str());
@@ -226,7 +226,7 @@ void ManageMapsDialog::onLoad()
 		if (item->checkState(0) == Qt::Checked)
 		{
 			nsstring mapName = item->text(0).toStdString();
-			NSScene * newmap = nsengine.active()->resource<NSScene>(mapName);
+			NSScene * newmap = nsengine.active()->get<NSScene>(mapName);
 			NSScene * curMap = nsengine.currentScene();
 
 			if (newmap == curMap)
@@ -238,7 +238,7 @@ void ManageMapsDialog::onLoad()
 			bool saveChanges = false;
 			if (curMap != NULL)
 			{
-				if (nsengine.resourceChanged(curMap))
+				if (nsengine.active()->resourceChanged(curMap))
 				{
 					QMessageBox mb(QMessageBox::Warning, "Save Current Map", "There are unsaved changes in the current map. Would you like to save before switching maps?", QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel, this);
 					int ret = mb.exec();
@@ -255,7 +255,7 @@ void ManageMapsDialog::onLoad()
 
 	NSScene * curMap = nsengine.currentScene();
 	bool saveChanges = false;
-	if (curMap != NULL && nsengine.resourceChanged(curMap))
+	if (curMap != NULL && nsengine.active()->resourceChanged(curMap))
 	{
 		QMessageBox mb(QMessageBox::Warning, "Save Current Map", "There are unsaved changes in the current map. Would you like to save before switching maps?", QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel, this);
 		int ret = mb.exec();
@@ -264,6 +264,7 @@ void ManageMapsDialog::onLoad()
 		saveChanges = (ret == QMessageBox::Yes);
 	}
 	nsengine.setCurrentScene(nullptr, false, saveChanges);
+	NSEngine * eng = &nsengine;
 }
 
 void ManageMapsDialog::onCancel()

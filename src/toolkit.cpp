@@ -23,7 +23,7 @@ This file contains all of the neccessary definitions for the Toolkit class.
 #include <qspinbox.h>
 #include <qcheckbox.h>
 #include <qdir.h>
-#include <nsinputmanager.h>
+#include <nsinputmapmanager.h>
 #include <nsglobal.h>
 #include <addnewbrushdialog.h>
 #include <qmenu.h>
@@ -90,7 +90,7 @@ void Toolkit::loadPluginFiles(const QDir & startingDir)
 		foreach(QFileInfo info, startingDir.entryInfoList(QDir::NoDotAndDotDot | QDir::Files | QDir::AllDirs))
 		{
 			if (info.isFile())
-				nsengine.loadPlugin(info.absoluteFilePath().toStdString(), false);
+				nsengine.loadPlugin(info.absoluteFilePath().toStdString());
 			if (info.isDir())
 				loadPluginFiles(info.dir());
 		}
@@ -525,7 +525,7 @@ void Toolkit::onSave()
 	if (!mUI.actionSelect->isChecked())
 		nsengine.system<NSBuildSystem>()->enable(false, fvec2());
 	
-	nsengine.save(nsengine.active());
+	nsengine.savePlugin(nsengine.active(), true);
 
 	if (!mUI.actionSelect->isChecked())
 	{

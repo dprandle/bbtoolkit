@@ -45,7 +45,7 @@ void NewMapDialog::onChooseSkybox()
 		auto entiter = plg->manager<NSEntityManager>()->begin();
 		while (entiter != plg->manager<NSEntityManager>()->end())
 		{
-			NSEntity * curent = plg->resource<NSEntity>(entiter->first);
+			NSEntity * curent = plg->get<NSEntity>(entiter->first);
 			NSRenderComp * rc = curent->get<NSRenderComp>();
 			if (rc != NULL)
 			{
@@ -53,7 +53,7 @@ void NewMapDialog::onChooseSkybox()
 				if (mat != NULL)
 				{
 					NSTexture * cm = nsengine.resource<NSTexture>(mat->mapTextureID(NSMaterial::Diffuse));
-					if (cm != NULL && cm->typeString() == NSTexCubeMap::getTypeString())
+					if (cm != NULL && type_to_hash(*cm) == type_to_hash(NSTexCubeMap))
 					{
 						QListWidgetItem * item = new QListWidgetItem(curent->name().c_str());
 						item->setData(VIEW_WIDGET_ITEM_PLUG, curent->plugid());
@@ -98,7 +98,7 @@ void NewMapDialog::onChooseTile()
 		auto entiter = plg->manager<NSEntityManager>()->begin();
 		while (entiter != plg->manager<NSEntityManager>()->end())
 		{
-			NSEntity * curent = plg->resource<NSEntity>(entiter->first);
+			NSEntity * curent = plg->get<NSEntity>(entiter->first);
 			if (curent->has<NSTileComp>())
 			{
 				QListWidgetItem * item = new QListWidgetItem(curent->name().c_str());
@@ -167,7 +167,7 @@ void NewMapDialog::onChooseCamera()
 		auto entiter = plg->manager<NSEntityManager>()->begin();
 		while (entiter != plg->manager<NSEntityManager>()->end())
 		{
-			NSEntity * curent = plg->resource<NSEntity>(entiter->first);
+			NSEntity * curent = plg->get<NSEntity>(entiter->first);
 			if (curent->has<NSCamComp>())
 			{
 				QListWidgetItem * item = new QListWidgetItem(curent->name().c_str());
@@ -217,7 +217,7 @@ void NewMapDialog::onChooseDirlight()
 		auto entiter = plg->manager<NSEntityManager>()->begin();
 		while (entiter != plg->manager<NSEntityManager>()->end())
 		{
-			NSEntity * curent = plg->resource<NSEntity>(entiter->first);
+			NSEntity * curent = plg->get<NSEntity>(entiter->first);
 			NSLightComp * lc = curent->get<NSLightComp>();
 			if (lc != NULL && lc->type() == NSLightComp::Directional)
 			{

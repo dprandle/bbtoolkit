@@ -19,7 +19,7 @@ This file contains all of the neccessary definitions for the MapView class.
 #include <nsengine.h>
 #include <nsshader.h>
 #include <nsshadermanager.h>
-#include <nsinputmanager.h>
+#include <nsinputmapmanager.h>
 #include <qmessagebox.h>
 #include <nstexmanager.h>
 #include <nsshadermanager.h>
@@ -49,7 +49,7 @@ Preview::~Preview()
 	if (nsengine.makeCurrent(mEngineContextID))
 	{
 		nsengine.shutdown();
-		nsengine.delContext(mEngineContextID);
+		nsengine.destroyContext(mEngineContextID);
 	}
 }
 

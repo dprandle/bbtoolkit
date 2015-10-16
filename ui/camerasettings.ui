@@ -1,0 +1,304 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>CameraSettingsDialog</class>
+ <widget class="QDialog" name="CameraSettingsDialog">
+  <property name="windowModality">
+   <enum>Qt::NonModal</enum>
+  </property>
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>332</width>
+    <height>271</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Camera Settings</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">QGroupBox {
+border: 1px solid rgb(100,100,100);
+border-radius: 5px;
+margin-top: 2ex;
+}
+
+QGroupBox::title {
+subcontrol-origin: margin;
+left: 10px;
+}</string>
+  </property>
+  <property name="modal">
+   <bool>false</bool>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout_4">
+   <item>
+    <widget class="QGroupBox" name="groupBox">
+     <property name="title">
+      <string>Sensitivity</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout">
+      <item>
+       <layout class="QFormLayout" name="formLayout_3">
+        <item row="0" column="0">
+         <widget class="QLabel" name="label">
+          <property name="text">
+           <string>Turning</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QSlider" name="mTurnSldr">
+          <property name="maximum">
+           <number>200</number>
+          </property>
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="tickPosition">
+           <enum>QSlider::NoTicks</enum>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QLabel" name="label_2">
+          <property name="text">
+           <string>Moving</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <widget class="QSlider" name="mMoveSldr">
+          <property name="maximum">
+           <number>200</number>
+          </property>
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="groupBox_2">
+     <property name="title">
+      <string>Camera Center</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_2">
+      <item>
+       <layout class="QFormLayout" name="formLayout">
+        <item row="0" column="0">
+         <widget class="QLabel" name="label_5">
+          <property name="text">
+           <string>Y Axis</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QComboBox" name="mCamCenterYCmB">
+          <item>
+           <property name="text">
+            <string>Not Inverted</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Inverted</string>
+           </property>
+          </item>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QLabel" name="label_6">
+          <property name="text">
+           <string>X Axis</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <widget class="QComboBox" name="mCamCenterXCmB">
+          <item>
+           <property name="text">
+            <string>Not Inverted</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Inverted</string>
+           </property>
+          </item>
+         </widget>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="groupBox_3">
+     <property name="title">
+      <string>Object Center</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_3">
+      <item>
+       <layout class="QFormLayout" name="formLayout_2">
+        <item row="0" column="0">
+         <widget class="QLabel" name="label_3">
+          <property name="text">
+           <string>Y Axis</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QComboBox" name="mObjCenterYCmB">
+          <item>
+           <property name="text">
+            <string>Not Inverted</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Inverted</string>
+           </property>
+          </item>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QLabel" name="label_4">
+          <property name="text">
+           <string>X Axis</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <widget class="QComboBox" name="mObjCenterXCmB">
+          <item>
+           <property name="text">
+            <string>Not Inverted</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Inverted</string>
+           </property>
+          </item>
+         </widget>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>mTurnSldr</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>CameraSettingsDialog</receiver>
+   <slot>onTurnChange(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>79</x>
+     <y>41</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>111</x>
+     <y>2</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>mMoveSldr</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>CameraSettingsDialog</receiver>
+   <slot>onMoveChange(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>235</x>
+     <y>74</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>323</x>
+     <y>97</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>mCamCenterYCmB</sender>
+   <signal>currentIndexChanged(QString)</signal>
+   <receiver>CameraSettingsDialog</receiver>
+   <slot>onCamCenterYCB(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>123</x>
+     <y>127</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>324</x>
+     <y>184</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>mCamCenterXCmB</sender>
+   <signal>currentIndexChanged(QString)</signal>
+   <receiver>CameraSettingsDialog</receiver>
+   <slot>onCamCenterXCB(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>281</x>
+     <y>155</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>8</x>
+     <y>181</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>mObjCenterYCmB</sender>
+   <signal>currentIndexChanged(QString)</signal>
+   <receiver>CameraSettingsDialog</receiver>
+   <slot>onObjCenterYCB(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>176</x>
+     <y>223</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>325</x>
+     <y>254</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>mObjCenterXCmB</sender>
+   <signal>currentTextChanged(QString)</signal>
+   <receiver>CameraSettingsDialog</receiver>
+   <slot>onObjCenterXCB(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>84</x>
+     <y>237</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>56</x>
+     <y>266</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>onCamCenterXCB(QString)</slot>
+  <slot>onCamCenterYCB(QString)</slot>
+  <slot>onObjCenterXCB(QString)</slot>
+  <slot>onObjCenterYCB(QString)</slot>
+  <slot>onTurnChange(int)</slot>
+  <slot>onMoveChange(int)</slot>
+ </slots>
+</ui>

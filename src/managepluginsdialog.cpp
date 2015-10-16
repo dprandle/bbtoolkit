@@ -172,7 +172,7 @@ void ManagePluginsDialog::onOkay()
 	if (mInitialActive != mUI.mActivePluginLbl->text())
 	{
 		NSScene * curScene = nsengine.currentScene();
-		if (plugs->active() != NULL && nsengine.resourceChanged(plugs->active()))
+		if (plugs->active() != NULL && nsengine.active()->resourceChanged(curScene))
 		{
 			int ans;
 			QMessageBox mb(QMessageBox::Warning, "Plugin Changes", "There are unsaved changes to the active plugin - would you like to save or discard these changes?", QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel, this);
@@ -354,7 +354,7 @@ void ManagePluginsDialog::onNewPluginAccept()
 		{
 			QMessageBox mb(QMessageBox::Warning, "Map Name Error", "There is already a map \"" + QString(sceneName.c_str()) + "\". Please use a different map name.", QMessageBox::NoButton, this);
 			mb.exec();
-			nsengine.unloadPlugin(plug);
+			nsengine.destroyPlugin(plug);
 			nsengine.setActive(nullptr);
 			return;
 		}
@@ -364,7 +364,7 @@ void ManagePluginsDialog::onNewPluginAccept()
 		{
 			QMessageBox mb(QMessageBox::Warning, "Map Error", "There was an error in creating map \"" + QString(sceneName.c_str()) + "\". You will have to make a new map.", QMessageBox::NoButton, this);
 			mb.exec();
-			nsengine.unloadPlugin(plug);
+			nsengine.destroyPlugin(plug);
 			nsengine.setActive(nullptr);
 		}
 
@@ -593,7 +593,7 @@ void ManagePluginsDialog::onDeletePlugin()
 	}
 	else if (ret == QMessageBox::No)
 	{
-		nsengine.unloadPlugin(plug);
+		nsengine.destroyPlugin(plug);
 		addPluginsToTreeWidget();
 	}
 	else

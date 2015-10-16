@@ -22,7 +22,8 @@ NewResourceDialog::NewResourceDialog(QWidget * parent):
 	mUI.setupUi(this);
 	mUI.mPropertiesGB->setLayout(gbLayout);
 	// Here we should add all of the resource manager widgets
-	mResWidgets[NSMaterial::getManagerTypeString()] = new MaterialWidget(this);
+	nsstring rm = type_to_guid(NSMatManager);
+	mResWidgets[rm] = new MaterialWidget(this);
 }
 
 NewResourceDialog::~NewResourceDialog()
@@ -96,6 +97,6 @@ void NewResourceDialog::onCancel()
 	NSResource * res = mCurrentResWidget->resource();
 	mCurrentResWidget->setResource(NULL);
 	mCurrentResWidget = NULL;
-
-	nsengine.delResource(res);
+	NSPlugin * plg = nsengine.plugin(res->plugid());
+	plg->destroy(res);
 }

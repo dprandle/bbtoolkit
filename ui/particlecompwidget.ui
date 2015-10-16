@@ -1,0 +1,1409 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>ParticleCompWidget</class>
+ <widget class="QWidget" name="ParticleCompWidget">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>468</width>
+    <height>694</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Particle Component</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout_2">
+   <item>
+    <widget class="QScrollArea" name="scrollArea">
+     <property name="widgetResizable">
+      <bool>true</bool>
+     </property>
+     <widget class="QWidget" name="scrollAreaWidgetContents">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>431</width>
+        <height>678</height>
+       </rect>
+      </property>
+      <layout class="QVBoxLayout" name="verticalLayout">
+       <item>
+        <layout class="QFormLayout" name="formLayout">
+         <property name="fieldGrowthPolicy">
+          <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+         </property>
+         <item row="0" column="0">
+          <widget class="QLabel" name="label">
+           <property name="text">
+            <string>Material</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <layout class="QHBoxLayout" name="horizontalLayout_5">
+           <item>
+            <widget class="QLineEdit" name="mMaterialLE">
+             <property name="readOnly">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QToolButton" name="mMaterialBtn">
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>0</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>25</width>
+               <height>16777215</height>
+              </size>
+             </property>
+             <property name="text">
+              <string>...</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item row="1" column="0">
+          <widget class="QLabel" name="label_2">
+           <property name="text">
+            <string>Shader</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <layout class="QHBoxLayout" name="horizontalLayout_4">
+           <item>
+            <widget class="QLineEdit" name="mShaderLE">
+             <property name="readOnly">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QToolButton" name="mShaderBtn">
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>0</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>25</width>
+               <height>16777215</height>
+              </size>
+             </property>
+             <property name="text">
+              <string>...</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item row="2" column="0">
+          <widget class="QLabel" name="label_6">
+           <property name="text">
+            <string>Random Texture</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="1">
+          <layout class="QHBoxLayout" name="horizontalLayout_3">
+           <item>
+            <widget class="QLineEdit" name="mRandTexLE">
+             <property name="readOnly">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QToolButton" name="mRandTexBtn">
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>0</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>25</width>
+               <height>16777215</height>
+              </size>
+             </property>
+             <property name="text">
+              <string>...</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item row="4" column="0">
+          <widget class="QLabel" name="label_15">
+           <property name="text">
+            <string>Emitter Shape</string>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="1">
+          <widget class="QComboBox" name="mEmitComb">
+           <item>
+            <property name="text">
+             <string>Cube</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Ellipse</string>
+            </property>
+           </item>
+          </widget>
+         </item>
+         <item row="5" column="0">
+          <widget class="QLabel" name="label_16">
+           <property name="text">
+            <string>Emitter Size</string>
+           </property>
+          </widget>
+         </item>
+         <item row="5" column="1">
+          <layout class="QHBoxLayout" name="horizontalLayout_13">
+           <item>
+            <spacer name="horizontalSpacer_3">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item>
+            <widget class="QLabel" name="label_17">
+             <property name="text">
+              <string>x</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QDoubleSpinBox" name="mEmitXDSB"/>
+           </item>
+           <item>
+            <widget class="QLabel" name="label_18">
+             <property name="text">
+              <string>y</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QDoubleSpinBox" name="mEmitYDSB"/>
+           </item>
+           <item>
+            <widget class="QLabel" name="label_23">
+             <property name="text">
+              <string>z</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QDoubleSpinBox" name="mEmitZDSB"/>
+           </item>
+          </layout>
+         </item>
+         <item row="6" column="0">
+          <widget class="QLabel" name="label_19">
+           <property name="text">
+            <string>Init Velocity Mult</string>
+           </property>
+          </widget>
+         </item>
+         <item row="6" column="1">
+          <layout class="QHBoxLayout" name="horizontalLayout_15">
+           <item>
+            <spacer name="horizontalSpacer_5">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item>
+            <widget class="QLabel" name="label_20">
+             <property name="text">
+              <string>x</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QDoubleSpinBox" name="mInitVelXDSB"/>
+           </item>
+           <item>
+            <widget class="QLabel" name="label_21">
+             <property name="text">
+              <string>y</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QDoubleSpinBox" name="mInitVelYDSB"/>
+           </item>
+           <item>
+            <widget class="QLabel" name="label_22">
+             <property name="text">
+              <string>z</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QDoubleSpinBox" name="mInitVelZDSB"/>
+           </item>
+          </layout>
+         </item>
+         <item row="7" column="0">
+          <widget class="QLabel" name="label_3">
+           <property name="text">
+            <string>Max Particles</string>
+           </property>
+          </widget>
+         </item>
+         <item row="7" column="1">
+          <widget class="QSpinBox" name="mMaxParticlesSB">
+           <property name="maximum">
+            <number>100000000</number>
+           </property>
+          </widget>
+         </item>
+         <item row="8" column="0">
+          <widget class="QLabel" name="label_5">
+           <property name="text">
+            <string>Emission Rate</string>
+           </property>
+          </widget>
+         </item>
+         <item row="8" column="1">
+          <widget class="QSpinBox" name="mEmissionSB">
+           <property name="maximum">
+            <number>100000</number>
+           </property>
+          </widget>
+         </item>
+         <item row="9" column="0">
+          <widget class="QLabel" name="label_13">
+           <property name="text">
+            <string>Angular Velocity</string>
+           </property>
+          </widget>
+         </item>
+         <item row="9" column="1">
+          <widget class="QSpinBox" name="mAngVelSB">
+           <property name="maximum">
+            <number>36000</number>
+           </property>
+           <property name="displayIntegerBase">
+            <number>10</number>
+           </property>
+          </widget>
+         </item>
+         <item row="10" column="0">
+          <widget class="QLabel" name="label_4">
+           <property name="text">
+            <string>Lifetime</string>
+           </property>
+          </widget>
+         </item>
+         <item row="10" column="1">
+          <widget class="QDoubleSpinBox" name="mLifetimeDSB">
+           <property name="maximum">
+            <double>100000.000000000000000</double>
+           </property>
+           <property name="singleStep">
+            <double>0.100000000000000</double>
+           </property>
+          </widget>
+         </item>
+         <item row="11" column="0">
+          <widget class="QLabel" name="label_10">
+           <property name="text">
+            <string>Starting Size</string>
+           </property>
+          </widget>
+         </item>
+         <item row="11" column="1">
+          <layout class="QHBoxLayout" name="horizontalLayout_6">
+           <item>
+            <spacer name="horizontalSpacer_8">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item>
+            <widget class="QLabel" name="label_11">
+             <property name="text">
+              <string>height</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QDoubleSpinBox" name="mStartHeightDSB">
+             <property name="maximum">
+              <double>1000.000000000000000</double>
+             </property>
+             <property name="singleStep">
+              <double>0.100000000000000</double>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="label_12">
+             <property name="text">
+              <string>width</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QDoubleSpinBox" name="mStartWidthDSB">
+             <property name="maximum">
+              <double>1000.000000000000000</double>
+             </property>
+             <property name="singleStep">
+              <double>0.100000000000000</double>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item row="12" column="0">
+          <widget class="QLabel" name="label_7">
+           <property name="text">
+            <string>Loop</string>
+           </property>
+          </widget>
+         </item>
+         <item row="12" column="1">
+          <layout class="QHBoxLayout" name="horizontalLayout">
+           <item>
+            <spacer name="horizontalSpacer">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item>
+            <widget class="QCheckBox" name="mLoopCB">
+             <property name="text">
+              <string/>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item row="13" column="0">
+          <widget class="QLabel" name="label_8">
+           <property name="text">
+            <string>Simulate</string>
+           </property>
+          </widget>
+         </item>
+         <item row="13" column="1">
+          <layout class="QHBoxLayout" name="horizontalLayout_2">
+           <item>
+            <spacer name="horizontalSpacer_2">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item>
+            <widget class="QCheckBox" name="mSimCB">
+             <property name="text">
+              <string/>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item row="3" column="0">
+          <widget class="QLabel" name="label_24">
+           <property name="text">
+            <string>Blend Mode</string>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="1">
+          <widget class="QComboBox" name="mBlendComb">
+           <item>
+            <property name="text">
+             <string>Source Alpha</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Additive</string>
+            </property>
+           </item>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_9">
+         <item>
+          <layout class="QFormLayout" name="formLayout_2">
+           <item row="0" column="1">
+            <widget class="QComboBox" name="mMotionComb">
+             <item>
+              <property name="text">
+               <string>Velocity</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Acceleration</string>
+              </property>
+             </item>
+            </widget>
+           </item>
+           <item row="0" column="0">
+            <widget class="QLabel" name="label_9">
+             <property name="text">
+              <string>Motion Keyframes</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_12">
+         <item>
+          <widget class="QTableWidget" name="mForceTblW">
+           <property name="maximumSize">
+            <size>
+             <width>282</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="frameShadow">
+            <enum>QFrame::Raised</enum>
+           </property>
+           <property name="lineWidth">
+            <number>1</number>
+           </property>
+           <property name="sizeAdjustPolicy">
+            <enum>QAbstractScrollArea::AdjustIgnored</enum>
+           </property>
+           <property name="alternatingRowColors">
+            <bool>false</bool>
+           </property>
+           <property name="selectionMode">
+            <enum>QAbstractItemView::SingleSelection</enum>
+           </property>
+           <property name="selectionBehavior">
+            <enum>QAbstractItemView::SelectRows</enum>
+           </property>
+           <property name="gridStyle">
+            <enum>Qt::SolidLine</enum>
+           </property>
+           <property name="sortingEnabled">
+            <bool>false</bool>
+           </property>
+           <property name="cornerButtonEnabled">
+            <bool>false</bool>
+           </property>
+           <attribute name="horizontalHeaderVisible">
+            <bool>true</bool>
+           </attribute>
+           <attribute name="horizontalHeaderDefaultSectionSize">
+            <number>70</number>
+           </attribute>
+           <attribute name="horizontalHeaderMinimumSectionSize">
+            <number>15</number>
+           </attribute>
+           <attribute name="verticalHeaderVisible">
+            <bool>false</bool>
+           </attribute>
+           <attribute name="verticalHeaderDefaultSectionSize">
+            <number>20</number>
+           </attribute>
+           <row>
+            <property name="text">
+             <string>0</string>
+            </property>
+           </row>
+           <row>
+            <property name="text">
+             <string>1</string>
+            </property>
+           </row>
+           <column>
+            <property name="text">
+             <string>time</string>
+            </property>
+           </column>
+           <column>
+            <property name="text">
+             <string>x</string>
+            </property>
+           </column>
+           <column>
+            <property name="text">
+             <string>y</string>
+            </property>
+           </column>
+           <column>
+            <property name="text">
+             <string>z</string>
+            </property>
+           </column>
+           <item row="0" column="0">
+            <property name="text">
+             <string>0.00</string>
+            </property>
+            <property name="flags">
+             <set>ItemIsSelectable|ItemIsEditable|ItemIsDragEnabled|ItemIsUserCheckable|ItemIsEnabled</set>
+            </property>
+           </item>
+           <item row="0" column="1">
+            <property name="text">
+             <string>0.00</string>
+            </property>
+           </item>
+           <item row="0" column="2">
+            <property name="text">
+             <string>0.00</string>
+            </property>
+           </item>
+           <item row="0" column="3">
+            <property name="text">
+             <string>0.00</string>
+            </property>
+           </item>
+           <item row="1" column="0">
+            <property name="text">
+             <string>1.00</string>
+            </property>
+           </item>
+           <item row="1" column="1">
+            <property name="text">
+             <string>0.00</string>
+            </property>
+           </item>
+           <item row="1" column="2">
+            <property name="text">
+             <string>0.00</string>
+            </property>
+           </item>
+           <item row="1" column="3">
+            <property name="text">
+             <string>0.00</string>
+            </property>
+           </item>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_8">
+         <item>
+          <widget class="QCheckBox" name="mInterpMotionCB">
+           <property name="layoutDirection">
+            <enum>Qt::LeftToRight</enum>
+           </property>
+           <property name="text">
+            <string>Interpolate</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QCheckBox" name="mGlobalTimeCB">
+           <property name="layoutDirection">
+            <enum>Qt::LeftToRight</enum>
+           </property>
+           <property name="text">
+            <string>Global time scale</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer_4">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QToolButton" name="mForcesDelBtn">
+           <property name="text">
+            <string>...</string>
+           </property>
+           <property name="icon">
+            <iconset resource="toolkit.qrc">
+             <normaloff>:/VecTB/icons/toolbars/Delete.png</normaloff>:/VecTB/icons/toolbars/Delete.png</iconset>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QToolButton" name="mForcesAddBtn">
+           <property name="text">
+            <string>...</string>
+           </property>
+           <property name="icon">
+            <iconset resource="toolkit.qrc">
+             <normaloff>:/VecTB/icons/toolbars/New_Map.png</normaloff>:/VecTB/icons/toolbars/New_Map.png</iconset>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_14"/>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_10">
+         <item>
+          <widget class="QLabel" name="label_14">
+           <property name="text">
+            <string>Visual Keyframes</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer_7">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_11">
+         <item>
+          <widget class="QTableWidget" name="mKeyframeTblW">
+           <property name="maximumSize">
+            <size>
+             <width>282</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="frameShadow">
+            <enum>QFrame::Raised</enum>
+           </property>
+           <property name="sizeAdjustPolicy">
+            <enum>QAbstractScrollArea::AdjustIgnored</enum>
+           </property>
+           <property name="selectionMode">
+            <enum>QAbstractItemView::SingleSelection</enum>
+           </property>
+           <property name="selectionBehavior">
+            <enum>QAbstractItemView::SelectRows</enum>
+           </property>
+           <property name="sortingEnabled">
+            <bool>false</bool>
+           </property>
+           <property name="cornerButtonEnabled">
+            <bool>false</bool>
+           </property>
+           <attribute name="horizontalHeaderDefaultSectionSize">
+            <number>70</number>
+           </attribute>
+           <attribute name="verticalHeaderVisible">
+            <bool>false</bool>
+           </attribute>
+           <attribute name="verticalHeaderDefaultSectionSize">
+            <number>20</number>
+           </attribute>
+           <row>
+            <property name="text">
+             <string>0</string>
+            </property>
+           </row>
+           <row>
+            <property name="text">
+             <string>1</string>
+            </property>
+           </row>
+           <column>
+            <property name="text">
+             <string>time</string>
+            </property>
+           </column>
+           <column>
+            <property name="text">
+             <string>scale length</string>
+            </property>
+           </column>
+           <column>
+            <property name="text">
+             <string>scale width</string>
+            </property>
+           </column>
+           <column>
+            <property name="text">
+             <string>alpha</string>
+            </property>
+           </column>
+           <item row="0" column="0">
+            <property name="text">
+             <string>0.00</string>
+            </property>
+           </item>
+           <item row="0" column="1">
+            <property name="text">
+             <string>1.00</string>
+            </property>
+           </item>
+           <item row="0" column="2">
+            <property name="text">
+             <string>0.00</string>
+            </property>
+           </item>
+           <item row="0" column="3">
+            <property name="text">
+             <string>1.00</string>
+            </property>
+           </item>
+           <item row="1" column="0">
+            <property name="text">
+             <string>1.00</string>
+            </property>
+           </item>
+           <item row="1" column="1">
+            <property name="text">
+             <string>1.00</string>
+            </property>
+           </item>
+           <item row="1" column="2">
+            <property name="text">
+             <string>1.00</string>
+            </property>
+           </item>
+           <item row="1" column="3">
+            <property name="text">
+             <string>1.00</string>
+            </property>
+           </item>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_7">
+         <item>
+          <widget class="QCheckBox" name="mInterpolateVisualCB">
+           <property name="text">
+            <string>Interpolate</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QCheckBox" name="mGlobalTimeVisualCB">
+           <property name="text">
+            <string>Global time scale</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer_6">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QToolButton" name="mKeyDelBtn">
+           <property name="text">
+            <string>...</string>
+           </property>
+           <property name="icon">
+            <iconset resource="toolkit.qrc">
+             <normaloff>:/VecTB/icons/toolbars/Delete.png</normaloff>:/VecTB/icons/toolbars/Delete.png</iconset>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QToolButton" name="mKeyAddBtn">
+           <property name="text">
+            <string>...</string>
+           </property>
+           <property name="icon">
+            <iconset resource="toolkit.qrc">
+             <normaloff>:/VecTB/icons/toolbars/New_Map.png</normaloff>:/VecTB/icons/toolbars/New_Map.png</iconset>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources>
+  <include location="toolkit.qrc"/>
+ </resources>
+ <connections>
+  <connection>
+   <sender>mLoopCB</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>ParticleCompWidget</receiver>
+   <slot>onToggleLoop(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>429</x>
+     <y>360</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>341</x>
+     <y>307</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>mSimCB</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>ParticleCompWidget</receiver>
+   <slot>onToggleSim(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>429</x>
+     <y>388</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>341</x>
+     <y>299</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>mForcesDelBtn</sender>
+   <signal>pressed()</signal>
+   <receiver>ParticleCompWidget</receiver>
+   <slot>onDelForce()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>401</x>
+     <y>532</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>341</x>
+     <y>315</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>mForcesAddBtn</sender>
+   <signal>pressed()</signal>
+   <receiver>ParticleCompWidget</receiver>
+   <slot>onAddForce()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>430</x>
+     <y>532</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>341</x>
+     <y>315</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>mKeyDelBtn</sender>
+   <signal>pressed()</signal>
+   <receiver>ParticleCompWidget</receiver>
+   <slot>onDelKeyframe()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>401</x>
+     <y>677</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>341</x>
+     <y>315</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>mKeyAddBtn</sender>
+   <signal>pressed()</signal>
+   <receiver>ParticleCompWidget</receiver>
+   <slot>onAddKeyframe()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>430</x>
+     <y>677</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>341</x>
+     <y>315</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>mForceTblW</sender>
+   <signal>itemChanged(QTableWidgetItem*)</signal>
+   <receiver>ParticleCompWidget</receiver>
+   <slot>onForceItemChange(QTableWidgetItem*)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>361</x>
+     <y>460</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>0</x>
+     <y>315</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>mKeyframeTblW</sender>
+   <signal>itemChanged(QTableWidgetItem*)</signal>
+   <receiver>ParticleCompWidget</receiver>
+   <slot>onKeyframeItemChange(QTableWidgetItem*)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>361</x>
+     <y>647</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>85</x>
+     <y>315</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>mMaterialBtn</sender>
+   <signal>pressed()</signal>
+   <receiver>ParticleCompWidget</receiver>
+   <slot>onChooseMat()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>429</x>
+     <y>39</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>339</x>
+     <y>12</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>mShaderBtn</sender>
+   <signal>pressed()</signal>
+   <receiver>ParticleCompWidget</receiver>
+   <slot>onChooseShader()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>429</x>
+     <y>67</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>346</x>
+     <y>60</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>mRandTexBtn</sender>
+   <signal>pressed()</signal>
+   <receiver>ParticleCompWidget</receiver>
+   <slot>onChooseRandTex()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>429</x>
+     <y>95</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>343</x>
+     <y>99</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>mStartHeightDSB</sender>
+   <signal>editingFinished()</signal>
+   <receiver>ParticleCompWidget</receiver>
+   <slot>onChangeStartHeight()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>326</x>
+     <y>336</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>0</x>
+     <y>404</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>mStartWidthDSB</sender>
+   <signal>editingFinished()</signal>
+   <receiver>ParticleCompWidget</receiver>
+   <slot>onChangeStartWidth()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>429</x>
+     <y>336</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>0</x>
+     <y>470</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>mLifetimeDSB</sender>
+   <signal>editingFinished()</signal>
+   <receiver>ParticleCompWidget</receiver>
+   <slot>onChangeLifetime()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>216</x>
+     <y>309</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>0</x>
+     <y>263</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>mAngVelSB</sender>
+   <signal>editingFinished()</signal>
+   <receiver>ParticleCompWidget</receiver>
+   <slot>onChangeAngVel()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>238</x>
+     <y>283</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>0</x>
+     <y>241</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>mEmissionSB</sender>
+   <signal>editingFinished()</signal>
+   <receiver>ParticleCompWidget</receiver>
+   <slot>onChangeEmissionRate()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>229</x>
+     <y>257</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>0</x>
+     <y>220</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>mMaxParticlesSB</sender>
+   <signal>editingFinished()</signal>
+   <receiver>ParticleCompWidget</receiver>
+   <slot>onChangeMaxParticle()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>213</x>
+     <y>231</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>0</x>
+     <y>185</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>mInterpMotionCB</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>ParticleCompWidget</receiver>
+   <slot>onToggleInterpolate(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>96</x>
+     <y>529</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>0</x>
+     <y>537</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>mGlobalTimeCB</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>ParticleCompWidget</receiver>
+   <slot>onToggleGlobalTime(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>204</x>
+     <y>529</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>0</x>
+     <y>517</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>mMotionComb</sender>
+   <signal>currentIndexChanged(int)</signal>
+   <receiver>ParticleCompWidget</receiver>
+   <slot>onChangeMotionType(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>225</x>
+     <y>417</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>0</x>
+     <y>369</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>mInterpolateVisualCB</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>ParticleCompWidget</receiver>
+   <slot>onToggleInterpolateVisual(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>60</x>
+     <y>674</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>0</x>
+     <y>670</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>mGlobalTimeVisualCB</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>ParticleCompWidget</receiver>
+   <slot>onToggleGlobalTimeVisual(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>204</x>
+     <y>674</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>0</x>
+     <y>612</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>mInitVelZDSB</sender>
+   <signal>editingFinished()</signal>
+   <receiver>ParticleCompWidget</receiver>
+   <slot>onChangeInitVel()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>429</x>
+     <y>204</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>467</x>
+     <y>153</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>mInitVelYDSB</sender>
+   <signal>editingFinished()</signal>
+   <receiver>ParticleCompWidget</receiver>
+   <slot>onChangeInitVel()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>359</x>
+     <y>204</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>467</x>
+     <y>207</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>mInitVelXDSB</sender>
+   <signal>editingFinished()</signal>
+   <receiver>ParticleCompWidget</receiver>
+   <slot>onChangeInitVel()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>288</x>
+     <y>204</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>466</x>
+     <y>251</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>mEmitZDSB</sender>
+   <signal>editingFinished()</signal>
+   <receiver>ParticleCompWidget</receiver>
+   <slot>onChangeEmitterSize()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>429</x>
+     <y>176</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>467</x>
+     <y>121</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>mEmitYDSB</sender>
+   <signal>editingFinished()</signal>
+   <receiver>ParticleCompWidget</receiver>
+   <slot>onChangeEmitterSize()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>359</x>
+     <y>176</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>467</x>
+     <y>99</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>mEmitXDSB</sender>
+   <signal>editingFinished()</signal>
+   <receiver>ParticleCompWidget</receiver>
+   <slot>onChangeEmitterSize()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>288</x>
+     <y>176</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>467</x>
+     <y>86</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>mEmitComb</sender>
+   <signal>currentIndexChanged(int)</signal>
+   <receiver>ParticleCompWidget</receiver>
+   <slot>onChangeEmitterShape(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>236</x>
+     <y>149</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>0</x>
+     <y>120</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>mBlendComb</sender>
+   <signal>currentIndexChanged(int)</signal>
+   <receiver>ParticleCompWidget</receiver>
+   <slot>onChangeBlendMode(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>125</x>
+     <y>111</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>3</x>
+     <y>103</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>onChooseMat()</slot>
+  <slot>onChooseShader()</slot>
+  <slot>onChooseRandTex()</slot>
+  <slot>onChangeMaxParticle()</slot>
+  <slot>onChangeEmissionRate()</slot>
+  <slot>onChangeAngVel()</slot>
+  <slot>onChangeLifetime()</slot>
+  <slot>onChangeStartHeight()</slot>
+  <slot>onChangeStartWidth()</slot>
+  <slot>onToggleLoop(bool)</slot>
+  <slot>onToggleSim(bool)</slot>
+  <slot>onAddForce()</slot>
+  <slot>onDelForce()</slot>
+  <slot>onAddKeyframe()</slot>
+  <slot>onDelKeyframe()</slot>
+  <slot>onForceItemChange(QTableWidgetItem*)</slot>
+  <slot>onKeyframeItemChange(QTableWidgetItem*)</slot>
+  <slot>onChangeEmitterShape(int)</slot>
+  <slot>onChangeEmitterSize()</slot>
+  <slot>onChangeMotionType(int)</slot>
+  <slot>onToggleInterpolate(bool)</slot>
+  <slot>onToggleGlobalTime(bool)</slot>
+  <slot>onToggleInterpolateVisual(bool)</slot>
+  <slot>onToggleGlobalTimeVisual(bool)</slot>
+  <slot>onChangeInitVel()</slot>
+  <slot>onChangeBlendMode(int)</slot>
+ </slots>
+</ui>

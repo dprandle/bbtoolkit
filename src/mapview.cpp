@@ -22,7 +22,7 @@ This file contains all of the neccessary definitions for the MapView class.
 #include <camerasettingsdialog.h>
 #include <nsmeshmanager.h>
 #include <nsanimmanager.h>
-#include <nsinputmanager.h>
+#include <nsinputmapmanager.h>
 #include <nsbuildsystem.h>
 #include <nsoccupycomp.h>
 #include <nstilecomp.h>
