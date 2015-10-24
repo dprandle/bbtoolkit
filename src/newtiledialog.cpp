@@ -1,29 +1,27 @@
-#include <newtiledialog.h>
 #include <nsengine.h>
-#include <qfiledialog.h>
-#include <nsentitymanager.h>
-#include <nstilecomp.h>
-#include <nsoccupycomp.h>
-#include <nsinputcomp.h>
-#include <nsselcomp.h>
+#include <nsentity_manager.h>
+#include <nstile_comp.h>
+#include <nsoccupy_comp.h>
+#include <nssel_comp.h>
 #include <nsmaterial.h>
-#include <qmessagebox.h>
-#include <nsmatmanager.h>
-#include <nsmeshmanager.h>
-#include <nstexmanager.h>
+#include <nsmat_manager.h>
+#include <nsmesh_manager.h>
+#include <nstex_manager.h>
 #include <nstexture.h>
 #include <nsmesh.h>
+#include <nsplugin.h>
+#include <nsplugin_manager.h>
+
+#include <qfiledialog.h>
+#include <qmessagebox.h>
 #include <preview.h>
 #include <toolkit.h>
 #include <qcolordialog.h>
 #include <ui_newfilterdialog.h>
-#include <nsplugin.h>
-#include <nspluginmanager.h>
-
+#include <newtiledialog.h>
 
 NewTileDialog::NewTileDialog(QWidget * parent) :
 QDialog(parent),
-mTK(NULL),
 mTempMat(NULL),
 mGenFile(QString()),
 diffuseLoaded(false),
@@ -40,11 +38,10 @@ Initialize the dialog with some basic rendering settings for the preview window,
 creating a temporary material that is used to store the textures as they are changed.
 Upon clicking the add tile button this material is renamed to match the new tile name.
 */
-void NewTileDialog::init(Toolkit * pTK)
+void NewTileDialog::init()
 {
-	mTK = pTK;
 	mUI.setupUi(this);
-	mUI.mPreview->init(mTK);
+    mUI.mPreview->init();
 }
 
 QString NewTileDialog::getEntityName()
@@ -76,8 +73,8 @@ void NewTileDialog::onAdd()
 	//	throw(std::exception("Engine pointer is NULL"));
 
 	//// Get the materials and textures from the engine
-	//NSMatManager * mats = mEngine->getManager<NSMatManager>();
-	//NSTexManager * textures = mEngine->getManager<NSTexManager>();
+	//nsmat_manager * mats = mEngine->getManager<nsmat_manager>();
+	//nstex_manager * textures = mEngine->getManager<nstex_manager>();
 
 	//// Get the name and sub directories from the filter and name line edits
 	//nsstring name = mUI.mNameLE->text().toStdString();
@@ -115,11 +112,11 @@ void NewTileDialog::onAdd()
 	//// Alright get the basic tile mesh as stored by the engine - we are counting on this already being 
 	//// loaded - if it is not something is wrong
 	//// We might add different tile types in the future - this is where we would want to insert them.
-	//NSMesh * tileMesh = NULL;
+	//nsmesh * tileMesh = NULL;
 	//if (mUI.mTypeCB->currentText() == "Full Tile")
-	//	tileMesh = mEngine->getManager<NSMeshManager>()->get(MESH_FULL_TILE);
+	//	tileMesh = mEngine->getManager<nsmesh_manager>()->get(MESH_FULL_TILE);
 	//else
-	//	tileMesh = mEngine->getManager<NSMeshManager>()->get(MESH_HALF_TILE);
+	//	tileMesh = mEngine->getManager<nsmesh_manager>()->get(MESH_HALF_TILE);
 
 	//// As mentioned before - if the tile mesh did not load then something weird is happening.. however it would still
 	//// be good to avoid a crash
@@ -129,33 +126,33 @@ void NewTileDialog::onAdd()
 	//	mb.setText("Something has gone pretty badly wrong - we can't seem to find where the mesh for the tile is...");
 	//	mb.exec();
 	//	if (diffuseLoaded)
-	//		textures->remove(mTempMat->getMapTextureID(NSMaterial::Diffuse));
+	//		textures->remove(mTempMat->getMapTextureID(nsmaterial::Diffuse));
 	//	if (normalLoaded)
-	//		textures->remove(mTempMat->getMapTextureID(NSMaterial::Normal));
+	//		textures->remove(mTempMat->getMapTextureID(nsmaterial::Normal));
 	//	mats->remove(mTempMat->getResourceID());
 	//	return;
 	//}
 
 	//// Create the new tile entity. If this fails then throw up a message box and delete the newly created textures
 	//// (if there were textures created).
-	//NSEntity * newTile = mEngine->getManager<NSEntityManager>()->create(name);
+	//nsentity * newTile = mEngine->getManager<nsentity_manager>()->create(name);
 	//if (newTile == NULL)
 	//{
 	//	QMessageBox mb(this);
 	//	mb.setText("An object or tile already exists with that name. Please choose another name.");
 	//	mb.exec();
 	//	if (diffuseLoaded)
-	//		textures->remove(mTempMat->getMapTextureID(NSMaterial::Diffuse));
+	//		textures->remove(mTempMat->getMapTextureID(nsmaterial::Diffuse));
 	//	if (normalLoaded)
-	//		textures->remove(mTempMat->getMapTextureID(NSMaterial::Normal));
+	//		textures->remove(mTempMat->getMapTextureID(nsmaterial::Normal));
 	//	mats->remove(mTempMat->getResourceID());
 	//	return;
 	//}
 
 	//// Set the texture subdirectories if the material has textures - this may expand
 	//// in the future to include more types of texture maps
-	//NSTexture* texD = textures->get(mTempMat->getMapTextureID(NSMaterial::Diffuse));
-	//NSTexture* texN = textures->get(mTempMat->getMapTextureID(NSMaterial::Normal));
+	//nstexture* texD = textures->get(mTempMat->getMapTextureID(nsmaterial::Diffuse));
+	//nstexture* texN = textures->get(mTempMat->getMapTextureID(nsmaterial::Normal));
 
 	//if (texD != NULL)
 	//	texD->setSubDir(subDir);
@@ -170,44 +167,27 @@ void NewTileDialog::onAdd()
 	//// tile component has the movement modifier but thats really it - currently
 	//// the movement modifier field still needs to be added
 	//// The tile component however makes it so that the entity can be used as a brush
-	//NSTileComp * tileComp = newTile->createComponent<NSTileComp>();
+	//nstile_comp * tileComp = newTile->createComponent<nstile_comp>();
 
 	//// Set the rendering material and mesh ID
-	//NSRenderComp * renComp = newTile->createComponent<NSRenderComp>();
+	//nsrender_comp * renComp = newTile->createComponent<nsrender_comp>();
 	//renComp->setMaterial(0, mTempMat->getResourceID());
 	//renComp->setMeshID(tileMesh->getResourceID());
 	//renComp->setCastShadow(mUI.mCastShadowsCB->isChecked());
 
 	//// Create the selection component used for the toolkit
-	//NSSelComp * selComp = newTile->createComponent<NSSelComp>();
+	//nssel_comp * selComp = newTile->createComponent<nssel_comp>();
 
-	//// Create an input component with all the normal commands
-	//NSInputComp * inComp = newTile->createComponent<NSInputComp>();
-	//inComp->add(SELECT);
-	//inComp->add(ROTATE_X);
-	//inComp->add(ROTATE_Z);
-	//inComp->add(MULTI_SELECT);
-	//inComp->add(PAINT_SELECT);
-	//inComp->add(DRAG_OBJECT_XY);
-	//inComp->add(DRAG_OBJECT_XZ);
-	//inComp->add(DRAG_OBJECT_YZ);
-	//inComp->add(XZ_MOVE_END);
-	//inComp->add(YZ_MOVE_END);
-	//inComp->add(SHIFT_DONE);
-
-	//// If the tile has an icon give it an icon component
-	//if (!iconPath.empty())
-	//	newTile->createComponent<NSIconComp>()->setIconPath(iconPath);
 
 	//// If tile is collidable give it an occupy component
 	//if (mUI.mCollidableChk->isChecked())
 	//{
-	//	NSOccupyComp * occComp = newTile->createComponent<NSOccupyComp>();
-	//	occComp->build(mEngine->getManager<NSMeshManager>()->get(MESH_FULL_TILE)->getAABB());
+	//	nsoccupy_comp * occComp = newTile->createComponent<nsoccupy_comp>();
+	//	occComp->build(mEngine->getManager<nsmesh_manager>()->get(MESH_FULL_TILE)->getAABB());
 	//}
 
 	//// Get the active plugin and make sure that it is valid
-	//NSPlugin * activePlug = mEngine->getManager<NSPluginManager>()->getActive();
+	//nsplugin * activePlug = mEngine->getManager<nsplugin_manager>()->getActive();
 
 	//// If not valid throw up a message box
 	//if (activePlug == NULL)
@@ -218,13 +198,13 @@ void NewTileDialog::onAdd()
 	//}
 
 	//// Add all of the resources to the active plugin
-	//activePlug->addResource(NSEntityManager::getResTypeString(), newTile->getResourceID());
-	//activePlug->addResource(NSMatManager::getResTypeString(), mTempMat->getResourceID());
+	//activePlug->addResource(nsentity_manager::getResTypeString(), newTile->getResourceID());
+	//activePlug->addResource(nsmat_manager::getResTypeString(), mTempMat->getResourceID());
 	//if (texD != NULL)
-	//	activePlug->addResource(NSTexManager::getResTypeString(), mTempMat->getMapTextureID(NSMaterial::Diffuse));
+	//	activePlug->addResource(nstex_manager::getResTypeString(), mTempMat->getMapTextureID(nsmaterial::Diffuse));
 	//if (texN != NULL)
-	//	activePlug->addResource(NSTexManager::getResTypeString(), mTempMat->getMapTextureID(NSMaterial::Normal));
-	//activePlug->addResource(NSMeshManager::getResTypeString(), tileMesh->getResourceID());
+	//	activePlug->addResource(nstex_manager::getResTypeString(), mTempMat->getMapTextureID(nsmaterial::Normal));
+	//activePlug->addResource(nsmesh_manager::getResTypeString(), tileMesh->getResourceID());
 	done(Accepted);
 }
 
@@ -297,7 +277,7 @@ void NewTileDialog::onTileSizeChange(QString pText)
 
 void NewTileDialog::onDiffuseSldrChange(int pNewVal)
 {
-	//mUI.mPreview->setDiffuse(nsfloat(pNewVal / 100.0f));
+	//mUI.mPreview->setDiffuse(float(pNewVal / 100.0f));
 }
 
 void NewTileDialog::onNameEdit()
@@ -314,7 +294,7 @@ void NewTileDialog::onNameEdit()
 	//if (!subDir.isEmpty())
 	//	subDir += "/";
 
-	//QString end = QString(mEngine->getResourceDirectory().c_str()) + QString(mEngine->getManager<NSTexManager>()->getLocalDirectory().c_str()) + "Icons/" + subDir;
+	//QString end = QString(mEngine->getResourceDirectory().c_str()) + QString(mEngine->getManager<nstex_manager>()->getLocalDirectory().c_str()) + "Icons/" + subDir;
 
 	//end += mUI.mNameLE->text() + "Icon.png";
 
@@ -325,7 +305,7 @@ void NewTileDialog::onNameEdit()
 
 void NewTileDialog::onAmbientSldrChange(int pNewVal)
 {
-	//mUI.mPreview->setAmbient(nsfloat(pNewVal / 100.0f));
+	//mUI.mPreview->setAmbient(float(pNewVal / 100.0f));
 }
 
 void NewTileDialog::onPreviewDefaults()
@@ -344,34 +324,34 @@ void NewTileDialog::onPreviewDefaults()
 
 void NewTileDialog::onNormLEEdit(QString pNewText)
 {
-	//NSTexManager * texManager = mEngine->getManager<NSTexManager>();
+	//nstex_manager * texManager = mEngine->getManager<nstex_manager>();
 
 	//if (mTempMat == NULL)
 	//	return;
 
 	//nsstring fName = pNewText.toStdString();
-	//nsuint namePos = fName.find_last_of("/\\");
-	//nsuint extPos = fName.find_last_of(".");
+	//uint32 namePos = fName.find_last_of("/\\");
+	//uint32 extPos = fName.find_last_of(".");
 
 	//if (namePos == nsstring::npos || extPos == nsstring::npos)
 	//	return;
 
-	//NSTexture * tex = texManager->loadFromFile(fName, false);
+	//nstexture * tex = texManager->loadFromFile(fName, false);
 	//normalLoaded = true;
 
 
 	//if (tex == NULL)
 	//{
-	//	tex = texManager->get(NSTexManager::nameFromFilename(fName));
+	//	tex = texManager->get(nstex_manager::nameFromFilename(fName));
 	//	normalLoaded = false;
 	//}
 
 	//if (tex != NULL)
 	//{
 	//	if (normalLoaded)
-	//		mEngine->getManager<NSTexManager>()->remove(mTempMat->getMapTextureID(NSMaterial::Normal));
+	//		mEngine->getManager<nstex_manager>()->remove(mTempMat->getMapTextureID(nsmaterial::Normal));
 
-	//	mTempMat->setMapTextureID(NSMaterial::Normal, tex->getResourceID(), true);
+	//	mTempMat->setMapTextureID(nsmaterial::Normal, tex->getResourceID(), true);
 	//}
 	//else
 	//{
@@ -382,34 +362,34 @@ void NewTileDialog::onNormLEEdit(QString pNewText)
 
 void NewTileDialog::onDiffLEEdit(QString pNewText)
 {
-	//NSTexManager * texManager = mEngine->getManager<NSTexManager>();
+	//nstex_manager * texManager = mEngine->getManager<nstex_manager>();
 
 	//if (mTempMat == NULL)
 	//	return;
 
 	//nsstring fName = pNewText.toStdString();
-	//nsuint namePos = fName.find_last_of("/\\");
-	//nsuint extPos = fName.find_last_of(".");
+	//uint32 namePos = fName.find_last_of("/\\");
+	//uint32 extPos = fName.find_last_of(".");
 
 	//if (namePos == nsstring::npos || extPos == nsstring::npos)
 	//	return;
 
-	//NSTexture * tex = texManager->loadFromFile(fName, false);
+	//nstexture * tex = texManager->loadFromFile(fName, false);
 	//diffuseLoaded = true;
 
 
 	//if (tex == NULL)
 	//{
-	//	tex = texManager->get(NSTexManager::nameFromFilename(fName));
+	//	tex = texManager->get(nstex_manager::nameFromFilename(fName));
 	//	diffuseLoaded = false;
 	//}
 
 	//if (tex != NULL)
 	//{
 	//	if (diffuseLoaded)
-	//		mEngine->getManager<NSTexManager>()->remove(mTempMat->getMapTextureID(NSMaterial::Diffuse));
+	//		mEngine->getManager<nstex_manager>()->remove(mTempMat->getMapTextureID(nsmaterial::Diffuse));
 
-	//	mTempMat->setMapTextureID(NSMaterial::Diffuse, tex->getResourceID(), true);
+	//	mTempMat->setMapTextureID(nsmaterial::Diffuse, tex->getResourceID(), true);
 	//}
 	//else
 	//{
@@ -431,14 +411,14 @@ void NewTileDialog::reject()
 
 void NewTileDialog::onCancel()
 {
-	//NSMatManager * mats = mEngine->getManager<NSMatManager>();
-	//NSTexManager * textures = mEngine->getManager<NSTexManager>();
+	//nsmat_manager * mats = mEngine->getManager<nsmat_manager>();
+	//nstex_manager * textures = mEngine->getManager<nstex_manager>();
 
 	//if (diffuseLoaded)
-	//	textures->remove(mTempMat->getMapTextureID(NSMaterial::Diffuse));
+	//	textures->remove(mTempMat->getMapTextureID(nsmaterial::Diffuse));
 
 	//if (normalLoaded)
-	//	textures->remove(mTempMat->getMapTextureID(NSMaterial::Normal));
+	//	textures->remove(mTempMat->getMapTextureID(nsmaterial::Normal));
 
 	//mats->remove(mTempMat->getResourceID());
 	done(Rejected);
@@ -479,7 +459,7 @@ void NewTileDialog::onGenerateIcon()
 	//if (!subDir.isEmpty())
 	//	subDir += "/";
 
-	//QString end = QString(mEngine->getResourceDirectory().c_str()) + QString(mEngine->getManager<NSTexManager>()->getLocalDirectory().c_str()) + "Icons/" + subDir;
+	//QString end = QString(mEngine->getResourceDirectory().c_str()) + QString(mEngine->getManager<nstex_manager>()->getLocalDirectory().c_str()) + "Icons/" + subDir;
 
 	//end += mUI.mNameLE->text() + "Icon.png";
 

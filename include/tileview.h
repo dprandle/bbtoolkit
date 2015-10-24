@@ -4,9 +4,8 @@
 // Inlcudes
 #include <ui_tileview.h>
 #include <toolkitdef.h>
-#include <nsglobal.h>
 
-class NSEngine;
+class nsengine;
 class EntityEditorDialog;
 
 class TileView : public QMainWindow
@@ -16,8 +15,8 @@ public:
 	TileView(QWidget * parent = NULL);
 	~TileView();
 
-	Ui_TileView * getUI();
-	void init(Toolkit * pTK, EntityEditorDialog * pEntityDialogEditor);
+    Ui_TileView * ui();
+    void init();
 	void reset();
 	void refresh();
 
@@ -30,8 +29,6 @@ public slots:
 	void onSelectionChanged();
 
 private:
-	Ui_TileView mUI;
-	EntityEditorDialog * mEntD;
-	Toolkit * mTK;
+    Ui_TileView m_ui;
 };
 #endif

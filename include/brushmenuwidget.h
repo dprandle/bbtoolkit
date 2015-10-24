@@ -4,10 +4,10 @@
 // Inlcudes
 #include <ui_brushmenuwidget.h>
 #include <qwidget.h>
-#include <nsglobal.h>
-class NSEngine;
+class nsengine;
 class Toolkit;
 class QToolBar;
+class nsentity;
 
 class BrushMenuWidget : public QWidget
 {
@@ -19,26 +19,25 @@ public:
 	BrushMenuWidget(QWidget * parent = NULL);
 	~BrushMenuWidget();
 
-	NSEntity * selectedItem();
+	nsentity * selectedItem();
 
-	void init(Toolkit * pTK);
+    void init();
 	void setupLW();
-	void setSelectedItem(NSEntity * ent);
+	void setSelectedItem(nsentity * ent);
 
-	public slots:
+public slots:
 	void onDeleteBrush();
 	void onEditBrush();
 	void onDoubleClick();
 	void onNewBrush();
-	void onItemChanged(QListWidgetItem*);
+    void onSelectionChanged();
 
 signals:
 	void brushChange(QListWidgetItem*);
 	void brushDoubleClick();
 
 private:
+    QToolBar * mTB;
 	Ui_BrushMenuWidget mUI;
-	Toolkit * mTK;
-	QToolBar * mTB;
 };
 #endif

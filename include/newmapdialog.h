@@ -4,7 +4,7 @@
 // Inlcudes
 #include <ui_newmap.h>
 
-class NSEngine;
+class nsengine;
 class Toolkit;
 
 class NewMapDialog : public QDialog
@@ -14,7 +14,7 @@ public:
 	NewMapDialog(QWidget * parent = NULL);
 	~NewMapDialog();
 
-	void init(Toolkit * pTK);
+    void init();
 
 	public slots:
 	void onChooseSkybox();
@@ -37,6 +37,5 @@ private:
 	QColor prevC;
 
 	Ui_NewMapDialog mNewMapUI;
-	Toolkit * mTK;
 };
 #endif

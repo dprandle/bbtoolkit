@@ -1,27 +1,26 @@
+
+#include <myGL/glew.h>
 #include <entityeditordialog.h>
 #include <toolkit.h>
 #include <nsengine.h>
 #include <nsentity.h>
-#include <nstexmanager.h>
+#include <nstex_manager.h>
 #include <componentwidgets.h>
-#include <nsanimcomp.h>
-#include <nscamcomp.h>
-#include <nsinputcomp.h>
-#include <nslightcomp.h>
-#include <nsoccupycomp.h>
-#include <nsparticlecomp.h>
-#include <nsrendercomp.h>
-#include <nsselcomp.h>
-#include <nstformcomp.h>
-#include <nstilebrushcomp.h>
-#include <nstilecomp.h>
+#include <nsanim_comp.h>
+#include <nscam_comp.h>
+#include <nslight_comp.h>
+#include <nsoccupy_comp.h>
+#include <nsparticle_comp.h>
+#include <nsrender_comp.h>
+#include <nssel_comp.h>
+#include <nstform_comp.h>
+#include <nstile_brush_comp.h>
+#include <nstile_comp.h>
 #include <ui_selectresdialog.h>
-#include <nsglobal.h>
 #include <qtimer.h>
 
 EntityEditorDialog::EntityEditorDialog(QWidget * parent) :
 QDialog(parent),
-mTK(NULL),
 mEnt(NULL)
 {}
 
@@ -37,34 +36,31 @@ void EntityEditorDialog::clear()
 	mUI.mIconLE->clear();
 }
 
-NSEntity * EntityEditorDialog::entity()
+nsentity * EntityEditorDialog::entity()
 {
-	return mEnt;
+    return mEnt;
 }
 
-void EntityEditorDialog::init(Toolkit * pTK)
+void EntityEditorDialog::init()
 {
-	mTK = pTK;
 	mUI.setupUi(this);
-	mUI.mPreview->init(mTK);
+    mUI.mPreview->init();
 
-	mTypeToIndex[nsengine.guid(std::type_index(typeid(NSAnimComp))).c_str()] = Animation;
-	mTypeToIndex[nsengine.guid(std::type_index(typeid(NSCamComp))).c_str()] = Camera;
-	mTypeToIndex[nsengine.guid(std::type_index(typeid(NSInputComp))).c_str()] = Input;
-	mTypeToIndex[nsengine.guid(std::type_index(typeid(NSLightComp))).c_str()] = Light;
-	mTypeToIndex[nsengine.guid(std::type_index(typeid(NSOccupyComp))).c_str()] = Occupy;
-	mTypeToIndex[nsengine.guid(std::type_index(typeid(NSParticleComp))).c_str()] = Particle;
-	mTypeToIndex[nsengine.guid(std::type_index(typeid(NSRenderComp))).c_str()] = Render;
-	mTypeToIndex[nsengine.guid(std::type_index(typeid(NSSelComp))).c_str()] = Selection;
-	mTypeToIndex[nsengine.guid(std::type_index(typeid(NSTFormComp))).c_str()] = Transform;
-	mTypeToIndex[nsengine.guid(std::type_index(typeid(NSTileBrushComp))).c_str()] = Tilebrush;
-	mTypeToIndex[nsengine.guid(std::type_index(typeid(NSTileComp))).c_str()] = Tile;
+	mTypeToIndex[nse.guid(std::type_index(typeid(nsanim_comp))).c_str()] = Animation;
+	mTypeToIndex[nse.guid(std::type_index(typeid(nscam_comp))).c_str()] = Camera;
+	mTypeToIndex[nse.guid(std::type_index(typeid(nslight_comp))).c_str()] = Light;
+	mTypeToIndex[nse.guid(std::type_index(typeid(nsoccupy_comp))).c_str()] = Occupy;
+	mTypeToIndex[nse.guid(std::type_index(typeid(nsparticle_comp))).c_str()] = Particle;
+	mTypeToIndex[nse.guid(std::type_index(typeid(nsrender_comp))).c_str()] = Render;
+	mTypeToIndex[nse.guid(std::type_index(typeid(nssel_comp))).c_str()] = Selection;
+	mTypeToIndex[nse.guid(std::type_index(typeid(nstform_comp))).c_str()] = Transform;
+	mTypeToIndex[nse.guid(std::type_index(typeid(nstile_brush_comp))).c_str()] = Tilebrush;
+	mTypeToIndex[nse.guid(std::type_index(typeid(nstile_comp))).c_str()] = Tile;
 	
 	// setup component widgets
 	mUI.mCompW->insertWidget(None,new QWidget());
 	mUI.mCompW->insertWidget(Animation, new AnimCompWidget());
 	mUI.mCompW->insertWidget(Camera, new CamCompWidget());
-	mUI.mCompW->insertWidget(Input, new InputCompWidget());
 	mUI.mCompW->insertWidget(Light, new LightCompWidget());
 	mUI.mCompW->insertWidget(Occupy, new OccupyCompWidget());
 	mUI.mCompW->insertWidget(Particle, new ParticleCompWidget());
@@ -78,8 +74,8 @@ void EntityEditorDialog::init(Toolkit * pTK)
 	for (unsigned int i = 0; i <= Tile; ++i)
 	{
 		mUI.mCompW->widget(i)->setMinimumSize(QSize(200, 200));
-		if (i != 0)
-			((CompWidget*)mUI.mCompW->widget(i))->init(mTK);
+        if (i != 0)
+            ((CompWidget*)mUI.mCompW->widget(i))->init();
 	}
 
 	QTimer * t = new QTimer();
@@ -89,7 +85,7 @@ void EntityEditorDialog::init(Toolkit * pTK)
 
 void EntityEditorDialog::onIdle()
 {
-	mTK->mapView()->update();
+    bbtk.map_view()->update();
 }
 
 void EntityEditorDialog::onChooseIcon()
@@ -97,7 +93,7 @@ void EntityEditorDialog::onChooseIcon()
 
 }
 
-void EntityEditorDialog::setEntity(NSEntity * pEnt)
+void EntityEditorDialog::setEntity(nsentity * pEnt)
 {
 	if (pEnt == NULL)
 		return;
@@ -109,7 +105,7 @@ void EntityEditorDialog::setEntity(NSEntity * pEnt)
 	auto compIter = mEnt->begin();
 	while (compIter != mEnt->end())
 	{
-		nsstring guid = nsengine.guid(compIter->first);
+		nsstring guid = nse.guid(compIter->first);
 		mUI.mCompLW->addItem(guid.c_str());
 		++compIter;
 	}
@@ -127,10 +123,10 @@ void EntityEditorDialog::onRemoveComp()
 	if (items.isEmpty())
 		return;
 	auto item = items.first();
-	mTK->mapView()->makeCurrent();
+    bbtk.map_view()->makeCurrent();
 	mEnt->del(item->text().toStdString());
 	setEntity(mEnt);
-	mTK->mapView()->update();
+    bbtk.map_view()->update();
 }
 
 void EntityEditorDialog::onPrevDefault()
@@ -190,7 +186,6 @@ void EntityEditorDialog::onAddComp()
 	ui.setupUi(&addCompD);
 	ui.mListWidget->addItem(ANIM_COMP_TYPESTRING);
 	ui.mListWidget->addItem(CAM_COMP_TYPESTRING);
-	ui.mListWidget->addItem(INPUT_COMP_TYPESTRING);
 	ui.mListWidget->addItem(LIGHT_COMP_TYPESTRING);
 	ui.mListWidget->addItem(OCCUPY_COMP_TYPESTRING);
 	ui.mListWidget->addItem(RENDER_COMP_TYPESTRING);

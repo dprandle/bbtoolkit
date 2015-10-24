@@ -106,7 +106,7 @@
   </widget>
   <action name="actionNewObject">
    <property name="icon">
-    <iconset resource="toolkit.qrc">
+    <iconset resource="../toolkit.qrc">
      <normaloff>:/VecTB/icons/toolbars/New_Map.png</normaloff>:/VecTB/icons/toolbars/New_Map.png</iconset>
    </property>
    <property name="text">
@@ -121,7 +121,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset resource="toolkit.qrc">
+    <iconset resource="../toolkit.qrc">
      <normaloff>:/VecTB/icons/toolbars/Edit.png</normaloff>:/VecTB/icons/toolbars/Edit.png</iconset>
    </property>
    <property name="text">
@@ -136,7 +136,7 @@
     <bool>false</bool>
    </property>
    <property name="icon">
-    <iconset resource="toolkit.qrc">
+    <iconset resource="../toolkit.qrc">
      <normaloff>:/VecTB/icons/toolbars/Delete.png</normaloff>:/VecTB/icons/toolbars/Delete.png</iconset>
    </property>
    <property name="text">
@@ -148,7 +148,7 @@
   </action>
  </widget>
  <resources>
-  <include location="toolkit.qrc"/>
+  <include location="../toolkit.qrc"/>
  </resources>
  <connections>
   <connection>
@@ -164,22 +164,6 @@
     <hint type="destinationlabel">
      <x>148</x>
      <y>202</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>mListWidget</sender>
-   <signal>itemPressed(QListWidgetItem*)</signal>
-   <receiver>ObjectView</receiver>
-   <slot>onItemPressed(QListWidgetItem*)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>86</x>
-     <y>354</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>68</x>
-     <y>367</y>
     </hint>
    </hints>
   </connection>
@@ -215,11 +199,28 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>mListWidget</sender>
+   <signal>itemSelectionChanged()</signal>
+   <receiver>ObjectView</receiver>
+   <slot>onSelectionChanged()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>148</x>
+     <y>183</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>148</x>
+     <y>202</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>onActionEdit()</slot>
   <slot>onActionNew()</slot>
   <slot>onActionDelete()</slot>
   <slot>onItemPressed(QListWidgetItem*)</slot>
+  <slot>onSelectionChanged()</slot>
  </slots>
 </ui>

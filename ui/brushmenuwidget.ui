@@ -39,7 +39,7 @@
   </layout>
   <action name="actionEditBrush">
    <property name="icon">
-    <iconset resource="toolkit.qrc">
+    <iconset resource="../toolkit.qrc">
      <normaloff>:/VecTB/icons/toolbars/Edit.png</normaloff>:/VecTB/icons/toolbars/Edit.png</iconset>
    </property>
    <property name="text">
@@ -51,7 +51,7 @@
   </action>
   <action name="actionNewBrush">
    <property name="icon">
-    <iconset resource="toolkit.qrc">
+    <iconset resource="../toolkit.qrc">
      <normaloff>:/VecTB/icons/toolbars/New_Map.png</normaloff>:/VecTB/icons/toolbars/New_Map.png</iconset>
    </property>
    <property name="text">
@@ -63,7 +63,7 @@
   </action>
   <action name="actionDeleteBrush">
    <property name="icon">
-    <iconset resource="toolkit.qrc">
+    <iconset resource="../toolkit.qrc">
      <normaloff>:/VecTB/icons/toolbars/Delete.png</normaloff>:/VecTB/icons/toolbars/Delete.png</iconset>
    </property>
    <property name="text">
@@ -75,7 +75,7 @@
   </action>
  </widget>
  <resources>
-  <include location="toolkit.qrc"/>
+  <include location="../toolkit.qrc"/>
  </resources>
  <connections>
   <connection>
@@ -128,22 +128,6 @@
   </connection>
   <connection>
    <sender>mBrushedLW</sender>
-   <signal>itemClicked(QListWidgetItem*)</signal>
-   <receiver>BrushMenuWidget</receiver>
-   <slot>onItemChanged(QListWidgetItem*)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>62</x>
-     <y>239</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>49</x>
-     <y>256</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>mBrushedLW</sender>
    <signal>doubleClicked(QModelIndex)</signal>
    <receiver>BrushMenuWidget</receiver>
    <slot>onDoubleClick()</slot>
@@ -158,6 +142,22 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>mBrushedLW</sender>
+   <signal>itemSelectionChanged()</signal>
+   <receiver>BrushMenuWidget</receiver>
+   <slot>onSelectionChanged()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>173</x>
+     <y>128</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>173</x>
+     <y>128</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>onNewBrush()</slot>
@@ -165,5 +165,6 @@
   <slot>onEditBrush()</slot>
   <slot>onItemChanged(QListWidgetItem*)</slot>
   <slot>onDoubleClick()</slot>
+  <slot>onSelectionChanged()</slot>
  </slots>
 </ui>

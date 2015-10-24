@@ -2,17 +2,15 @@
 #include <newtiledialog.h>
 #include <nsengine.h>
 #include <nsentity.h>
-#include <nsentitymanager.h>
-#include <nsbuildsystem.h>
+#include <nsentity_manager.h>
+#include <nsbuild_system.h>
 #include <toolkit.h>
-#include <nstilecomp.h>
-#include <nspluginmanager.h>
-#include <nstilebrushcomp.h>
+#include <nstile_comp.h>
+#include <nsplugin_manager.h>
+#include <nstile_brush_comp.h>
 #include <qevent.h>
 
 TileView::TileView(QWidget * parent):
-mEntD(NULL),
-mTK(NULL),
 QMainWindow(parent)
 {}
 
@@ -21,33 +19,31 @@ TileView::~TileView()
 
 }
 
-void TileView::init(Toolkit * pTK, EntityEditorDialog * pEntityDialogEditor)
+void TileView::init()
 {
-	mTK = pTK;
-	mEntD = pEntityDialogEditor;
-	mUI.setupUi(this);
-	mUI.mListWidget->init(mTK);
+    m_ui.setupUi(this);
+    m_ui.mListWidget->init();
 }
 
 void TileView::onActionNew()
 {
 	NewTileDialog newTileDialog(parentWidget()->parentWidget());
-	newTileDialog.init(mTK);
-	NSPlugin * actplg = nsengine.active();
+    newTileDialog.init();
+	nsplugin * actplg = nse.active();
 
 	if (newTileDialog.exec() == QDialog::Accepted)
 	{
 		QListWidgetItem * item = new QListWidgetItem(newTileDialog.getEntityName());
-		NSEntity * ent = actplg->get<NSEntity>(item->text().toStdString());
+		nsentity * ent = actplg->get<nsentity>(item->text().toStdString());
 		if (ent == NULL)
 			return;
 		
-		if (!ent->iconPath().empty())
-			item->setIcon(QIcon(ent->iconPath().c_str()));
+        if (!ent->icon_path().empty())
+            item->setIcon(QIcon(ent->icon_path().c_str()));
 		else
 			item->setIcon(QIcon(":/TileIcons/Resources/defaulthexicon.png"));
 
-		mUI.mListWidget->addItem(item);
+        m_ui.mListWidget->addItem(item);
 	}
 }
 
@@ -65,15 +61,15 @@ void TileView::refresh()
 {
 	reset();
 
-	auto plugiter = nsengine.plugins()->begin();
-	while (plugiter != nsengine.plugins()->end())
+	auto plugiter = nse.plugins()->begin();
+	while (plugiter != nse.plugins()->end())
 	{
-		NSPlugin * plg = nsengine.plugin(plugiter->first);
-		auto iter = plg->manager<NSEntityManager>()->begin();
-		while (iter != plg->manager<NSEntityManager>()->end())
+		nsplugin * plg = nse.plugin(plugiter->first);
+		auto iter = plg->manager<nsentity_manager>()->begin();
+		while (iter != plg->manager<nsentity_manager>()->end())
 		{
-			NSEntity * ent = (NSEntity*)iter->second;
-			if (ent->has<NSTileComp>() && !ent->has<NSTileBrushComp>())
+			nsentity * ent = (nsentity*)iter->second;
+			if (ent->has<nstile_comp>() && !ent->has<nstile_brush_comp>())
 			{
 				QListWidgetItem * item = new QListWidgetItem();
 
@@ -81,15 +77,15 @@ void TileView::refresh()
 				item->setText(ent->name().c_str());
 
 				// Store the resource id and plug id for easy lookup later
-				item->setData(VIEW_WIDGET_ITEM_PLUG, ent->plugid());
+                item->setData(VIEW_WIDGET_ITEM_PLUG, ent->plugin_id());
 				item->setData(VIEW_WIDGET_ITEM_ENT, ent->id());
 				
-				if (!ent->iconPath().empty())
-					item->setIcon(QIcon(ent->iconPath().c_str()));
+                if (!ent->icon_path().empty())
+                    item->setIcon(QIcon(ent->icon_path().c_str()));
 				else
-					item->setIcon(QIcon(":/TileIcons/Resources/defaulthexicon.png"));
+                    item->setIcon(QIcon(":/ResourceIcons/icons/default_hex.png"));
 
-				mUI.mListWidget->addItem(item);
+                m_ui.mListWidget->addItem(item);
 			}
 			++iter;
 		}
@@ -99,33 +95,28 @@ void TileView::refresh()
 
 void TileView::onSelectionChanged()
 {
-	NSBuildSystem * buildSys = nsengine.system<NSBuildSystem>();
 	QListWidgetItem * item = NULL;
-
-	auto items = mUI.mListWidget->selectedItems();
+    auto items = m_ui.mListWidget->selectedItems();
 	if (!items.isEmpty())
 		item = items[0];
 
 	if (item == NULL)
 	{
-		nsengine.system<NSBuildSystem>()->setBuildEnt(NULL);
+        nse.system<nsbuild_system>()->set_tile_build_ent(NULL);
 		return;
 	}
 
 	uivec2 itid(item->data(VIEW_WIDGET_ITEM_PLUG).toUInt(), item->data(VIEW_WIDGET_ITEM_ENT).toUInt());
-	NSEntity * ent = nsengine.resource<NSEntity>(itid);
-	nsengine.system<NSBuildSystem>()->setBuildEnt(ent);
-
-	//if (buildSys->isEnabled() && buildSys->getBrushMode() == NSBuildSystem::Tile)
-	//	((Toolkit*)parentWidget()->parentWidget())->getMapView()->setFocus();
+	nsentity * ent = nse.resource<nsentity>(itid);
+    nse.system<nsbuild_system>()->set_tile_build_ent(ent);
 }
 
 void TileView::reset()
 {
-	mUI.mListWidget->clear();
+    m_ui.mListWidget->clear();
 }
 
-Ui_TileView * TileView::getUI()
+Ui_TileView * TileView::ui()
 {
-	return &mUI;
+    return &m_ui;
 }

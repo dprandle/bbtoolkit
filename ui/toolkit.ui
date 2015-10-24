@@ -19,12 +19,6 @@ color: white;
 background-color: rgb(55,55,55);
 }
 
-QGroupBox {
-border: 1px solid rgb(100,100,100);
-border-radius: 5px;
-margin-top: 2ex;
-}
-
 QComboBox
 {
 background-color: qlineargradient(spread:reflect, x1:0, y1:0.051, x2:0, y2:1, stop:0 rgba(97, 97, 97, 255), stop:0.642045 rgba(30, 30, 30, 255), stop:1 rgba(48, 48, 48, 255));
@@ -77,11 +71,27 @@ selection-background-color:  rgb(90, 90, 90);
 border: 1px solid rgb(100,100,100);
  }
 
-
+/*
 QGroupBox::title {
 subcontrol-origin: margin;
 left: 10px;
 }
+*/
+
+
+QGroupBox {
+border: 1px solid rgb(100,100,100);
+border-radius: 5px;
+margin-top: 1ex;
+padding-top: 20px;
+}
+
+/*
+QGroupBox::title
+{
+subcontrol-origin: margin;
+}
+*/
 
 QLineEdit {
 background-color: rgb(30,30,30);
@@ -262,6 +272,8 @@ width: 1px;
 height: 1px;
 }
 
+/* TOOLBUTTON */
+
 QToolButton
 {
 border-radius: 5px;
@@ -272,17 +284,42 @@ border: 1px solid rgb(55, 55, 55);
 QToolButton:hover {
 background-color: rgb(90, 90, 90);
 border-radius: 5px;
-border: 1px solid rgb(55, 55, 55);
+border: 1px solid rgb(70, 70, 70);
 padding: 3px;
 }
 
 QToolButton:pressed
 {
 background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.547, fx:0.5, fy:0.5, stop:0 rgba(77, 77, 77, 255), stop:1 rgba(27, 27, 27, 255));
-border: 1px solid rgb(55, 55, 55);
+border: 1px solid rgb(70, 70, 70);
 padding: 3px;
 border-radius: 5px;
 }
+
+QToolButton[popupMode=&quot;1&quot;] { /* only for MenuButtonPopup */
+    padding-right: 20px; /* make way for the popup button */
+}
+
+/* the subcontrols below are used only in the MenuButtonPopup mode */
+QToolButton::menu-button {
+	border: 1px solid rgb(55, 55, 55);
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+    /* 16px width + 4px for border = 20px allocated above */
+    width: 16px;
+}
+
+QToolButton::menu-arrow {
+    image: url(:/VecTB/icons/toolbars/Down_Arrow.png);
+	width: 6px;
+	height: 6px; 
+}
+
+QToolButton::menu-arrow:open {
+    top: 1px; left: 1px; /* shift it a bit */
+}
+
+/* END TOOLBUTTON */
 
 QToolButton:checked 
 {
@@ -368,7 +405,7 @@ QTabBar::tab:!selected
      <x>0</x>
      <y>0</y>
      <width>876</width>
-     <height>21</height>
+     <height>22</height>
     </rect>
    </property>
    <property name="styleSheet">
@@ -479,7 +516,6 @@ QTabBar::tab:!selected
    <addaction name="actionNewBrush"/>
    <addaction name="actionHideSelection"/>
    <addaction name="actionUnhideSelection"/>
-   <addaction name="actionEnableXFB"/>
   </widget>
   <widget class="QDockWidget" name="mDockTiles">
    <property name="allowedAreas">
@@ -888,9 +924,6 @@ border: 0px;
    </property>
   </action>
   <action name="actionFrontView">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
    <property name="icon">
     <iconset resource="../toolkit.qrc">
      <normaloff>:/VecTB/icons/toolbars/Front_Camera.png</normaloff>
@@ -904,9 +937,6 @@ border: 0px;
    </property>
   </action>
   <action name="actionTopDown">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
    <property name="icon">
     <iconset resource="../toolkit.qrc">
      <normaloff>:/VecTB/icons/toolbars/Top_Camera.png</normaloff>
@@ -920,9 +950,6 @@ border: 0px;
    </property>
   </action>
   <action name="actionIsoView">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
    <property name="icon">
     <iconset resource="../toolkit.qrc">
      <normaloff>:/VecTB/icons/toolbars/Iso_Camera.png</normaloff>
@@ -1027,21 +1054,6 @@ border: 0px;
     <string>Enable/disable lighting - disabling lighting can increase performance</string>
    </property>
   </action>
-  <action name="actionEnableXFB">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="icon">
-    <iconset resource="../toolkit.qrc">
-     <normaloff>:/VecTB/icons/toolbars/xfbIcon.png</normaloff>:/VecTB/icons/toolbars/xfbIcon.png</iconset>
-   </property>
-   <property name="text">
-    <string>enableXFB</string>
-   </property>
-   <property name="toolTip">
-    <string>Enable transform feedback for selected object</string>
-   </property>
-  </action>
   <action name="actionResource_Browser">
    <property name="text">
     <string>Resource Browser</string>
@@ -1077,521 +1089,40 @@ border: 0px;
  <resources>
   <include location="../toolkit.qrc"/>
  </resources>
- <connections>
-  <connection>
-   <sender>actionSelect</sender>
-   <signal>triggered(bool)</signal>
-   <receiver>Toolkit</receiver>
-   <slot>onSelect(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>533</x>
-     <y>345</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>actionSelectArea</sender>
-   <signal>triggered(bool)</signal>
-   <receiver>Toolkit</receiver>
-   <slot>onSelectArea(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>533</x>
-     <y>345</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>actionTileBrush</sender>
-   <signal>triggered(bool)</signal>
-   <receiver>Toolkit</receiver>
-   <slot>onTileBrush(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>533</x>
-     <y>345</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>actionObjectBrush</sender>
-   <signal>triggered(bool)</signal>
-   <receiver>Toolkit</receiver>
-   <slot>onObjectBrush(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>533</x>
-     <y>345</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>actionEraserBrush</sender>
-   <signal>triggered(bool)</signal>
-   <receiver>Toolkit</receiver>
-   <slot>onEraserBrush(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>533</x>
-     <y>345</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>actionNew</sender>
-   <signal>triggered()</signal>
-   <receiver>Toolkit</receiver>
-   <slot>onNew()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>533</x>
-     <y>345</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>actionLoad</sender>
-   <signal>triggered()</signal>
-   <receiver>Toolkit</receiver>
-   <slot>onLoad()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>533</x>
-     <y>345</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>actionSave</sender>
-   <signal>triggered()</signal>
-   <receiver>Toolkit</receiver>
-   <slot>onSave()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>533</x>
-     <y>345</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>actionUnlock</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>Toolkit</receiver>
-   <slot>onUnlock(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>533</x>
-     <y>345</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>actionSwapTiles</sender>
-   <signal>triggered()</signal>
-   <receiver>Toolkit</receiver>
-   <slot>onReplaceTile()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>533</x>
-     <y>345</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>actionDeleteSelection</sender>
-   <signal>triggered()</signal>
-   <receiver>Toolkit</receiver>
-   <slot>onDelSelection()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>533</x>
-     <y>345</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>actionNewBrush</sender>
-   <signal>triggered()</signal>
-   <receiver>Toolkit</receiver>
-   <slot>onNewBrush()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>533</x>
-     <y>345</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>actionLayerMode</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>Toolkit</receiver>
-   <slot>onLayerMode(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>533</x>
-     <y>345</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>actionStampMode</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>Toolkit</receiver>
-   <slot>onStampMode(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>533</x>
-     <y>345</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>actionHideSelection</sender>
-   <signal>triggered()</signal>
-   <receiver>Toolkit</receiver>
-   <slot>onHideSelection()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>533</x>
-     <y>345</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>actionUnhideSelection</sender>
-   <signal>triggered()</signal>
-   <receiver>Toolkit</receiver>
-   <slot>onUnhideSelection()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>533</x>
-     <y>345</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>actionCameraCenter</sender>
-   <signal>triggered(bool)</signal>
-   <receiver>Toolkit</receiver>
-   <slot>onCamCenter(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>533</x>
-     <y>345</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>actionFrontView</sender>
-   <signal>triggered(bool)</signal>
-   <receiver>Toolkit</receiver>
-   <slot>onCamFront(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>533</x>
-     <y>345</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>actionObjectCenter</sender>
-   <signal>triggered(bool)</signal>
-   <receiver>Toolkit</receiver>
-   <slot>onObjectCenter(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>533</x>
-     <y>345</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>actionIsoView</sender>
-   <signal>triggered(bool)</signal>
-   <receiver>Toolkit</receiver>
-   <slot>onCamIso(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>533</x>
-     <y>345</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>actionTopDown</sender>
-   <signal>triggered(bool)</signal>
-   <receiver>Toolkit</receiver>
-   <slot>onCamTop(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>533</x>
-     <y>345</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>actionRedo</sender>
-   <signal>triggered()</signal>
-   <receiver>Toolkit</receiver>
-   <slot>onRedo()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>533</x>
-     <y>345</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>actionUndo</sender>
-   <signal>triggered()</signal>
-   <receiver>Toolkit</receiver>
-   <slot>onUndo()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>533</x>
-     <y>345</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>actionSwitchMap</sender>
-   <signal>triggered()</signal>
-   <receiver>Toolkit</receiver>
-   <slot>onSwitchMaps()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>533</x>
-     <y>345</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>actionCameraSettings</sender>
-   <signal>triggered()</signal>
-   <receiver>Toolkit</receiver>
-   <slot>onCameraSettings()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>533</x>
-     <y>345</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>actionShowAllHidden</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>Toolkit</receiver>
-   <slot>onShowAllHidden(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>533</x>
-     <y>345</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>actionMirrorMode</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>Toolkit</receiver>
-   <slot>onMirrorMode(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>533</x>
-     <y>345</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>actionToggleLighting</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>Toolkit</receiver>
-   <slot>onToggleLighting(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>533</x>
-     <y>345</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>actionEnableXFB</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>Toolkit</receiver>
-   <slot>onToggleXFB(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>533</x>
-     <y>345</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>actionResource_Browser</sender>
-   <signal>triggered()</signal>
-   <receiver>Toolkit</receiver>
-   <slot>onResourceBrowser()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>437</x>
-     <y>356</y>
-    </hint>
-   </hints>
-  </connection>
- </connections>
+ <connections/>
  <slots>
-  <slot>onSelect(bool)</slot>
-  <slot>onSelectArea(bool)</slot>
-  <slot>onSelectionBrush(bool)</slot>
-  <slot>onTileBrush(bool)</slot>
-  <slot>onObjectBrush(bool)</slot>
-  <slot>onEraserBrush(bool)</slot>
-  <slot>onPropertiesClick(bool)</slot>
-  <slot>onEraseClick(bool)</slot>
-  <slot>onNew()</slot>
-  <slot>onLoad()</slot>
-  <slot>onSave()</slot>
-  <slot>onUndo()</slot>
-  <slot>onRedo()</slot>
-  <slot>onUnlock(bool)</slot>
-  <slot>onStampMode(bool)</slot>
-  <slot>onLayerMode(bool)</slot>
-  <slot>onDelSelection()</slot>
-  <slot>onReplaceTile()</slot>
-  <slot>onNewBrush()</slot>
-  <slot>onHideSelection()</slot>
-  <slot>onUnhideSelection()</slot>
-  <slot>onCamCenter(bool)</slot>
-  <slot>onCamIso(bool)</slot>
-  <slot>onCamTop(bool)</slot>
-  <slot>onSwitchMaps()</slot>
-  <slot>onCamFront(bool)</slot>
-  <slot>onObjectCenter(bool)</slot>
-  <slot>onCameraSettings()</slot>
-  <slot>onShowAllHidden(bool)</slot>
-  <slot>onMirrorMode(bool)</slot>
-  <slot>onToggleLighting(bool)</slot>
-  <slot>onToggleXFB(bool)</slot>
-  <slot>onResourceBrowser()</slot>
+  <slot>on_select(bool)</slot>
+  <slot>on_select_area(bool)</slot>
+  <slot>on_selection_brush(bool)</slot>
+  <slot>on_tile_brush(bool)</slot>
+  <slot>on_object_brush(bool)</slot>
+  <slot>on_eraser_brush(bool)</slot>
+  <slot>on_properties_click(bool)</slot>
+  <slot>on_erase_click(bool)</slot>
+  <slot>on_new()</slot>
+  <slot>on_load()</slot>
+  <slot>on_save()</slot>
+  <slot>on_undo()</slot>
+  <slot>on_redo()</slot>
+  <slot>on_unlock(bool)</slot>
+  <slot>on_stamp_mode(bool)</slot>
+  <slot>on_layer_mode(bool)</slot>
+  <slot>on_del_selection()</slot>
+  <slot>on_replace_tile()</slot>
+  <slot>on_new_brush()</slot>
+  <slot>on_hide_selection()</slot>
+  <slot>on_unhide_selection()</slot>
+  <slot>on_cam_center(bool)</slot>
+  <slot>on_cam_iso(bool)</slot>
+  <slot>on_cam_top(bool)</slot>
+  <slot>on_switch_maps()</slot>
+  <slot>on_cam_front(bool)</slot>
+  <slot>on_object_center(bool)</slot>
+  <slot>on_camera_settings()</slot>
+  <slot>on_show_all_hidden(bool)</slot>
+  <slot>on_mirror_mode(bool)</slot>
+  <slot>on_toggle_lighting(bool)</slot>
+  <slot>on_toggle_xfb(bool)</slot>
+  <slot>on_resource_browser()</slot>
  </slots>
 </ui>

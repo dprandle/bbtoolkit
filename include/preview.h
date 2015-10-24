@@ -3,12 +3,9 @@
 
 
 // Includes
-#include <myGL\glew.h>
 #include <qopenglwidget.h>
 #include <toolkitdef.h>
-#include <nsglobal.h>
-#include <nsmath.h>
-#include <nstformcomp.h>
+#include <nstypes.h>
 
 class Toolkit;
 
@@ -19,13 +16,13 @@ class Preview : public QOpenGLWidget
 	Preview(QWidget * parent=NULL);
 	~Preview();
 
-	void init(Toolkit * pTK);
+    void init();
 						  
   public slots:
 	void onIdle();
 
   signals:
-	void opengl_initialized(nsuint);
+    void opengl_initialized(uint32);
 
   protected:
 	void initializeGL();
@@ -43,9 +40,8 @@ class Preview : public QOpenGLWidget
 
   private:
 	
-	nsuint mEngineContextID;
+    uint32 mEngineContextID;
 	void _connect();
-	Toolkit * mTK;
 };
 
 #endif // MAPWINDOW_H

@@ -4,7 +4,8 @@
 #include <resourcewidget.h>
 #include <ui_materialwidget.h>
 
-class NSMaterial;
+class nsmaterial;
+class nsresource;
 
 class MaterialWidget : public ResourceWidget
 {
@@ -15,12 +16,12 @@ class MaterialWidget : public ResourceWidget
     MaterialWidget(QWidget * parent = NULL);
     virtual ~MaterialWidget();
 
-	void setResource(NSResource * res);
-	NSResource * resource();
+    void setResource(nsresource * res);
+    nsresource * resource();
 	nsstring defaultResName();
 							 	
   private:
-	NSMaterial * mMat;
+	nsmaterial * mMat;
 	Ui::MaterialWidget mUI;
 };
 

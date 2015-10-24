@@ -1,43 +1,41 @@
 #include <componentwidgets.h>
 #include <nsentity.h>
-#include <nsanimcomp.h>
-#include <nscamcomp.h>
-#include <nsinputcomp.h>
-#include <nslightcomp.h>
-#include <nsoccupycomp.h>
-#include <nsparticlecomp.h>
-#include <nsshadermanager.h>
-#include <nspluginmanager.h>
-#include <nsrendercomp.h>
-#include <nsselcomp.h>
-#include <nstformcomp.h>
-#include <nsmatmanager.h>
-#include <nstilebrushcomp.h>
-#include <nstexmanager.h>
-#include <nstilecomp.h>
+#include <nsanim_comp.h>
+#include <nscam_comp.h>
+#include <nslight_comp.h>
+#include <nsoccupy_comp.h>
+#include <nsparticle_comp.h>
+#include <nsshader_manager.h>
+#include <nsplugin_manager.h>
+#include <nsrender_comp.h>
+#include <nssel_comp.h>
+#include <nstform_comp.h>
+#include <nsmat_manager.h>
+#include <nstile_brush_comp.h>
+#include <nstex_manager.h>
+#include <nstile_comp.h>
 #include <qcolordialog.h>
 #include <qcolor.h>
 #include <toolkit.h>
 #include <nsengine.h>
-#include <nsmeshmanager.h>
+#include <nsmesh_manager.h>
 #include <ui_selectresdialog.h>
+#include <nsrender_system.h>
 
 CompWidget::CompWidget(QWidget * pParent) :
 mEnt(NULL),
 QWidget(pParent)
 {}
 
-void CompWidget::init(Toolkit * pTK)
-{
-	mTK = pTK;
-}
+void CompWidget::init()
+{}
 
-void CompWidget::setEntity(NSEntity * pEnt)
+void CompWidget::setEntity(nsentity * pEnt)
 {
 	mEnt = pEnt;
 }
 
-NSEntity * CompWidget::getEntity()
+nsentity * CompWidget::getEntity()
 {
 	return mEnt;
 }
@@ -60,13 +58,13 @@ CompWidget(pParent)
 CamCompWidget::~CamCompWidget()
 {}
 
-void CamCompWidget::setEntity(NSEntity * pEnt)
+void CamCompWidget::setEntity(nsentity * pEnt)
 {
 	CompWidget::setEntity(pEnt);
 	if (mEnt == NULL)
 		return;
 
-	NSCamComp * camComp = mEnt->get<NSCamComp>();
+	nscam_comp * camComp = mEnt->get<nscam_comp>();
 	if (camComp == NULL)
 		return;
 
@@ -80,12 +78,12 @@ void CamCompWidget::onChangeSpeed(double pNewSpeed)
 	if (mEnt == NULL)
 		return;
 
-	NSCamComp * camComp = mEnt->get<NSCamComp>();
+	nscam_comp * camComp = mEnt->get<nscam_comp>();
 	if (camComp == NULL)
 		return;
 
-	camComp->setSpeed(pNewSpeed);
-	mTK->mapView()->update();
+    camComp->set_speed(pNewSpeed);
+    bbtk.map_view()->update();
 }
 
 InputCompWidget::InputCompWidget(QWidget * pParent) :
@@ -106,13 +104,13 @@ CompWidget(pParent)
 LightCompWidget::~LightCompWidget()
 {}
 
-void LightCompWidget::setEntity(NSEntity * pEnt)
+void LightCompWidget::setEntity(nsentity * pEnt)
 {
 	CompWidget::setEntity(pEnt);
 	if (mEnt == NULL)
 		return;
 
-	NSLightComp * lightComp = mEnt->get<NSLightComp>();
+	nslight_comp * lightComp = mEnt->get<nslight_comp>();
 	if (lightComp == NULL)
 		return;
 
@@ -146,15 +144,15 @@ void LightCompWidget::setEntity(NSEntity * pEnt)
 	mUI.mRadiusSB->blockSignals(false);
 
 	mUI.mShadowSldr->blockSignals(true);
-	mUI.mShadowSldr->setValue(lightComp->shadowDarkness()*100);
+    mUI.mShadowSldr->setValue(lightComp->shadow_darkness()*100);
 	mUI.mShadowSldr->blockSignals(false);
 
 	mUI.mShadowSamplesSB->blockSignals(true);
-	mUI.mShadowSamplesSB->setValue(lightComp->shadowSamples());
+    mUI.mShadowSamplesSB->setValue(lightComp->shadow_samples());
 	mUI.mShadowSamplesSB->blockSignals(false);
 
 	mUI.mCastsShadowsCB->blockSignals(true);
-	mUI.mCastsShadowsCB->setChecked(lightComp->castShadows());
+    mUI.mCastsShadowsCB->setChecked(lightComp->cast_shadows());
 	mUI.mCastsShadowsCB->blockSignals(false);
 
 	fvec3 col = lightComp->color();
@@ -168,13 +166,13 @@ void LightCompWidget::onAmbientChange(int pVal)
 	if (mEnt == NULL)
 		return;
 
-	NSLightComp * lightComp = mEnt->get<NSLightComp>();
+	nslight_comp * lightComp = mEnt->get<nslight_comp>();
 	if (lightComp == NULL)
 		return;
 
-	lightComp->setIntensity(lightComp->intensity().x, float(pVal)/100.0f, NSLightComp::Adjustment(mUI.mFalloffCB->currentIndex()));
+    lightComp->set_intensity(lightComp->intensity().x, float(pVal)/100.0f, nslight_comp::adjustment_t(mUI.mFalloffCB->currentIndex()));
 	setEntity(mEnt);
-	mTK->mapView()->update();
+    bbtk.map_view()->update();
 }
 
 void LightCompWidget::onColorChange()
@@ -182,7 +180,7 @@ void LightCompWidget::onColorChange()
 	if (mEnt == NULL)
 		return;
 
-	NSLightComp * lightComp = mEnt->get<NSLightComp>();
+	nslight_comp * lightComp = mEnt->get<nslight_comp>();
 	if (lightComp == NULL)
 		return;
 
@@ -193,11 +191,11 @@ void LightCompWidget::onColorChange()
 	if (c.isValid())
 	{
 		fvec3 newCol(c.redF(), c.greenF(), c.blueF());
-		lightComp->setColor(newCol);
+        lightComp->set_color(newCol);
 		prevC = c;
 	}
 	_setColorStyle(prevC);
-	mTK->mapView()->update();
+    bbtk.map_view()->update();
 }
 
 void LightCompWidget::onCutoffChange(int pVal)
@@ -205,13 +203,13 @@ void LightCompWidget::onCutoffChange(int pVal)
 	if (mEnt == NULL)
 		return;
 
-	NSLightComp * lightComp = mEnt->get<NSLightComp>();
+	nslight_comp * lightComp = mEnt->get<nslight_comp>();
 	if (lightComp == NULL)
 		return;
 
-	lightComp->setCutoff(float(pVal));
+    lightComp->set_cutoff(float(pVal));
 	setEntity(mEnt);
-	mTK->mapView()->update();
+    bbtk.map_view()->update();
 }
 
 void LightCompWidget::onDiffuseChange(int pVal)
@@ -219,13 +217,13 @@ void LightCompWidget::onDiffuseChange(int pVal)
 	if (mEnt == NULL)
 		return;
 
-	NSLightComp * lightComp = mEnt->get<NSLightComp>();
+	nslight_comp * lightComp = mEnt->get<nslight_comp>();
 	if (lightComp == NULL)
 		return;
 
-	lightComp->setIntensity(float(pVal)/100.0f, lightComp->intensity().y, NSLightComp::Adjustment(mUI.mFalloffCB->currentIndex()));
+    lightComp->set_intensity(float(pVal)/100.0f, lightComp->intensity().y, nslight_comp::adjustment_t(mUI.mFalloffCB->currentIndex()));
 	setEntity(mEnt);
-	mTK->mapView()->update();
+    bbtk.map_view()->update();
 }
 
 void LightCompWidget::onDistanceChange(int pVal)
@@ -233,16 +231,16 @@ void LightCompWidget::onDistanceChange(int pVal)
 	if (mEnt == NULL)
 		return;
 
-	NSLightComp * lightComp = mEnt->get<NSLightComp>();
+	nslight_comp * lightComp = mEnt->get<nslight_comp>();
 	if (lightComp == NULL)
 		return;
 
-	lightComp->setDistance(float(pVal), NSLightComp::Adjustment(mUI.mFalloffCB->currentIndex()));
+    lightComp->set_distance(float(pVal), nslight_comp::adjustment_t(mUI.mFalloffCB->currentIndex()));
 	mUI.mDistanceSB->blockSignals(true);
 	mUI.mDistanceSB->setValue(double(pVal));
 	mUI.mDistanceSB->blockSignals(false);
 	setEntity(mEnt);
-	mTK->mapView()->update();
+    bbtk.map_view()->update();
 }
 
 void LightCompWidget::onDistanceChangeSB(double pVal)
@@ -250,16 +248,16 @@ void LightCompWidget::onDistanceChangeSB(double pVal)
 	if (mEnt == NULL)
 		return;
 
-	NSLightComp * lightComp = mEnt->get<NSLightComp>();
+	nslight_comp * lightComp = mEnt->get<nslight_comp>();
 	if (lightComp == NULL)
 		return;
 
-	lightComp->setDistance(pVal, NSLightComp::Adjustment(mUI.mFalloffCB->currentIndex()));
+    lightComp->set_distance(pVal, nslight_comp::adjustment_t(mUI.mFalloffCB->currentIndex()));
 	mUI.mDistanceSldr->blockSignals(true);
 	mUI.mDistanceSldr->setValue(int(pVal));
 	mUI.mDistanceSldr->blockSignals(false);
 	setEntity(mEnt);
-	mTK->mapView()->update();
+    bbtk.map_view()->update();
 }
 
 void LightCompWidget::onFalloffChange(QString pVal)
@@ -267,12 +265,12 @@ void LightCompWidget::onFalloffChange(QString pVal)
 	if (mEnt == NULL)
 		return;
 
-	NSLightComp * lightComp = mEnt->get<NSLightComp>();
+	nslight_comp * lightComp = mEnt->get<nslight_comp>();
 	if (lightComp == NULL)
 		return;
 
 	setEntity(mEnt);
-	mTK->mapView()->update();
+    bbtk.map_view()->update();
 }
 
 void LightCompWidget::onLightTypeChange(QString pVal)
@@ -280,30 +278,30 @@ void LightCompWidget::onLightTypeChange(QString pVal)
 	if (mEnt == NULL)
 		return;
 
-	NSLightComp * lightComp = mEnt->get<NSLightComp>();
+	nslight_comp * lightComp = mEnt->get<nslight_comp>();
 	if (lightComp == NULL)
 		return;
 
-	NSLightComp::LightType lType = NSLightComp::LightType(mUI.mLightTypeCB->findText(pVal));
+    nslight_comp::light_t lType = nslight_comp::light_t(mUI.mLightTypeCB->findText(pVal));
 	uivec2 ID;
 
 	switch (lType)
 	{
-	case(NSLightComp::Directional) :
-		ID = nsengine.resource<NSMesh>(ENGINE_PLUG,MESH_DIRLIGHT_BOUNDS)->fullid();
+    case(nslight_comp::l_dir) :
+        ID = nse.resource<nsmesh>(ENGINE_PLUG,MESH_DIRLIGHT_BOUNDS)->full_id();
 		break;
-	case(NSLightComp::Point) :
-		ID = nsengine.resource<NSMesh>(ENGINE_PLUG, MESH_POINTLIGHT_BOUNDS)->fullid();
+    case(nslight_comp::l_point) :
+        ID = nse.resource<nsmesh>(ENGINE_PLUG, MESH_POINTLIGHT_BOUNDS)->full_id();
 		break;
-	case(NSLightComp::Spot) :
-		ID = nsengine.resource<NSMesh>(ENGINE_PLUG, MESH_SPOTLIGHT_BOUNDS)->fullid();
+    case(nslight_comp::l_spot) :
+        ID = nse.resource<nsmesh>(ENGINE_PLUG, MESH_SPOTLIGHT_BOUNDS)->full_id();
 		break;
 	}
 
-	lightComp->setType(lType);
-	lightComp->setMeshID(ID);
+    lightComp->set_type(lType);
+    lightComp->set_mesh_id(ID);
 	setEntity(mEnt);
-	mTK->mapView()->update();
+    bbtk.map_view()->update();
 }
 
 void LightCompWidget::onRadiusChange(double pVal)
@@ -311,13 +309,13 @@ void LightCompWidget::onRadiusChange(double pVal)
 	if (mEnt == NULL)
 		return;
 
-	NSLightComp * lightComp = mEnt->get<NSLightComp>();
+	nslight_comp * lightComp = mEnt->get<nslight_comp>();
 	if (lightComp == NULL)
 		return;
 
-	lightComp->setRadius(pVal);
+    lightComp->set_radius(pVal);
 	setEntity(mEnt);
-	mTK->mapView()->update();
+    bbtk.map_view()->update();
 }
 
 void LightCompWidget::onCastShadowChange(bool pVal)
@@ -325,12 +323,12 @@ void LightCompWidget::onCastShadowChange(bool pVal)
 	if (mEnt == NULL)
 		return;
 
-	NSLightComp * lightComp = mEnt->get<NSLightComp>();
+	nslight_comp * lightComp = mEnt->get<nslight_comp>();
 	if (lightComp == NULL)
 		return;
 
-	lightComp->setCastShadows(pVal);
-	mTK->mapView()->update();
+    lightComp->set_cast_shadows(pVal);
+    bbtk.map_view()->update();
 }
 
 void LightCompWidget::onShadowDarknessChange(int pVal)
@@ -338,12 +336,12 @@ void LightCompWidget::onShadowDarknessChange(int pVal)
 	if (mEnt == NULL)
 		return;
 
-	NSLightComp * lightComp = mEnt->get<NSLightComp>();
+	nslight_comp * lightComp = mEnt->get<nslight_comp>();
 	if (lightComp == NULL)
 		return;
 
-	lightComp->setShadowDarkness(float(pVal)/100.0f);
-	mTK->mapView()->update();
+    lightComp->set_shadow_darkness(float(pVal)/100.0f);
+    bbtk.map_view()->update();
 }
 
 void LightCompWidget::onShadowSamplesChange(int pVal)
@@ -351,12 +349,12 @@ void LightCompWidget::onShadowSamplesChange(int pVal)
 	if (mEnt == NULL)
 		return;
 
-	NSLightComp * lightComp = mEnt->get<NSLightComp>();
+	nslight_comp * lightComp = mEnt->get<nslight_comp>();
 	if (lightComp == NULL)
 		return;
 
-	lightComp->setShadowSamples(pVal);
-	mTK->mapView()->update();
+    lightComp->set_shadow_samples(pVal);
+    bbtk.map_view()->update();
 }
 
 void LightCompWidget::_setColorStyle(const QColor & pCol)
@@ -392,14 +390,14 @@ CompWidget(pParent)
 ParticleCompWidget::~ParticleCompWidget()
 {}
 
-void ParticleCompWidget::setEntity(NSEntity * pEnt)
+void ParticleCompWidget::setEntity(nsentity * pEnt)
 {
 	CompWidget::setEntity(pEnt);
 	if (mEnt == NULL)
 		return;
 
 
-	NSParticleComp * partComp = mEnt->get<NSParticleComp>();
+	nsparticle_comp * partComp = mEnt->get<nsparticle_comp>();
 	if (partComp == NULL)
 		return;
 
@@ -408,9 +406,9 @@ void ParticleCompWidget::setEntity(NSEntity * pEnt)
 	mUI.mForceTblW->setMinimumHeight(40);
 	mUI.mKeyframeTblW->setMinimumHeight(40);
 
-	NSMaterial * mat = nsengine.resource<NSMaterial>(partComp->materialID());
-	NSShader * shader = nsengine.resource<NSShader>(partComp->shaderID());
-	NSTexture * tex = nsengine.resource<NSTexture>(partComp->randomTextureID());
+    nsmaterial * mat = nse.resource<nsmaterial>(partComp->material_id());
+    nsshader * shader = nse.resource<nsshader>(partComp->shader_id());
+    nstexture * tex = nse.resource<nstexture>(partComp->rand_tex_id());
 
 	if (mat != NULL)
 		mUI.mMaterialLE->setText(mat->name().c_str());
@@ -431,15 +429,15 @@ void ParticleCompWidget::setEntity(NSEntity * pEnt)
 	mUI.mSimCB->setChecked(partComp->simulating());
 
 	mUI.mMaxParticlesSB->blockSignals(true);
-	mUI.mMaxParticlesSB->setValue(partComp->maxParticles());
+    mUI.mMaxParticlesSB->setValue(partComp->max_particles());
 	mUI.mMaxParticlesSB->blockSignals(false);
 
 	mUI.mEmissionSB->blockSignals(true);
-	mUI.mEmissionSB->setValue(partComp->emissionRate());
+    mUI.mEmissionSB->setValue(partComp->emission_rate());
 	mUI.mEmissionSB->blockSignals(false);
 
 	mUI.mAngVelSB->blockSignals(true);
-	mUI.mAngVelSB->setValue(partComp->angularVelocity());
+    mUI.mAngVelSB->setValue(partComp->angular_vel());
 	mUI.mAngVelSB->blockSignals(false);
 
 	mUI.mLifetimeDSB->blockSignals(true);
@@ -447,18 +445,18 @@ void ParticleCompWidget::setEntity(NSEntity * pEnt)
 	mUI.mLifetimeDSB->blockSignals(false);
 
 	mUI.mStartWidthDSB->blockSignals(true);
-	mUI.mStartWidthDSB->setValue(partComp->startingSize().u);
+    mUI.mStartWidthDSB->setValue(partComp->starting_size().u);
 	mUI.mStartWidthDSB->blockSignals(false);
 
 	mUI.mStartHeightDSB->blockSignals(true);
-	mUI.mStartHeightDSB->setValue(partComp->startingSize().v);
+    mUI.mStartHeightDSB->setValue(partComp->starting_size().v);
 	mUI.mStartHeightDSB->blockSignals(false);
 
 	mUI.mEmitComb->blockSignals(true);
-	mUI.mEmitComb->setCurrentIndex(partComp->emitterShape());
+    mUI.mEmitComb->setCurrentIndex(partComp->emitter_shape());
 	mUI.mEmitComb->blockSignals(false);
 
-	fvec3 ss = partComp->emitterSize();
+    fvec3 ss = partComp->emitter_size();
 	mUI.mEmitXDSB->blockSignals(true);
 	mUI.mEmitXDSB->setValue(ss.x);
 	mUI.mEmitXDSB->blockSignals(false);
@@ -472,26 +470,26 @@ void ParticleCompWidget::setEntity(NSEntity * pEnt)
 	mUI.mEmitZDSB->blockSignals(false);
 
 	mUI.mMotionComb->blockSignals(true);
-	mUI.mMotionComb->setCurrentIndex(partComp->motionKeyType());
+    mUI.mMotionComb->setCurrentIndex(partComp->motion_key_type());
 	mUI.mMotionComb->blockSignals(false);
 
 	mUI.mInterpMotionCB->blockSignals(true);
-	mUI.mInterpMotionCB->setChecked(partComp->motionKeyInterpolation());
+    mUI.mInterpMotionCB->setChecked(partComp->motion_key_interpolation());
 	mUI.mInterpMotionCB->blockSignals(false);
 
 	mUI.mGlobalTimeCB->blockSignals(true);
-	mUI.mGlobalTimeCB->setChecked(partComp->motionGlobalTime());
+    mUI.mGlobalTimeCB->setChecked(partComp->motion_global_time());
 	mUI.mGlobalTimeCB->blockSignals(false);
 
 	mUI.mGlobalTimeVisualCB->blockSignals(true);
-	mUI.mGlobalTimeVisualCB->setChecked(partComp->visualGlobalTime());
+    mUI.mGlobalTimeVisualCB->setChecked(partComp->visual_global_time());
 	mUI.mGlobalTimeVisualCB->blockSignals(false);
 
 	mUI.mInterpolateVisualCB->blockSignals(true);
-	mUI.mInterpolateVisualCB->setChecked(partComp->visualKeyInterpolation());
+    mUI.mInterpolateVisualCB->setChecked(partComp->visual_key_interpolation());
 	mUI.mInterpolateVisualCB->blockSignals(false);
 
-	fvec3 iv = partComp->initVelocityMult();
+    fvec3 iv = partComp->init_vel_mult();
 	mUI.mInitVelXDSB->blockSignals(true);
 	mUI.mInitVelXDSB->setValue(iv.x);
 	mUI.mInitVelXDSB->blockSignals(false);
@@ -505,25 +503,25 @@ void ParticleCompWidget::setEntity(NSEntity * pEnt)
 	mUI.mInitVelZDSB->blockSignals(false);
 
 	mUI.mBlendComb->blockSignals(true);
-	mUI.mBlendComb->setCurrentIndex(partComp->blendMode());
+    mUI.mBlendComb->setCurrentIndex(partComp->blend_mode());
 	mUI.mBlendComb->blockSignals(false);
 
 
 
-	mUI.mForceTblW->setRowCount(partComp->motionKeyCount());
-	mUI.mKeyframeTblW->setRowCount(partComp->visualKeyCount());
+    mUI.mForceTblW->setRowCount(partComp->motion_key_count());
+    mUI.mKeyframeTblW->setRowCount(partComp->visual_key_count());
 
 	mUI.mForceTblW->blockSignals(true);
-	auto iterF = partComp->beginMotionKey();
+    auto iterF = partComp->begin_motion_key();
 	int index = 0;
-	while (iterF != partComp->endMotionKey())
+    while (iterF != partComp->end_motion_key())
 	{
 		QTableWidgetItem * item = new QTableWidgetItem();
 		QTableWidgetItem * item2 = new QTableWidgetItem();
 		QTableWidgetItem * item3 = new QTableWidgetItem();
 		QTableWidgetItem * item4 = new QTableWidgetItem();
 		
-		float normTime = float(iterF->first) / float(partComp->maxMotionKeys());
+        float normTime = float(iterF->first) / float(partComp->max_motion_keys());
 		item->setData(0, normTime);
 		item->setData(Qt::UserRole, normTime);
 
@@ -548,15 +546,15 @@ void ParticleCompWidget::setEntity(NSEntity * pEnt)
 
 	mUI.mKeyframeTblW->blockSignals(true);
 	index = 0;
-	auto iterR = partComp->beginVisualKey();
-	while (iterR != partComp->endVisualKey())
+    auto iterR = partComp->begin_visual_key();
+    while (iterR != partComp->end_visual_key())
 	{
 		QTableWidgetItem * item = new QTableWidgetItem();
 		QTableWidgetItem * item2 = new QTableWidgetItem();
 		QTableWidgetItem * item3 = new QTableWidgetItem();
 		QTableWidgetItem * item4 = new QTableWidgetItem();
 
-		float normTime = float(iterR->first) / float(partComp->maxVisualKeys());
+        float normTime = float(iterR->first) / float(partComp->max_visual_keys());
 		item->setData(0, normTime);
 		item->setData(Qt::UserRole, normTime);
 
@@ -585,7 +583,7 @@ void ParticleCompWidget::onChooseMat()
 	if (mEnt == NULL)
 		return;
 
-	NSParticleComp * partComp = mEnt->get<NSParticleComp>();
+	nsparticle_comp * partComp = mEnt->get<nsparticle_comp>();
 	if (partComp == NULL)
 		return;
 
@@ -594,17 +592,17 @@ void ParticleCompWidget::onChooseMat()
 	ui.setupUi(&selMatD);
 	selMatD.setWindowTitle("Select Material");
 
-	auto plugiter = nsengine.plugins()->begin();
-	while (plugiter != nsengine.plugins()->end())
+	auto plugiter = nse.plugins()->begin();
+	while (plugiter != nse.plugins()->end())
 	{
-		NSPlugin * plg = nsengine.plugin(plugiter->first);
+		nsplugin * plg = nse.plugin(plugiter->first);
 
-		NSMatManager * mats = plg->manager<NSMatManager>();
+		nsmat_manager * mats = plg->manager<nsmat_manager>();
 		auto miter = mats->begin();
 		while (miter != mats->end())
 		{
 			QListWidgetItem * toAdd = new QListWidgetItem(miter->second->name().c_str());
-			toAdd->setData(VIEW_WIDGET_ITEM_PLUG, miter->second->plugid());
+            toAdd->setData(VIEW_WIDGET_ITEM_PLUG, miter->second->plugin_id());
 			toAdd->setData(VIEW_WIDGET_ITEM_ENT, miter->second->id());
 			ui.mListWidget->addItem(toAdd);
 			++miter;
@@ -622,11 +620,11 @@ void ParticleCompWidget::onChooseMat()
 
 		uivec2 id(lwitem->data(VIEW_WIDGET_ITEM_PLUG).toUInt(), lwitem->data(VIEW_WIDGET_ITEM_ENT).toUInt());
 
-		NSMaterial * mat = nsengine.resource<NSMaterial>(id);
+		nsmaterial * mat = nse.resource<nsmaterial>(id);
 		if (mat == NULL)
 			return;
 
-		partComp->setMaterialID(mat->fullid());
+        partComp->set_material_id(mat->full_id());
 		setEntity(mEnt);
 	}
 }
@@ -636,11 +634,11 @@ void ParticleCompWidget::onChangeBlendMode(int pVal)
 	if (mEnt == NULL)
 		return;
 
-	NSParticleComp * partComp = mEnt->get<NSParticleComp>();
+	nsparticle_comp * partComp = mEnt->get<nsparticle_comp>();
 	if (partComp == NULL)
 		return;
 
-	partComp->setBlendMode(NSParticleComp::BlendMode(pVal));
+    partComp->set_blend_mode(nsparticle_comp::blend_m(pVal));
 	setEntity(mEnt);
 }
 
@@ -649,7 +647,7 @@ void ParticleCompWidget::onChooseShader()
 	if (mEnt == NULL)
 		return;
 
-	NSParticleComp * partComp = mEnt->get<NSParticleComp>();
+	nsparticle_comp * partComp = mEnt->get<nsparticle_comp>();
 	if (partComp == NULL)
 		return;
 
@@ -658,16 +656,16 @@ void ParticleCompWidget::onChooseShader()
 	ui.setupUi(&selShaderD);
 	selShaderD.setWindowTitle("Select Shader");
 
-	auto plugiter = nsengine.plugins()->begin();
-	while (plugiter != nsengine.plugins()->end())
+	auto plugiter = nse.plugins()->begin();
+	while (plugiter != nse.plugins()->end())
 	{
-		NSPlugin *plg = nsengine.plugin(plugiter->first);
-		NSShaderManager * shaders = plg->manager<NSShaderManager>();
+		nsplugin *plg = nse.plugin(plugiter->first);
+		nsshader_manager * shaders = plg->manager<nsshader_manager>();
 		auto siter = shaders->begin();
 		while (siter != shaders->end())
 		{
 			QListWidgetItem * lwitem = new QListWidgetItem(siter->second->name().c_str());
-			lwitem->setData(VIEW_WIDGET_ITEM_PLUG, siter->second->plugid());
+            lwitem->setData(VIEW_WIDGET_ITEM_PLUG, siter->second->plugin_id());
 			lwitem->setData(VIEW_WIDGET_ITEM_ENT, siter->second->id());
 			ui.mListWidget->addItem(lwitem);
 			++siter;
@@ -683,11 +681,11 @@ void ParticleCompWidget::onChooseShader()
 		auto lwitem = lwitems.first();
 
 		uivec2 id(lwitem->data(VIEW_WIDGET_ITEM_PLUG).toUInt(), lwitem->data(VIEW_WIDGET_ITEM_ENT).toUInt());
-		NSShader * shader = nsengine.resource<NSShader>(id);
+		nsshader * shader = nse.resource<nsshader>(id);
 		if (shader == NULL)
 			return;
 
-		partComp->setShaderID(shader->fullid());
+        partComp->set_shader_id(shader->full_id());
 		setEntity(mEnt);
 	}
 }
@@ -697,7 +695,7 @@ void ParticleCompWidget::onChooseRandTex()
 	if (mEnt == NULL)
 		return;
 
-	NSParticleComp * partComp = mEnt->get<NSParticleComp>();
+	nsparticle_comp * partComp = mEnt->get<nsparticle_comp>();
 	if (partComp == NULL)
 		return;
 
@@ -707,17 +705,17 @@ void ParticleCompWidget::onChooseRandTex()
 	selTextureD.setWindowTitle("Select Texture");
 
 
-	auto plugiter = nsengine.plugins()->begin();
-	while (plugiter != nsengine.plugins()->end())
+	auto plugiter = nse.plugins()->begin();
+	while (plugiter != nse.plugins()->end())
 	{
-		NSPlugin *plg = nsengine.plugin(plugiter->first);
-		NSTexManager * textures = plg->manager<NSTexManager>();
+		nsplugin *plg = nse.plugin(plugiter->first);
+		nstex_manager * textures = plg->manager<nstex_manager>();
 		auto txiter = textures->begin();
 		while (txiter != textures->end())
 		{
-			NSTexture * tex = textures->get(txiter->first);
+			nstexture * tex = textures->get(txiter->first);
 			QListWidgetItem * lwitem = new QListWidgetItem(txiter->second->name().c_str());
-			lwitem->setData(VIEW_WIDGET_ITEM_PLUG, tex->plugid());
+            lwitem->setData(VIEW_WIDGET_ITEM_PLUG, tex->plugin_id());
 			lwitem->setData(VIEW_WIDGET_ITEM_ENT, tex->id());
 			ui.mListWidget->addItem(lwitem);
 			++txiter;
@@ -731,11 +729,11 @@ void ParticleCompWidget::onChooseRandTex()
 			return;
 		auto lwitem = lwitems.first();
 		uivec2 id(lwitem->data(VIEW_WIDGET_ITEM_PLUG).toUInt(), lwitem->data(VIEW_WIDGET_ITEM_ENT).toUInt());
-		NSTexture * tex = nsengine.resource<NSTexture>(id);
+		nstexture * tex = nse.resource<nstexture>(id);
 		if (tex == NULL)
 			return;
 
-		partComp->setRandTextureID(tex->fullid());
+        partComp->set_rand_tex_id(tex->full_id());
 		setEntity(mEnt);
 	}
 }
@@ -745,11 +743,11 @@ void ParticleCompWidget::onChangeMaxParticle()
 	if (mEnt == NULL)
 		return;
 
-	NSParticleComp * partComp = mEnt->get<NSParticleComp>();
+	nsparticle_comp * partComp = mEnt->get<nsparticle_comp>();
 	if (partComp == NULL)
 		return;
 
-	partComp->setMaxParticles(mUI.mMaxParticlesSB->value());
+    partComp->set_max_particles(mUI.mMaxParticlesSB->value());
 	setEntity(mEnt);
 }
 
@@ -758,11 +756,11 @@ void ParticleCompWidget::onChangeEmissionRate()
 	if (mEnt == NULL)
 		return;
 
-	NSParticleComp * partComp = mEnt->get<NSParticleComp>();
+	nsparticle_comp * partComp = mEnt->get<nsparticle_comp>();
 	if (partComp == NULL)
 		return;
 
-	partComp->setEmissionRate(mUI.mEmissionSB->value());
+    partComp->set_emission_rate(mUI.mEmissionSB->value());
 	setEntity(mEnt);
 }
 
@@ -771,11 +769,11 @@ void ParticleCompWidget::onChangeAngVel()
 	if (mEnt == NULL)
 		return;
 
-	NSParticleComp * partComp = mEnt->get<NSParticleComp>();
+	nsparticle_comp * partComp = mEnt->get<nsparticle_comp>();
 	if (partComp == NULL)
 		return;
 
-	partComp->setAngularVelocity(mUI.mAngVelSB->value());
+    partComp->set_angular_vel(mUI.mAngVelSB->value());
 	setEntity(mEnt);
 }
 
@@ -784,11 +782,11 @@ void ParticleCompWidget::onChangeLifetime()
 	if (mEnt == NULL)
 		return;
 
-	NSParticleComp * partComp = mEnt->get<NSParticleComp>();
+	nsparticle_comp * partComp = mEnt->get<nsparticle_comp>();
 	if (partComp == NULL)
 		return;
 
-	partComp->setLifetime(nsuint(mUI.mLifetimeDSB->value()*1000.0f));
+    partComp->set_lifetime(uint32(mUI.mLifetimeDSB->value()*1000.0f));
 	setEntity(mEnt);
 }
 
@@ -797,13 +795,13 @@ void ParticleCompWidget::onChangeStartHeight()
 	if (mEnt == NULL)
 		return;
 
-	NSParticleComp * partComp = mEnt->get<NSParticleComp>();
+	nsparticle_comp * partComp = mEnt->get<nsparticle_comp>();
 	if (partComp == NULL)
 		return;
 
-	fvec2 size = partComp->startingSize();
+    fvec2 size = partComp->starting_size();
 	size.v = mUI.mStartHeightDSB->value();
-	partComp->setStartingSize(size);
+    partComp->set_starting_size(size);
 	setEntity(mEnt);
 }
 
@@ -812,13 +810,13 @@ void ParticleCompWidget::onChangeStartWidth()
 	if (mEnt == NULL)
 		return;
 
-	NSParticleComp * partComp = mEnt->get<NSParticleComp>();
+	nsparticle_comp * partComp = mEnt->get<nsparticle_comp>();
 	if (partComp == NULL)
 		return;
 
-	fvec2 size = partComp->startingSize();
+    fvec2 size = partComp->starting_size();
 	size.u = mUI.mStartWidthDSB->value();
-	partComp->setStartingSize(size);
+    partComp->set_starting_size(size);
 	setEntity(mEnt);
 }
 
@@ -827,11 +825,11 @@ void ParticleCompWidget::onToggleLoop(bool pVal)
 	if (mEnt == NULL)
 		return;
 
-	NSParticleComp * partComp = mEnt->get<NSParticleComp>();
+	nsparticle_comp * partComp = mEnt->get<nsparticle_comp>();
 	if (partComp == NULL)
 		return;
 
-	partComp->enableLooping(pVal);
+    partComp->enable_looping(pVal);
 	setEntity(mEnt);
 }
 
@@ -840,11 +838,11 @@ void ParticleCompWidget::onToggleSim(bool pVal)
 	if (mEnt == NULL)
 		return;
 
-	NSParticleComp * partComp = mEnt->get<NSParticleComp>();
+	nsparticle_comp * partComp = mEnt->get<nsparticle_comp>();
 	if (partComp == NULL)
 		return;
 
-	partComp->enableSimulation(pVal);
+    partComp->enable_simulation(pVal);
 	setEntity(mEnt);
 }
 
@@ -853,7 +851,7 @@ void ParticleCompWidget::onAddForce()
 	if (mEnt == NULL)
 		return;
 
-	NSParticleComp * partComp = mEnt->get<NSParticleComp>();
+	nsparticle_comp * partComp = mEnt->get<nsparticle_comp>();
 	if (partComp == NULL)
 		return;
 
@@ -863,10 +861,10 @@ void ParticleCompWidget::onAddForce()
 
 	float time = stuff.first().data().toFloat();
 
-	while (partComp->hasMotionKey(time))
-		time += 1 / float(partComp->maxMotionKeys());
+    while (partComp->has_motion_key(time))
+        time += 1 / float(partComp->max_motion_keys());
 
-	partComp->setMotionKey(time, fvec3());
+    partComp->set_motion_key(time, fvec3());
 	setEntity(mEnt);
 }
 
@@ -875,7 +873,7 @@ void ParticleCompWidget::onDelForce()
 	if (mEnt == NULL)
 		return;
 
-	NSParticleComp * partComp = mEnt->get<NSParticleComp>();
+	nsparticle_comp * partComp = mEnt->get<nsparticle_comp>();
 	if (partComp == NULL)
 		return;
 
@@ -884,7 +882,7 @@ void ParticleCompWidget::onDelForce()
 		return;
 
 	float time = stuff.first().data().toFloat();
-	partComp->removeMotionKey(time);
+    partComp->remove_motion_key(time);
 
 	setEntity(mEnt);
 }
@@ -894,7 +892,7 @@ void ParticleCompWidget::onAddKeyframe()
 	if (mEnt == NULL)
 		return;
 
-	NSParticleComp * partComp = mEnt->get<NSParticleComp>();
+	nsparticle_comp * partComp = mEnt->get<nsparticle_comp>();
 	if (partComp == NULL)
 		return;
 
@@ -904,10 +902,10 @@ void ParticleCompWidget::onAddKeyframe()
 
 	float time = stuff.first().data().toFloat();
 
-	while (partComp->hasVisualKey(time))
-		time += 1 / float(partComp->maxVisualKeys());
+    while (partComp->has_visual_key(time))
+        time += 1 / float(partComp->max_visual_keys());
 
-	partComp->setVisualKey(time, fvec3(1.0f, 1.0f, 1.0f));
+    partComp->set_visual_key(time, fvec3(1.0f, 1.0f, 1.0f));
 	setEntity(mEnt);
 }
 
@@ -916,7 +914,7 @@ void ParticleCompWidget::onDelKeyframe()
 	if (mEnt == NULL)
 		return;
 
-	NSParticleComp * partComp = mEnt->get<NSParticleComp>();
+	nsparticle_comp * partComp = mEnt->get<nsparticle_comp>();
 	if (partComp == NULL)
 		return;
 
@@ -925,7 +923,7 @@ void ParticleCompWidget::onDelKeyframe()
 		return;
 
 	float time = stuff.first().data().toFloat();
-	partComp->removeVisualKey(time);
+    partComp->remove_visual_key(time);
 
 	setEntity(mEnt);
 }
@@ -935,7 +933,7 @@ void ParticleCompWidget::onForceItemChange(QTableWidgetItem* pItem)
 	if (mEnt == NULL || pItem == NULL)
 		return;
 
-	NSParticleComp * partComp = mEnt->get<NSParticleComp>();
+	nsparticle_comp * partComp = mEnt->get<nsparticle_comp>();
 	if (partComp == NULL)
 		return;
 
@@ -944,21 +942,21 @@ void ParticleCompWidget::onForceItemChange(QTableWidgetItem* pItem)
 		float oldTime = pItem->data(Qt::UserRole).toFloat();
 		float newTime = pItem->data(0).toFloat();
 
-		fvec3 force = partComp->motionKeyAt(oldTime);
-		partComp->removeMotionKey(oldTime);
-		partComp->setMotionKey(newTime, force);
+        fvec3 force = partComp->motion_key_at(oldTime);
+        partComp->remove_motion_key(oldTime);
+        partComp->set_motion_key(newTime, force);
 	}
 	else
 	{
 		float time = mUI.mForceTblW->item(pItem->row(), 0)->data(0).toFloat();
-		fvec3 force = partComp->motionKeyAt(time);
+        fvec3 force = partComp->motion_key_at(time);
 		if (pItem->column() == 1)
 			force.x = pItem->data(0).toFloat();
 		else if (pItem->column() == 2)
 			force.y = pItem->data(0).toFloat();
 		else
 			force.z = pItem->data(0).toFloat();
-		partComp->setMotionKey(time, force);
+        partComp->set_motion_key(time, force);
 	}
 
 	setEntity(mEnt);
@@ -969,7 +967,7 @@ void ParticleCompWidget::onKeyframeItemChange(QTableWidgetItem* pItem)
 	if (mEnt == NULL || pItem == NULL)
 		return;
 
-	NSParticleComp * partComp = mEnt->get<NSParticleComp>();
+	nsparticle_comp * partComp = mEnt->get<nsparticle_comp>();
 	if (partComp == NULL)
 		return;
 
@@ -978,21 +976,21 @@ void ParticleCompWidget::onKeyframeItemChange(QTableWidgetItem* pItem)
 		float oldTime = pItem->data(Qt::UserRole).toFloat();
 		float newTime = pItem->data(0).toFloat();
 
-		fvec3 renKey = partComp->visualKeyAt(oldTime);
-		partComp->removeVisualKey(oldTime);
-		partComp->setVisualKey(newTime, renKey);
+        fvec3 renKey = partComp->visual_key_at(oldTime);
+        partComp->remove_visual_key(oldTime);
+        partComp->set_visual_key(newTime, renKey);
 	}
 	else
 	{
 		float time = mUI.mKeyframeTblW->item(pItem->row(), 0)->data(0).toFloat();
-		fvec3 renKey = partComp->visualKeyAt(time);
+        fvec3 renKey = partComp->visual_key_at(time);
 		if (pItem->column() == 1)
 			renKey.x = pItem->data(0).toFloat();
 		else if (pItem->column() == 2)
 			renKey.y = pItem->data(0).toFloat();
 		else
 			renKey.z = pItem->data(0).toFloat();
-		partComp->setVisualKey(time, renKey);
+        partComp->set_visual_key(time, renKey);
 	}
 
 	setEntity(mEnt);
@@ -1003,11 +1001,11 @@ void ParticleCompWidget::onChangeEmitterShape(int pVal)
 	if (mEnt == NULL)
 		return;
 
-	NSParticleComp * partComp = mEnt->get<NSParticleComp>();
+	nsparticle_comp * partComp = mEnt->get<nsparticle_comp>();
 	if (partComp == NULL)
 		return;
 
-	partComp->setEmitterShape(NSParticleComp::EmitterShape(pVal));
+    partComp->set_emitter_shape(nsparticle_comp::emitter_shape_t(pVal));
 	setEntity(mEnt);
 }
 
@@ -1016,7 +1014,7 @@ void ParticleCompWidget::onChangeEmitterSize()
 	if (mEnt == NULL)
 		return;
 
-	NSParticleComp * partComp = mEnt->get<NSParticleComp>();
+	nsparticle_comp * partComp = mEnt->get<nsparticle_comp>();
 	if (partComp == NULL)
 		return;
 
@@ -1024,7 +1022,7 @@ void ParticleCompWidget::onChangeEmitterSize()
 	emitterSize.x = mUI.mEmitXDSB->value();
 	emitterSize.y = mUI.mEmitYDSB->value();
 	emitterSize.z = mUI.mEmitZDSB->value();
-	partComp->setEmitterSize(emitterSize);
+    partComp->set_emitter_size(emitterSize);
 	setEntity(mEnt);
 }
 
@@ -1033,10 +1031,10 @@ void ParticleCompWidget::onToggleInterpolateVisual(bool pVal)
 	if (mEnt == NULL)
 		return;
 
-	NSParticleComp * partComp = mEnt->get<NSParticleComp>();
+	nsparticle_comp * partComp = mEnt->get<nsparticle_comp>();
 	if (partComp == NULL)
 		return;
-	partComp->enableVisualKeyInterpolation(pVal);
+    partComp->enable_visual_key_interp(pVal);
 	setEntity(mEnt);
 }
 
@@ -1045,11 +1043,11 @@ void ParticleCompWidget::onToggleGlobalTimeVisual(bool pVal)
 	if (mEnt == NULL)
 		return;
 
-	NSParticleComp * partComp = mEnt->get<NSParticleComp>();
+	nsparticle_comp * partComp = mEnt->get<nsparticle_comp>();
 	if (partComp == NULL)
 		return;
 
-	partComp->enableVisualGlobalTime(pVal);
+    partComp->enable_visual_global_time(pVal);
 	setEntity(mEnt);
 }
 
@@ -1058,7 +1056,7 @@ void ParticleCompWidget::onChangeInitVel()
 	if (mEnt == NULL)
 		return;
 
-	NSParticleComp * partComp = mEnt->get<NSParticleComp>();
+	nsparticle_comp * partComp = mEnt->get<nsparticle_comp>();
 	if (partComp == NULL)
 		return;
 
@@ -1066,7 +1064,7 @@ void ParticleCompWidget::onChangeInitVel()
 	initVel.x = mUI.mInitVelXDSB->value();
 	initVel.y = mUI.mInitVelYDSB->value();
 	initVel.z = mUI.mInitVelZDSB->value();
-	partComp->setInitVelocityMult(initVel);
+    partComp->set_init_vel_mult(initVel);
 	setEntity(mEnt);
 }
 
@@ -1075,11 +1073,11 @@ void ParticleCompWidget::onChangeMotionType(int pVal)
 	if (mEnt == NULL)
 		return;
 
-	NSParticleComp * partComp = mEnt->get<NSParticleComp>();
+	nsparticle_comp * partComp = mEnt->get<nsparticle_comp>();
 	if (partComp == NULL)
 		return;
 
-	partComp->setMotionKeyType(NSParticleComp::MotionKeyType(pVal));
+    partComp->set_motion_key_type(nsparticle_comp::motion_key_t(pVal));
 	setEntity(mEnt);
 }
 
@@ -1088,11 +1086,11 @@ void ParticleCompWidget::onToggleInterpolate(bool pVal)
 	if (mEnt == NULL)
 		return;
 
-	NSParticleComp * partComp = mEnt->get<NSParticleComp>();
+	nsparticle_comp * partComp = mEnt->get<nsparticle_comp>();
 	if (partComp == NULL)
 		return;
 
-	partComp->enableMotionKeyInterpolation(pVal);
+    partComp->enable_motion_key_interp(pVal);
 	setEntity(mEnt);
 }
 
@@ -1101,11 +1099,11 @@ void ParticleCompWidget::onToggleGlobalTime(bool pVal)
 	if (mEnt == NULL)
 		return;
 
-	NSParticleComp * partComp = mEnt->get<NSParticleComp>();
+	nsparticle_comp * partComp = mEnt->get<nsparticle_comp>();
 	if (partComp == NULL)
 		return;
 
-	partComp->enableMotionGlobalTime(pVal);
+    partComp->enable_motion_global_time(pVal);
 	setEntity(mEnt);
 }
 
@@ -1120,30 +1118,30 @@ CompWidget(pParent)
 RenderCompWidget::~RenderCompWidget()
 {}
 
-void RenderCompWidget::setEntity(NSEntity * pEnt)
+void RenderCompWidget::setEntity(nsentity * pEnt)
 {
 	CompWidget::setEntity(pEnt);
 	if (mEnt == NULL)
 		return;
 
-	NSRenderComp * renComp = mEnt->get<NSRenderComp>();
+	nsrender_comp * renComp = mEnt->get<nsrender_comp>();
 	if (renComp == NULL)
 		return;
 
 	mUI.mMaterialsTW->clear();
 
 	mUI.mCastsShadowsCB->blockSignals(true);
-	mUI.mCastsShadowsCB->setChecked(renComp->castShadow());
+    mUI.mCastsShadowsCB->setChecked(renComp->cast_shadow());
 	mUI.mCastsShadowsCB->blockSignals(false);
 
-	NSMesh * mesh = nsengine.resource<NSMesh>(renComp->meshID());
+    nsmesh * mesh = nse.resource<nsmesh>(renComp->mesh_id());
 
 	mUI.mMeshNameLE->setText(mesh->name().c_str());
 	
 	
-	for (nsuint i = 0; i < mesh->count(); ++i)
+	for (uint32 i = 0; i < mesh->count(); ++i)
 	{
-		NSMaterial * mat = nsengine.resource<NSMaterial>(renComp->materialID(i));
+        nsmaterial * mat = nse.resource<nsmaterial>(renComp->material_id(i));
 		QTreeWidgetItem * item = new QTreeWidgetItem();
 		item->setText(0, QString::number(i)); item->setData(0, 0, i);
 		item->setText(1, "None");
@@ -1159,12 +1157,12 @@ void RenderCompWidget::onCastShadowsChange(bool)
 	if (mEnt == NULL)
 		return;
 
-	NSRenderComp * renComp = mEnt->get<NSRenderComp>();
+	nsrender_comp * renComp = mEnt->get<nsrender_comp>();
 	if (renComp == NULL)
 		return;
 
-	renComp->setCastShadow(mUI.mCastsShadowsCB->isChecked());
-	mTK->mapView()->update();
+    renComp->set_cast_shadow(mUI.mCastsShadowsCB->isChecked());
+    bbtk.map_view()->update();
 }
 
 void RenderCompWidget::onChooseMat()
@@ -1172,7 +1170,7 @@ void RenderCompWidget::onChooseMat()
 	if (mEnt == NULL)
 		return;
 
-	NSRenderComp * renComp = mEnt->get<NSRenderComp>();
+	nsrender_comp * renComp = mEnt->get<nsrender_comp>();
 	if (renComp == NULL)
 		return;
 
@@ -1187,17 +1185,17 @@ void RenderCompWidget::onChooseMat()
 	ui.setupUi(&selMatD);
 	selMatD.setWindowTitle("Select Material");
 
-	auto plugiter = nsengine.plugins()->begin();
-	while (plugiter != nsengine.plugins()->end())
+	auto plugiter = nse.plugins()->begin();
+	while (plugiter != nse.plugins()->end())
 	{
-		NSPlugin * plg = nsengine.plugin(plugiter->first);
+		nsplugin * plg = nse.plugin(plugiter->first);
 
-		NSMatManager * mats = plg->manager<NSMatManager>();
+		nsmat_manager * mats = plg->manager<nsmat_manager>();
 		auto miter = mats->begin();
 		while (miter != mats->end())
 		{
 			QListWidgetItem * toAdd = new QListWidgetItem(miter->second->name().c_str());
-			toAdd->setData(VIEW_WIDGET_ITEM_PLUG, miter->second->plugid());
+            toAdd->setData(VIEW_WIDGET_ITEM_PLUG, miter->second->plugin_id());
 			toAdd->setData(VIEW_WIDGET_ITEM_ENT, miter->second->id());
 			ui.mListWidget->addItem(toAdd);
 			++miter;
@@ -1215,13 +1213,13 @@ void RenderCompWidget::onChooseMat()
 
 		uivec2 id(lwitem->data(VIEW_WIDGET_ITEM_PLUG).toUInt(), lwitem->data(VIEW_WIDGET_ITEM_ENT).toUInt());
 
-		NSMaterial * mat = nsengine.resource<NSMaterial>(id);
+		nsmaterial * mat = nse.resource<nsmaterial>(id);
 		if (mat == NULL)
 			return;
 
-		renComp->setMaterial(twItem->data(0, 0).toInt(), mat->fullid(), true);
+        renComp->set_material(twItem->data(0, 0).toInt(), mat->full_id(), true);
 		setEntity(mEnt);
-		mTK->mapView()->update();
+        bbtk.map_view()->update();
 	}
 }
 
@@ -1230,7 +1228,7 @@ void RenderCompWidget::onChooseMesh()
 	if (mEnt == NULL)
 		return;
 
-	NSRenderComp * renComp = mEnt->get<NSRenderComp>();
+	nsrender_comp * renComp = mEnt->get<nsrender_comp>();
 	if (renComp == NULL)
 		return;
 
@@ -1240,17 +1238,17 @@ void RenderCompWidget::onChooseMesh()
 
 	selMeshD.setWindowTitle("Select Mesh");
 
-	auto plugiter = nsengine.plugins()->begin();
-	while (plugiter != nsengine.plugins()->end())
+	auto plugiter = nse.plugins()->begin();
+	while (plugiter != nse.plugins()->end())
 	{
-		NSPlugin * plg = nsengine.plugin(plugiter->first);
+		nsplugin * plg = nse.plugin(plugiter->first);
 
-		NSMeshManager * meshes = plg->manager<NSMeshManager>();
+		nsmesh_manager * meshes = plg->manager<nsmesh_manager>();
 		auto miter = meshes->begin();
 		while (miter != meshes->end())
 		{
 			QListWidgetItem * toAdd = new QListWidgetItem(miter->second->name().c_str());
-			toAdd->setData(VIEW_WIDGET_ITEM_PLUG, miter->second->plugid());
+            toAdd->setData(VIEW_WIDGET_ITEM_PLUG, miter->second->plugin_id());
 			toAdd->setData(VIEW_WIDGET_ITEM_ENT, miter->second->id());
 			ui.mListWidget->addItem(toAdd);
 			++miter;
@@ -1268,14 +1266,14 @@ void RenderCompWidget::onChooseMesh()
 
 		uivec2 id(lwitem->data(VIEW_WIDGET_ITEM_PLUG).toUInt(), lwitem->data(VIEW_WIDGET_ITEM_ENT).toUInt());
 
-		NSMesh * mesh = nsengine.resource<NSMesh>(id);
+		nsmesh * mesh = nse.resource<nsmesh>(id);
 		if (mesh == NULL)
 			return;
 
-		renComp->setMeshID(mesh->fullid());
-		renComp->clearMats();
+        renComp->set_mesh_id(mesh->full_id());
+        renComp->clear_mats();
 		setEntity(mEnt);
-		mTK->mapView()->update();
+        bbtk.map_view()->update();
 	}
 }
 
@@ -1284,7 +1282,7 @@ void RenderCompWidget::onClearMat()
 	if (mEnt == NULL)
 		return;
 
-	NSRenderComp * renComp = mEnt->get<NSRenderComp>();
+	nsrender_comp * renComp = mEnt->get<nsrender_comp>();
 	if (renComp == NULL)
 		return;
 
@@ -1294,9 +1292,9 @@ void RenderCompWidget::onClearMat()
 
 	QTreeWidgetItem * twItem = items.first();
 
-	renComp->removeMaterial(twItem->data(0, 0).toInt());
+    renComp->remove_material(twItem->data(0, 0).toInt());
 	setEntity(mEnt);
-	mTK->mapView()->update();
+    bbtk.map_view()->update();
 
 }
 
@@ -1305,7 +1303,7 @@ void RenderCompWidget::onSelectionChange()
 	if (mEnt == NULL)
 		return;
 
-	NSRenderComp * renComp = mEnt->get<NSRenderComp>();
+	nsrender_comp * renComp = mEnt->get<nsrender_comp>();
 	if (renComp == NULL)
 		return;
 
@@ -1325,21 +1323,21 @@ CompWidget(pParent)
 SelCompWidget::~SelCompWidget()
 {}
 
-void SelCompWidget::setEntity(NSEntity * pEnt)
+void SelCompWidget::setEntity(nsentity * pEnt)
 {
 	CompWidget::setEntity(pEnt);
 	if (mEnt == NULL)
 		return;
 
-	NSSelComp * selComp = mEnt->get<NSSelComp>();
+	nssel_comp * selComp = mEnt->get<nssel_comp>();
 	if (selComp == NULL)
 		return;
 
 	mUI.mAlphaSB->blockSignals(true);
-	mUI.mAlphaSB->setValue(selComp->maskAlpha());
+    mUI.mAlphaSB->setValue(selComp->mask_alpha());
 	mUI.mAlphaSB->blockSignals(false);
 	
-	fvec4 col = selComp->defaultColor();
+    fvec4 col = selComp->default_color();
 	QColor prevC;
 	prevC.setRedF(col.x); prevC.setGreenF(col.y); prevC.setBlueF(col.z); prevC.setAlphaF(col.w);
 	_setColorStyle(prevC);
@@ -1350,12 +1348,12 @@ void SelCompWidget::onAlphaChange(double pVal)
 	if (mEnt == NULL)
 		return;
 
-	NSSelComp * selComp = mEnt->get<NSSelComp>();
+	nssel_comp * selComp = mEnt->get<nssel_comp>();
 	if (selComp == NULL)
 		return;
 
-	selComp->setMaskAlpha(pVal);
-	mTK->mapView()->update();
+    selComp->set_mask_alpha(pVal);
+    bbtk.map_view()->update();
 }
 
 void SelCompWidget::onChangeColor()
@@ -1363,22 +1361,22 @@ void SelCompWidget::onChangeColor()
 	if (mEnt == NULL)
 		return;
 
-	NSSelComp * selComp = mEnt->get<NSSelComp>();
+	nssel_comp * selComp = mEnt->get<nssel_comp>();
 	if (selComp == NULL)
 		return;
 
-	fvec4 col = selComp->defaultColor();
+    fvec4 col = selComp->default_color();
 	QColor prevC;
 	prevC.setRedF(col.x); prevC.setGreenF(col.y); prevC.setBlueF(col.z); prevC.setAlphaF(col.w);
 	QColor c = QColorDialog::getColor(prevC);
 	if (c.isValid())
 	{
 		fvec4 newCol(c.redF(), c.greenF(), c.blueF(), c.alphaF());
-		selComp->setDefaultColor(newCol);
+        selComp->set_default_sel_color(newCol);
 		prevC = c;
 	}
 	_setColorStyle(prevC);
-	mTK->mapView()->update();
+    bbtk.map_view()->update();
 }
 
 void SelCompWidget::_setColorStyle(const QColor & pCol)

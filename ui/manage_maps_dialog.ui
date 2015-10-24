@@ -67,7 +67,7 @@ left: 10px;
              <string/>
             </property>
             <property name="icon">
-             <iconset resource="toolkit.qrc">
+             <iconset resource="../toolkit.qrc">
               <normaloff>:/VecTB/icons/toolbars/New_Map.png</normaloff>
               <disabledoff>:/VecTB/icons/toolbars/New_Map_Disabled.png</disabledoff>:/VecTB/icons/toolbars/New_Map.png</iconset>
             </property>
@@ -79,7 +79,7 @@ left: 10px;
              <string/>
             </property>
             <property name="icon">
-             <iconset resource="toolkit.qrc">
+             <iconset resource="../toolkit.qrc">
               <normaloff>:/VecTB/icons/toolbars/Edit.png</normaloff>
               <disabledoff>:/VecTB/icons/toolbars/Edit_Disabled.png</disabledoff>:/VecTB/icons/toolbars/Edit.png</iconset>
             </property>
@@ -91,7 +91,7 @@ left: 10px;
              <string/>
             </property>
             <property name="icon">
-             <iconset resource="toolkit.qrc">
+             <iconset resource="../toolkit.qrc">
               <normaloff>:/VecTB/icons/toolbars/Delete.png</normaloff>
               <disabledoff>:/VecTB/icons/toolbars/Delete_Disabled.png</disabledoff>:/VecTB/icons/toolbars/Delete.png</iconset>
             </property>
@@ -214,7 +214,7 @@ left: 10px;
   </layout>
  </widget>
  <resources>
-  <include location="toolkit.qrc"/>
+  <include location="../toolkit.qrc"/>
  </resources>
  <connections>
   <connection>

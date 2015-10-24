@@ -2,18 +2,18 @@
 #define RESOURCEWIDGET_H
 
 #include <qwidget.h>
-#include <nsglobal.h>
+#include <nsstring.h>
 
-class NSResource;
+class nsresource;
 
 class ResourceWidget : public QWidget
 {
   public:
     ResourceWidget(QWidget * parent = NULL):QWidget(parent){}
-    virtual ~ResourceWidget() {};
+    virtual ~ResourceWidget() {}
 
-	virtual void setResource(NSResource * res)=0;
-	virtual NSResource * resource()=0;
+    virtual void setResource(nsresource * res)=0;
+    virtual nsresource * resource()=0;
 	virtual nsstring defaultResName()=0;
 };
 

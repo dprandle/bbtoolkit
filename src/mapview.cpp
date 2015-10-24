@@ -10,47 +10,27 @@ This file contains all of the neccessary definitions for the MapView class.
 \copywrite Earth Banana Games 2013
 */
 
+// Engine includes
+#include <nsdebug.h>
+#include <nsinput_system.h>
+#include <nsrender_system.h>
+#include <nsbuild_system.h>
+#include <nsentity.h>
+#include <nsplugin.h>
+#include <nsscene.h>
+
+// Qt Includes
+#include <qevent.h>
 #include <qpushbutton.h>
 #include <mapview.h>
 #include <toolkit.h>
-#include <myGL/glew.h>
-#include <nsmesh.h>
-#include <nslogfile.h>
-//#include <windows.h>
-#include <nsdebug.h>
-#include <nsshadermanager.h>
-#include <camerasettingsdialog.h>
-#include <nsmeshmanager.h>
-#include <nsanimmanager.h>
-#include <nsinputmapmanager.h>
-#include <nsbuildsystem.h>
-#include <nsoccupycomp.h>
-#include <nstilecomp.h>
-#include <nstilebrushcomp.h>
-#include <nsmatmanager.h>
-#include <nstexmanager.h>
-#include <nsbufferobject.h>
-#include <nsshader.h>
-#include <nsglobal.h>
-#include <nsanimset.h>
-#include <nsanimcomp.h>
-#include <nsrendersystem.h>
-#include <nsscenemanager.h>
-#include <nslightcomp.h>
-#include <nscamcomp.h>
-#include <nsentity.h>
-#include <nspluginmanager.h>
-#include <nsengine.h>
-#include <nsentitymanager.h>
-#include <nsinputcomp.h>
-#include <nsplugin.h>
-#include <nsselcomp.h>
-#include <vector>
-#include <nsinputsystem.h>
-// Qt Includes
-#include <qevent.h>
 #include <qtimer.h>
-
+#include <camerasettingsdialog.h>
+#include <qmessagebox.h>
+#include <resource_browser.h>
+#include <resource_dialog.h>
+#include <resource_dialog_prev.h>
+#include <resource_dialog_prev_lighting.h>
 
 MapView::MapView(QWidget * parent) :
 	QOpenGLWidget(parent)
@@ -60,14 +40,13 @@ MapView::MapView(QWidget * parent) :
 MapView::~MapView()
 {}
 
-nsuint MapView::glewID()
+uint32 MapView::glewID()
 {
-	return mGlewID;
+    return m_glew_id;
 }
 
-void MapView::init(Toolkit * pTK)
+void MapView::init()
 {
-	mTK = pTK;
 	setMouseTracking(true);
 	setFocusPolicy(Qt::StrongFocus);
 	setSizePolicy(QSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum));
@@ -78,155 +57,262 @@ void MapView::init(Toolkit * pTK)
 
 void MapView::_connect()
 {
-	QTimer * t = new QTimer();
-	connect(t, SIGNAL(timeout()), this, SLOT(onIdle()));
-	t->start(0);
+    QTimer * t = new QTimer();
+    connect(t, SIGNAL(timeout()), this, SLOT(onIdle()));
+    t->start(0);
 }
 
 void MapView::enterEvent(QEvent *)
 {
-	nsengine.makeCurrent(mGlewID);
-	QPoint p = mapFromGlobal(QCursor::pos());
-	fvec2 pos(nsfloat(p.x()) / nsfloat(width()), 1.0f - nsfloat(p.y()) / nsfloat(height()));
-	nsengine.system<NSBuildSystem>()->toCursor(pos);
-	nsengine.system<NSInputSystem>()->setLastPos(pos);
+    nse.make_current(m_glew_id);
+    nse.system<nsinput_system>()->set_cursor_pos(platform_normalized_mpos());
+    nse.system<nsbuild_system>()->to_cursor();
 }
 
 void MapView::keyReleaseEvent(QKeyEvent * kEvent)
 {
-	nsengine.makeCurrent(mGlewID);
-	if (kEvent->isAutoRepeat())
-	{
-		QOpenGLWidget::keyPressEvent(kEvent);
-		return;
-	}
+    nse.make_current(m_glew_id);
+    if (kEvent->isAutoRepeat())
+    {
+        QOpenGLWidget::keyPressEvent(kEvent);
+        return;
+    }
 
-	switch (kEvent->key())
-	{
-	case (Qt::Key_W) :
-		nsengine.system<NSInputSystem>()->keyRelease(NSInputMap::Key_W);
-		break;
-	case (Qt::Key_S) :
-		nsengine.system<NSInputSystem>()->keyRelease(NSInputMap::Key_S);
-		break;
-	case (Qt::Key_A) :
-		nsengine.system<NSInputSystem>()->keyRelease(NSInputMap::Key_A);
-		break;
-	case (Qt::Key_D) :
-		nsengine.system<NSInputSystem>()->keyRelease(NSInputMap::Key_D);
-		break;
-	case (Qt::Key_Z) :
-		nsengine.system<NSInputSystem>()->keyRelease(NSInputMap::Key_Z);
-		break;
-	case (Qt::Key_Y) :
-		nsengine.system<NSInputSystem>()->keyRelease(NSInputMap::Key_Y);
-		break;
-	case (Qt::Key_B) :
-		nsengine.system<NSInputSystem>()->keyRelease(NSInputMap::Key_B);
-		break;
-	case (Qt::Key_P) :
-		nsengine.system<NSInputSystem>()->keyRelease(NSInputMap::Key_P);
-		break;
-	case (Qt::Key_Shift) :
-		nsengine.system<NSInputSystem>()->keyRelease(NSInputMap::Key_LShift);
-		break;
-	case (Qt::Key_Control) :
-		nsengine.system<NSInputSystem>()->keyRelease(NSInputMap::Key_LCtrl);
-		break;
-	default:
-		QOpenGLWidget::keyPressEvent(kEvent);
-	}
+    if (!_on_key(false,kEvent->key()))
+        QOpenGLWidget::keyPressEvent(kEvent);
 }
 
 void MapView::keyPressEvent(QKeyEvent * kEvent)
 {
-	nsengine.makeCurrent(mGlewID);
-	if (kEvent->isAutoRepeat())
-	{
-		QOpenGLWidget::keyPressEvent(kEvent);
-		return;
-	}
+    nse.make_current(m_glew_id);
+    if (kEvent->isAutoRepeat())
+    {
+        QOpenGLWidget::keyPressEvent(kEvent);
+        return;
+    }
 
-	switch (kEvent->key())
-	{
-	case (Qt::Key_W) :
-		nsengine.system<NSInputSystem>()->keyPress(NSInputMap::Key_W);
-		break;
-	case (Qt::Key_Z) :
-		nsengine.system<NSInputSystem>()->keyPress(NSInputMap::Key_Z);
-		break;
-	case (Qt::Key_Y) :
-		nsengine.system<NSInputSystem>()->keyPress(NSInputMap::Key_Y);
-		break;
-	case (Qt::Key_S) :
-		nsengine.system<NSInputSystem>()->keyPress(NSInputMap::Key_S);
-		break;
-	case (Qt::Key_A) :
-		nsengine.system<NSInputSystem>()->keyPress(NSInputMap::Key_A);
-		break;
-	case (Qt::Key_D) :
-		nsengine.system<NSInputSystem>()->keyPress(NSInputMap::Key_D);
-		break;
-	case (Qt::Key_B) :
-		nsengine.system<NSInputSystem>()->keyPress(NSInputMap::Key_B);
-		break;
-	case (Qt::Key_P) :
-		nsengine.system<NSInputSystem>()->keyPress(NSInputMap::Key_P);
-		break;
-	case (Qt::Key_Shift) :
-		nsengine.system<NSInputSystem>()->keyPress(NSInputMap::Key_LShift);
-		break;
-	case (Qt::Key_Control) :
-		nsengine.system<NSInputSystem>()->keyPress(NSInputMap::Key_LCtrl);
-		break;
-	default:
-		QOpenGLWidget::keyPressEvent(kEvent);
-	}
+    if (!_on_key(true,kEvent->key()))
+        QOpenGLWidget::keyPressEvent(kEvent);
+}
+
+bool MapView::_on_key(bool pressed, int key)
+{
+    switch (key)
+    {
+    case (Qt::Key_A) :
+        nse.event_dispatch()->push<nskey_event>(nsinput_map::key_a, pressed);
+        break;
+    case (Qt::Key_B) :
+        nse.event_dispatch()->push<nskey_event>(nsinput_map::key_b, pressed);
+        break;
+    case (Qt::Key_C) :
+        nse.event_dispatch()->push<nskey_event>(nsinput_map::key_c, pressed);
+        break;
+    case (Qt::Key_D) :
+        nse.event_dispatch()->push<nskey_event>(nsinput_map::key_d, pressed);
+        break;
+    case (Qt::Key_E) :
+        nse.event_dispatch()->push<nskey_event>(nsinput_map::key_e, pressed);
+        break;
+    case (Qt::Key_F) :
+        nse.event_dispatch()->push<nskey_event>(nsinput_map::key_f, pressed);
+        break;
+    case (Qt::Key_G) :
+        nse.event_dispatch()->push<nskey_event>(nsinput_map::key_g, pressed);
+        break;
+    case (Qt::Key_H) :
+        nse.event_dispatch()->push<nskey_event>(nsinput_map::key_h, pressed);
+        break;
+    case (Qt::Key_I) :
+        nse.event_dispatch()->push<nskey_event>(nsinput_map::key_i, pressed);
+        break;
+    case (Qt::Key_J) :
+        nse.event_dispatch()->push<nskey_event>(nsinput_map::key_j, pressed);
+        break;
+    case (Qt::Key_K) :
+        nse.event_dispatch()->push<nskey_event>(nsinput_map::key_k, pressed);
+        break;
+    case (Qt::Key_L) :
+        nse.event_dispatch()->push<nskey_event>(nsinput_map::key_l, pressed);
+        break;
+    case (Qt::Key_M) :
+        nse.event_dispatch()->push<nskey_event>(nsinput_map::key_m, pressed);
+        break;
+    case (Qt::Key_N) :
+        nse.event_dispatch()->push<nskey_event>(nsinput_map::key_n, pressed);
+        break;
+    case (Qt::Key_O) :
+        nse.event_dispatch()->push<nskey_event>(nsinput_map::key_o, pressed);
+        break;
+    case (Qt::Key_P) :
+        nse.event_dispatch()->push<nskey_event>(nsinput_map::key_p, pressed);
+        break;
+    case (Qt::Key_Q) :
+        nse.event_dispatch()->push<nskey_event>(nsinput_map::key_q, pressed);
+        break;
+    case (Qt::Key_R) :
+        nse.event_dispatch()->push<nskey_event>(nsinput_map::key_r, pressed);
+        break;
+    case (Qt::Key_S) :
+        nse.event_dispatch()->push<nskey_event>(nsinput_map::key_s, pressed);
+        break;
+    case (Qt::Key_T) :
+        nse.event_dispatch()->push<nskey_event>(nsinput_map::key_t, pressed);
+        break;
+    case (Qt::Key_U) :
+        nse.event_dispatch()->push<nskey_event>(nsinput_map::key_u, pressed);
+        break;
+    case (Qt::Key_V) :
+        nse.event_dispatch()->push<nskey_event>(nsinput_map::key_v, pressed);
+        break;
+    case (Qt::Key_W) :
+        nse.event_dispatch()->push<nskey_event>(nsinput_map::key_w, pressed);
+        break;
+    case (Qt::Key_X) :
+        nse.event_dispatch()->push<nskey_event>(nsinput_map::key_x, pressed);
+        break;
+    case (Qt::Key_Y) :
+        nse.event_dispatch()->push<nskey_event>(nsinput_map::key_y, pressed);
+        break;
+    case (Qt::Key_Z) :
+        nse.event_dispatch()->push<nskey_event>(nsinput_map::key_z, pressed);
+        break;
+    case (Qt::Key_0) :
+        nse.event_dispatch()->push<nskey_event>(nsinput_map::key_keypad_0, pressed);
+        break;
+    case (Qt::Key_1) :
+        nse.event_dispatch()->push<nskey_event>(nsinput_map::key_keypad_1, pressed);
+        break;
+    case (Qt::Key_2) :
+        nse.event_dispatch()->push<nskey_event>(nsinput_map::key_keypad_2, pressed);
+        break;
+    case (Qt::Key_3) :
+        nse.event_dispatch()->push<nskey_event>(nsinput_map::key_keypad_3, pressed);
+        break;
+    case (Qt::Key_4) :
+        nse.event_dispatch()->push<nskey_event>(nsinput_map::key_keypad_4, pressed);
+        break;
+    case (Qt::Key_5) :
+        nse.event_dispatch()->push<nskey_event>(nsinput_map::key_keypad_5, pressed);
+        break;
+    case (Qt::Key_6) :
+        nse.event_dispatch()->push<nskey_event>(nsinput_map::key_keypad_6, pressed);
+        break;
+    case (Qt::Key_7) :
+        nse.event_dispatch()->push<nskey_event>(nsinput_map::key_keypad_7, pressed);
+        break;
+    case (Qt::Key_8) :
+        nse.event_dispatch()->push<nskey_event>(nsinput_map::key_keypad_8, pressed);
+        break;
+    case (Qt::Key_9) :
+        nse.event_dispatch()->push<nskey_event>(nsinput_map::key_keypad_9, pressed);
+        break;
+    case (Qt::Key_Shift) :
+        nse.event_dispatch()->push<nskey_event>(nsinput_map::key_lshift, pressed);
+        break;
+    case (Qt::Key_Control) :
+        nse.event_dispatch()->push<nskey_event>(nsinput_map::key_lctrl, pressed);
+        break;
+    case (Qt::Key_Alt) :
+        nse.event_dispatch()->push<nskey_event>(nsinput_map::key_lalt, pressed);
+        break;
+    case (Qt::Key_Tab) :
+        nse.event_dispatch()->push<nskey_event>(nsinput_map::key_tab, pressed);
+        break;
+    case (Qt::Key_CapsLock) :
+        nse.event_dispatch()->push<nskey_event>(nsinput_map::key_capslock, pressed);
+        break;
+    case (Qt::Key_Space) :
+        nse.event_dispatch()->push<nskey_event>(nsinput_map::key_space, pressed);
+        break;
+    case (Qt::Key_Super_L) :
+        nse.event_dispatch()->push<nskey_event>(nsinput_map::key_lsuper, pressed);
+        break;
+    case (Qt::Key_Super_R) :
+        nse.event_dispatch()->push<nskey_event>(nsinput_map::key_rsuper, pressed);
+        break;
+    case (Qt::Key_Left) :
+        nse.event_dispatch()->push<nskey_event>(nsinput_map::key_left, pressed);
+        break;
+    case (Qt::Key_Right) :
+        nse.event_dispatch()->push<nskey_event>(nsinput_map::key_right, pressed);
+        break;
+    case (Qt::Key_Up) :
+        nse.event_dispatch()->push<nskey_event>(nsinput_map::key_up, pressed);
+        break;
+    case (Qt::Key_Down) :
+        nse.event_dispatch()->push<nskey_event>(nsinput_map::key_down, pressed);
+        break;
+    case (Qt::Key_Escape) :
+        nse.event_dispatch()->push<nskey_event>(nsinput_map::key_esc, pressed);
+        break;
+    case (Qt::Key_Delete) :
+        nse.event_dispatch()->push<nskey_event>(nsinput_map::key_delete, pressed);
+        break;
+    case (Qt::Key_Backspace) :
+        nse.event_dispatch()->push<nskey_event>(nsinput_map::key_backspace, pressed);
+        break;
+    case (Qt::Key_Enter) :
+        nse.event_dispatch()->push<nskey_event>(nsinput_map::key_enter, pressed);
+        break;
+    default:
+        return false;
+    }
+    return true;
 }
 
 void MapView::mouseMoveEvent(QMouseEvent * mevent)
 {
-	nsengine.makeCurrent(mGlewID);
-	nsfloat normXPos = nsfloat(mevent->pos().x()) / nsfloat(width());
-	nsfloat normYPos = 1.0f - nsfloat(mevent->pos().y()) / nsfloat(height());
-
-	nsengine.system<NSInputSystem>()->mouseMove(normXPos, normYPos);
-	QOpenGLWidget::mouseMoveEvent(mevent);
+    nse.make_current(m_glew_id);
+    nse.event_dispatch()->push<nsmouse_move_event>(platform_normalized_mpos());
+    QOpenGLWidget::mouseMoveEvent(mevent);
 }
 
 void MapView::mouseReleaseEvent(QMouseEvent * mevent)
 {
-	nsengine.makeCurrent(mGlewID);
-	nsfloat normXPos = nsfloat(mevent->pos().x()) / nsfloat(width());
-	nsfloat normYPos = 1.0f - nsfloat(mevent->pos().y()) / nsfloat(height());
-
-	if (mevent->button() == Qt::LeftButton)
-		nsengine.system<NSInputSystem>()->mouseRelease(NSInputMap::LeftButton, normXPos, normYPos);
-	else if (mevent->button() == Qt::MiddleButton)
-		nsengine.system<NSInputSystem>()->mouseRelease(NSInputMap::MiddleButton, normXPos, normYPos);
-	else if (mevent->button() == Qt::RightButton)
-		nsengine.system<NSInputSystem>()->mouseRelease(NSInputMap::RightButton, normXPos, normYPos);
-	QOpenGLWidget::mouseReleaseEvent(mevent);
+    nse.make_current(m_glew_id);
+    if (!_on_mouse(false, mevent->button(), platform_normalized_mpos()))
+        QOpenGLWidget::mousePressEvent(mevent);
 }
 
 void MapView::mousePressEvent(QMouseEvent * mevent)
 {
-	nsengine.makeCurrent(mGlewID);
-	nsfloat normXPos = nsfloat(mevent->pos().x()) / nsfloat(width());
-	nsfloat normYPos = 1.0f - nsfloat(mevent->pos().y()) / nsfloat(height());
+    nse.make_current(m_glew_id);
+    if (!_on_mouse(true, mevent->button(), platform_normalized_mpos()))
+        QOpenGLWidget::mousePressEvent(mevent);
+}
 
-	if (mevent->button() == Qt::LeftButton)
-		nsengine.system<NSInputSystem>()->mousePress(NSInputMap::LeftButton, normXPos, normYPos);
-	else if (mevent->button() == Qt::MiddleButton)
-		nsengine.system<NSInputSystem>()->mousePress(NSInputMap::MiddleButton, normXPos, normYPos);
-	else if (mevent->button() == Qt::RightButton)
-		nsengine.system<NSInputSystem>()->mousePress(NSInputMap::RightButton, normXPos, normYPos);
-	QOpenGLWidget::mousePressEvent(mevent);
+bool MapView::_on_mouse(bool pressed, int mbutton, const fvec2 & norm_mpos)
+{
+    switch (mbutton)
+    {
+    case (Qt::LeftButton) :
+        nse.event_dispatch()->push<nsmouse_button_event>(nsinput_map::left_button, pressed, norm_mpos);
+        break;
+    case (Qt::RightButton) :
+        nse.event_dispatch()->push<nsmouse_button_event>(nsinput_map::right_button, pressed, norm_mpos);
+        break;
+    case (Qt::MiddleButton) :
+        nse.event_dispatch()->push<nsmouse_button_event>(nsinput_map::middle_button, pressed, norm_mpos);
+        break;
+    case (Qt::XButton1) :
+        nse.event_dispatch()->push<nsmouse_button_event>(nsinput_map::aux_button_1, pressed, norm_mpos);
+        break;
+    case (Qt::XButton2) :
+        nse.event_dispatch()->push<nsmouse_button_event>(nsinput_map::aux_button_2, pressed, norm_mpos);
+        break;
+    default:
+        return false;
+    }
+    return true;
+
 }
 
 void MapView::mouseDoubleClickEvent(QMouseEvent *)
 {
-	nsengine.makeCurrent(mGlewID);
+    QMessageBox mb;
+    mb.setText("Double clicked");
+    mb.exec();
 }
 
 void MapView::onIdle()
@@ -236,53 +322,77 @@ void MapView::onIdle()
 
 void MapView::wheelEvent(QWheelEvent * wevent)
 {
-	nsengine.makeCurrent(mGlewID);
-	nsfloat normXPos = nsfloat(wevent->pos().x()) / nsfloat(width());
-	nsfloat normYPos = 1.0f - nsfloat(wevent->pos().y()) / nsfloat(height());
-
-	nsengine.system<NSInputSystem>()->mouseScroll(wevent->delta(), normXPos, normYPos);
+    nse.make_current(m_glew_id);
+    nse.event_dispatch()->push<nsmouse_scroll_event>(wevent->delta(), platform_normalized_mpos());
 }
+
+fvec2 platform_normalized_mpos()
+{
+    QPoint p = bbtk.map_view()->mapFromGlobal(QCursor::pos());
+    fvec2 pos(float(p.x()) / float(bbtk.map_view()->width()), 1.0f - float(p.y()) / float(bbtk.map_view()->height()));
+    return pos;
+}
+
 
 void MapView::initializeGL()
 {
-	mGlewID = nsengine.createContext();
-	nsengine.start();
-	mTK->camSettings()->init(mTK);
-
-	// Load from file all plugins - dont actually call load unless checked in load plugins screen
-	mTK->loadPluginFiles(QDir(nsengine.pluginDirectory().c_str()));
-//	NSPlugin * plg = nsengine.createPlugin("buildandbattle");
-//	plg->manager<NSSceneManager>()->setSaveMode(NSResManager::Text);
-//	plg->createTile("grasstile", nsengine.importdir() + "diffuseGrass.png", nsengine.importdir() + "normalGrass.png", fvec3(1, 1, 1), 16.0f, 0.2f, fvec3(1, 1, 1), false, true);
+    m_glew_id = nse.create_context();
 
 #ifdef NSDEBUG
-	nsengine.debug()->setMessageCallback(OutputView::debugCallback, mTK->outputView());
+    nse.debug()->set_message_callback(OutputView::debugCallback, bbtk.output_view());
 #else
-	mUI.mOutputView->hide();
+    mUI.mOutputView->hide();
 #endif
 
-	mTK->refreshViews();
-	mTK->statusBar()->setSizeGripEnabled(false);
-	mTK->statusBar()->showMessage("Ready");
+    nse.start();
+
+    nsplugin * plg = nse.load_plugin("testplug.bbp");
+    plg->bind();
+    nse.set_active(plg);
+
+    // Setup build brush (simple one)
+    nsinput_map * imap = plg->get<nsinput_map>("bb_toolkit");
+    nse.set_current_scene("mainscene");
+    nse.system<nsrender_system>()->set_fog_factor(uivec2(60,110));
+    nse.system<nsrender_system>()->set_fog_color(fvec4(nse.current_scene()->bg_color(),1.0f));
+    nse.system<nsinput_system>()->set_input_map(imap->full_id());
+    nse.system<nsinput_system>()->push_context("Main");
+
+	// Load from file all plugins - dont actually call load unless checked in load plugins screen
+    bbtk.load_plugin_files(QDir(nse.plugin_dir().c_str()));
+
+    // Initialize stuff that needs to be initialized after the engine
+    bbtk.res_browser()->init();
+    bbtk.res_dialog()->init();
+    bbtk.res_dialog_prev()->init();
+    bbtk.res_dialog_prev_lighting()->init();
+
+
+    bbtk.refresh_views();
+    bbtk.statusBar()->setSizeGripEnabled(false);
+    bbtk.statusBar()->showMessage("Ready");
+}
+
+void MapView::make_current()
+{
+    makeCurrent();
+    nse.make_current(m_glew_id);
 }
 
 void MapView::resizeGL(int width, int height)
 {
-	nsengine.system<NSRenderSystem>()->setScreenfbo(defaultFramebufferObject());
-	nsengine.makeCurrent(mGlewID);
-
-	NSScene * sc = nsengine.currentScene(); if (sc == NULL) return;
-	NSEntity * cam = sc->camera(); if (cam == NULL) return;
-	cam->get<NSCamComp>()->resize(width, height);
-	glViewport(0, 0, width, height);
+    nse.make_current(m_glew_id);
+    nsrender_system * rs = nse.system<nsrender_system>();
+    if (rs != NULL)
+    {
+        rs->set_screen_fbo(defaultFramebufferObject());
+        rs->resize_screen(ivec2(width,height));
+    }
 }
 
 void MapView::paintGL()
 {
-	if (hasFocus())
-	{
-		nsengine.makeCurrent(mGlewID);
-		nsengine.update();
-		mTK->updateUI();
-	}
+    nse.make_current(m_glew_id);
+    nse.update();
+    bbtk.update_ui();
 }

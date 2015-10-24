@@ -5,9 +5,10 @@
 #include <ui_addnewbrushdialog.h>
 #include <nsmath.h>
 
-class NSEngine;
+class nsengine;
 class Toolkit;
 class QGraphicsScene;
+class nsentity;
 
 class AddNewBrushDialog : public QDialog
 {
@@ -16,7 +17,7 @@ public:
 	AddNewBrushDialog(QWidget * parent = NULL);
 	~AddNewBrushDialog();
 
-	void init(Toolkit * pTK);
+    void init();
 	void drawPolygons();
 	void setFromEngineSelection();
 
@@ -26,15 +27,11 @@ public:
 	void onIconBrowse();
 	void onGenerateIconCB(bool);
 
-	signals:
-	void setCurrentBrush(NSEntity *);
-
 private:
 	nsstring _generateIcon(const nsstring & pObjName, const nsstring & pSubdir="");
 
 	Ui_AddNewBrushDialog mUI;
 	QGraphicsScene * mScene;
-	Toolkit * mTK;
 	float mNormX;
 	float mNormY;
 };

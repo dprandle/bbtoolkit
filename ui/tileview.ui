@@ -112,7 +112,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset resource="toolkit.qrc">
+    <iconset resource="../toolkit.qrc">
      <normaloff>:/VecTB/icons/toolbars/New_Map.png</normaloff>:/VecTB/icons/toolbars/New_Map.png</iconset>
    </property>
    <property name="text">
@@ -127,7 +127,7 @@
     <bool>false</bool>
    </property>
    <property name="icon">
-    <iconset resource="toolkit.qrc">
+    <iconset resource="../toolkit.qrc">
      <normaloff>:/VecTB/icons/toolbars/Edit.png</normaloff>:/VecTB/icons/toolbars/Edit.png</iconset>
    </property>
    <property name="text">
@@ -142,7 +142,7 @@
     <bool>false</bool>
    </property>
    <property name="icon">
-    <iconset resource="toolkit.qrc">
+    <iconset resource="../toolkit.qrc">
      <normaloff>:/VecTB/icons/toolbars/Delete.png</normaloff>:/VecTB/icons/toolbars/Delete.png</iconset>
    </property>
    <property name="text">
@@ -161,7 +161,7 @@
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="toolkit.qrc"/>
+  <include location="../toolkit.qrc"/>
  </resources>
  <connections>
   <connection>

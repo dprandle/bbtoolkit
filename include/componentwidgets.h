@@ -14,8 +14,8 @@
 #include <ui_tilebrushcompwidget.h>
 #include <ui_tilecompwidget.h>
 
-class NSEntity;
-class NSEngine;
+class nsentity;
+class nsengine;
 class Toolkit;
 
 class CompWidget : public QWidget
@@ -23,12 +23,12 @@ class CompWidget : public QWidget
 	Q_OBJECT
 public:
 	CompWidget(QWidget * pParent = NULL);
-	virtual void init(Toolkit * pTK);
-	virtual void setEntity(NSEntity * pEnt);
-	NSEntity * getEntity();
+    virtual void init();
+	virtual void setEntity(nsentity * pEnt);
+	nsentity * getEntity();
 
 protected:
-	NSEntity * mEnt;
+	nsentity * mEnt;
 	Toolkit * mTK;
 };
 
@@ -51,7 +51,7 @@ public:
 	CamCompWidget(QWidget * pParent = NULL);
 	~CamCompWidget();
 
-	void setEntity(NSEntity * pEnt);
+	void setEntity(nsentity * pEnt);
 
 	public slots:
 
@@ -79,7 +79,7 @@ public:
 	LightCompWidget(QWidget * pParent = NULL);
 	~LightCompWidget();
 
-	void setEntity(NSEntity * pEnt);
+	void setEntity(nsentity * pEnt);
 
 	public slots:
 
@@ -119,7 +119,7 @@ public:
 	ParticleCompWidget(QWidget * pParent = NULL);
 	~ParticleCompWidget();
 
-	void setEntity(NSEntity * pEnt);
+	void setEntity(nsentity * pEnt);
 
 	public slots:
 
@@ -161,7 +161,7 @@ public:
 	RenderCompWidget(QWidget * pParent = NULL);
 	~RenderCompWidget();
 
-	void setEntity(NSEntity * pEnt);
+	void setEntity(nsentity * pEnt);
 
 	public slots:
 
@@ -182,7 +182,7 @@ public:
 	SelCompWidget(QWidget * pParent = NULL);
 	~SelCompWidget();
 
-	void setEntity(NSEntity * pEnt);
+	void setEntity(nsentity * pEnt);
 
 	public slots:
 	

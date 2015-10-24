@@ -1,28 +1,30 @@
+#include <nsfile_os.h>
+#include <nsplugin_manager.h>
+#include <nsrender_comp.h>
+#include <nsrender_system.h>
+#include <nssel_comp.h>
+#include <nsscene_manager.h>
+#include <nsscene.h>
+#include <nstform_comp.h>
+#include <nstile_grid.h>
+#include <nstex_manager.h>
+#include <nsentity_manager.h>
+#include <nstile_brush_comp.h>
+#include <nsoccupy_comp.h>
+#include <nssel_comp.h>
+#include <nsmesh_manager.h>
+#include <nstile_comp.h>
+#include <nsbuild_system.h>
+
 #include <addnewbrushdialog.h>
 #include <qgraphicsscene.h>
-#include <nsglobal.h>
 #include <qgraphicsitem.h>
 #include <nsengine.h>
-#include <nsselectionsystem.h>
+#include <nsselection_system.h>
 #include <qstyle.h>
-#include <nsselcomp.h>
-#include <nsscenemanager.h>
-#include <nsscene.h>
-#include <nstformcomp.h>
-#include <nstilegrid.h>
-#include <nstexmanager.h>
-#include <nsentitymanager.h>
-#include <nstilebrushcomp.h>
-#include <nsoccupycomp.h>
-#include <nsinputcomp.h>
-#include <nsselcomp.h>
-#include <nstilecomp.h>
 #include <toolkit.h>
-#include <nsmeshmanager.h>
 #include <qmessagebox.h>
 #include <qfiledialog.h>
-#include <nsfileos.h>
-#include <nspluginmanager.h>
 
 AddNewBrushDialog::AddNewBrushDialog(QWidget * parent):
 QDialog(parent),	
@@ -38,12 +40,10 @@ AddNewBrushDialog::~AddNewBrushDialog()
 
 }
 
-void AddNewBrushDialog::init(Toolkit * pTK)
+void AddNewBrushDialog::init()
 {
-	mTK = pTK;
 	mUI.setupUi(this);
 	mUI.mBrushView->setScene(mScene);
-	QObject::connect(this, SIGNAL(setCurrentBrush(NSEntity *)), mTK, SLOT(onSetCurrentBrush(NSEntity *)));
 	drawPolygons();
 }
 
@@ -64,11 +64,11 @@ void AddNewBrushDialog::drawPolygons()
 	p << QPointF(-X_GRID*mNormX, 0.5f*mNormY) << QPointF(0.0f, mNormY) << QPointF(X_GRID * mNormX, 0.5f*mNormY)
 		<< QPointF(X_GRID*mNormX, -0.5f*mNormY) << QPointF(0.0f, -mNormY) << QPointF(-X_GRID*mNormX, -0.5f*mNormY) << QPointF(-X_GRID*mNormX, 0.5f*mNormY);
 	
-	for (nsint i = -5; i < 6; ++i)
+	for (int32 i = -5; i < 6; ++i)
 	{
 		if (i % 2 != 0)
 		{
-			for (nsint j = -5; j < 5; ++j)
+			for (int32 j = -5; j < 5; ++j)
 			{
 				HexTileItem * item = new HexTileItem();
 				item->setPolygon(p);
@@ -81,7 +81,7 @@ void AddNewBrushDialog::drawPolygons()
 		}
 		else
 		{
-			for (nsint j = -5; j < 6; ++j)
+			for (int32 j = -5; j < 6; ++j)
 			{
 				HexTileItem * item = new HexTileItem();
 				item->setPolygon(p);
@@ -98,30 +98,30 @@ void AddNewBrushDialog::drawPolygons()
 
 void AddNewBrushDialog::setFromEngineSelection()
 {
-	uivec3 foc = nsengine.system<NSSelectionSystem>()->center();
-	NSScene * scene = nsengine.currentScene();
+	uivec3 foc = nse.system<nsselection_system>()->center();
+	nsscene * scene = nse.current_scene();
 
 	if (scene == NULL)
 		return;
 
-	NSEntity * ent = scene->entity(foc.xy());
+    nsentity * ent = scene->entity(foc.xy());
 	if (ent == NULL)
 		return;
 
-	NSSelComp * selComp = ent->get<NSSelComp>();
-	NSTFormComp * tComp = ent->get<NSTFormComp>();
+	nssel_comp * selComp = ent->get<nssel_comp>();
+	nstform_comp * tComp = ent->get<nstform_comp>();
 	if (selComp == NULL || tComp == NULL)
 		return;
 
-	ivec3 centerPos = NSTileGrid::grid(tComp->wpos(foc.y));
+    ivec3 centerPos = nstile_grid::grid(tComp->wpos(foc.z));
 
 	auto selIter = selComp->begin();
 	while (selIter != selComp->end())
 	{
-		ivec3 currentPos = NSTileGrid::grid(tComp->wpos(*selIter)) - centerPos;
+		ivec3 currentPos = nstile_grid::grid(tComp->wpos(*selIter)) - centerPos;
 
-		nsfloat posX = currentPos.x * X_GRID * 2.0f * mNormX;
-		nsfloat posY = -currentPos.y * Y_GRID * mNormY;
+		float posX = currentPos.x * X_GRID * 2.0f * mNormX;
+		float posY = -currentPos.y * Y_GRID * mNormY;
 		if (currentPos.y % 2 != 0 && centerPos.y % 2 == 0)
 			posX += X_GRID * mNormX;
 		else if (currentPos.y % 2)
@@ -139,7 +139,7 @@ void AddNewBrushDialog::onAddBrush()
 {
 	nsstring name = mUI.mObjectNameLE->text().toStdString();
 	nsstring iconFileName = mUI.mIconLE->text().toStdString();
-	NSPlugin * act = nsengine.active();
+	nsplugin * act = nse.active();
 
 	if (name.empty())
 	{
@@ -148,14 +148,14 @@ void AddNewBrushDialog::onAddBrush()
 		return;
 	}
 
-	if (act->contains<NSEntity>(name))
+	if (act->contains<nsentity>(name))
 	{
 		QMessageBox mb(QMessageBox::Warning, "Object Name Error", "An object already has this name - all game objects (including brushes) must have distinct names.", QMessageBox::NoButton, this);
 		mb.exec();
 		return;
 	}
 
-	NSEntity * tileBrush = act->create<NSEntity>(name);
+	nsentity * tileBrush = act->create<nsentity>(name);
 
 	if (tileBrush == NULL)
 	{
@@ -164,20 +164,12 @@ void AddNewBrushDialog::onAddBrush()
 		return;
 	}
 
-	NSTileBrushComp * tBComp = tileBrush->create<NSTileBrushComp>();
-	NSRenderComp * rComp = tileBrush->create<NSRenderComp>();
-	NSSelComp * sComp = tileBrush->create<NSSelComp>();
-	NSInputComp * inComp = tileBrush->create<NSInputComp>();
+	nstile_brush_comp * tBComp = tileBrush->create<nstile_brush_comp>();
+	nsrender_comp * rComp = tileBrush->create<nsrender_comp>();
+	nssel_comp * sComp = tileBrush->create<nssel_comp>();
 
-	rComp->setMeshID(nsengine.resource<NSMesh>(ENGINE_PLUG, MESH_FULL_TILE)->fullid());
-	sComp->setDefaultColor(fvec4(0.0f, 1.0f, 0.0f, 0.8f));
-	inComp->add(DRAG_OBJECT_XY);
-	inComp->add(DRAG_OBJECT_XZ);
-	inComp->add(DRAG_OBJECT_YZ);
-	inComp->add(INSERT_OBJECT);
-	inComp->add(XZ_MOVE_END);
-	inComp->add(YZ_MOVE_END);
-	inComp->add(SHIFT_DONE);
+    rComp->set_mesh_id(nse.resource<nsmesh>(ENGINE_PLUG, MESH_FULL_TILE)->full_id());
+    sComp->set_default_sel_color(fvec4(0.0f, 1.0f, 0.0f, 0.8f));
 
 	auto items = mScene->selectedItems();
 	auto iter = items.begin();
@@ -189,12 +181,13 @@ void AddNewBrushDialog::onAddBrush()
 	}
 
 	if (mUI.mGenIconCB->isChecked())
-		iconFileName = _generateIcon(name);
+        iconFileName = _generateIcon(name,"icons/");
 
 	if (!iconFileName.empty())
-		tileBrush->setIconPath(iconFileName);
+        tileBrush->set_icon_path(iconFileName);
 
-	emit setCurrentBrush(tileBrush);
+    nse.system<nsbuild_system>()->set_tile_brush(tileBrush);
+    bbtk.refresh_views();
 	accept();
 }
 
@@ -203,7 +196,7 @@ void AddNewBrushDialog::onIconBrowse()
 	QString filename = QFileDialog::getOpenFileName(
 		this,
 		"Choose icon file...",
-		nsengine.importdir().c_str(),
+        nse.import_dir().c_str(),
 		"Image Files (*.png *.jpg *.bmp)"
 		);
 
@@ -234,12 +227,13 @@ nsstring AddNewBrushDialog::_generateIcon(const nsstring & pObjName,const nsstri
 
 	QPixmap pixMap = QPixmap::grabWidget(mUI.mBrushView, r);
 	
-	nsstring savePath = nsengine.active()->resourceDirectory() + nsengine.active()->manager<NSTexManager>()->resourceDirectory() + "icons/";
-	nsfileio::create_dir(savePath);
-	nsfileio::create_dir(savePath + pSubdir);
-	nsstring saveName = savePath + pSubdir + pObjName + ".png";
-	pixMap.save(saveName.c_str());
-	return saveName;
+    nsstring savePath = nse.active()->manager<nstex_manager>()->res_dir() +
+            nse.active()->manager<nstex_manager>()->local_dir() +
+            pSubdir + pObjName + ".png";
+
+    nsfile_os::create_dir(savePath);
+    pixMap.save(savePath.c_str());
+    return savePath;
 }
 
 

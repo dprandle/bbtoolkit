@@ -16,12 +16,12 @@ This file contains all of the neccessary declarations for the OutputView class.
 // Inlcudes
 #include <qtextedit.h>
 #include <toolkitdef.h>
-#include <nsglobal.h>
+#include <nsstring.h>
 
 // Class Forward Declarations
 class QVBoxLayout;
 class QToolBar;
-class NSEngine;
+class nsengine;
 class Toolkit;
 class QAction;
 
@@ -34,7 +34,7 @@ public:
 
 	~OutputView();
 
-	void init(Toolkit * pTK);
+    void init();
 
 	void writeToScreen(const QString & text);
 
@@ -58,6 +58,5 @@ private:
 	QAction * clrScreen;
 	QAction * selectAll;
 	QAction * copy;
-	Toolkit * mTK;
 };
 #endif

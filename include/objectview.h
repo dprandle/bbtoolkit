@@ -4,10 +4,9 @@
 // Inlcudes
 #include <ui_objectview.h>
 #include <toolkitdef.h>
-#include <nsglobal.h>
 
 class Toolkit;
-class NSEngine;
+class nsengine;
 class EntityEditorDialog;
 
 class ObjectView : public QMainWindow
@@ -17,7 +16,7 @@ public:
 	ObjectView(QWidget * parent = NULL);
 	~ObjectView();
 
-	void init(Toolkit * pTK, EntityEditorDialog * pEntityEditorDialog);
+    void init();
 
 	void refresh();
 
@@ -26,11 +25,9 @@ public:
 	void onActionNew();
 	void onActionDelete();
 	void onActionEdit();
-	void onItemPressed(QListWidgetItem* pItem);
+    void onSelectionChanged();
 
 private:
-	Ui_ObjectView mUI;
-	Toolkit * mTK;
-	EntityEditorDialog * mEntD;
+    Ui_ObjectView m_ui;
 };
 #endif

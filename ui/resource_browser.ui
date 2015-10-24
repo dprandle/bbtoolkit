@@ -1,0 +1,276 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>resource_browser</class>
+ <widget class="QMainWindow" name="resource_browser">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>646</width>
+    <height>536</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Resource Browser</string>
+  </property>
+  <widget class="QWidget" name="m_central_widget">
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <item>
+     <widget class="QSplitter" name="m_splitter">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <property name="handleWidth">
+       <number>1</number>
+      </property>
+      <widget class="QListWidget" name="m_res_type_lw">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>129</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>129</width>
+         <height>16777215</height>
+        </size>
+       </property>
+       <item>
+        <property name="text">
+         <string>Entities</string>
+        </property>
+        <property name="icon">
+         <iconset>
+          <normalon>:/ResourceIcons/icons/default_entity.png</normalon>
+         </iconset>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Input Maps</string>
+        </property>
+        <property name="icon">
+         <iconset>
+          <normalon>:/ResourceIcons/icons/default_entity.png</normalon>
+         </iconset>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Meshes</string>
+        </property>
+        <property name="icon">
+         <iconset>
+          <normaloff>:/VecTB/icons/toolbars/meshicon.png</normaloff>
+          <normalon>:/ResourceIcons/icons/default_mesh.png</normalon>:/VecTB/icons/toolbars/meshicon.png</iconset>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Materials</string>
+        </property>
+        <property name="icon">
+         <iconset>
+          <normaloff>:/VecTB/icons/toolbars/maticon.png</normaloff>
+          <normalon>:/ResourceIcons/icons/default_material.png</normalon>:/VecTB/icons/toolbars/maticon.png</iconset>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Animations</string>
+        </property>
+        <property name="icon">
+         <iconset>
+          <normaloff>:/VecTB/icons/toolbars/animicon.png</normaloff>
+          <normalon>:/ResourceIcons/icons/default_anim.png</normalon>:/VecTB/icons/toolbars/animicon.png</iconset>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Textures</string>
+        </property>
+        <property name="icon">
+         <iconset>
+          <normaloff>:/VecTB/icons/toolbars/texicon.png</normaloff>
+          <normalon>:/ResourceIcons/icons/default_texture.png</normalon>:/VecTB/icons/toolbars/texicon.png</iconset>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Shaders</string>
+        </property>
+        <property name="icon">
+         <iconset>
+          <normaloff>:/VecTB/icons/toolbars/shadericon.png</normaloff>
+          <normalon>:/ResourceIcons/icons/default_shader.png</normalon>:/VecTB/icons/toolbars/shadericon.png</iconset>
+        </property>
+       </item>
+      </widget>
+      <widget class="QListWidget" name="m_res_lw">
+       <property name="gridSize">
+        <size>
+         <width>96</width>
+         <height>96</height>
+        </size>
+       </property>
+       <property name="viewMode">
+        <enum>QListView::IconMode</enum>
+       </property>
+      </widget>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="m_menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>646</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="m_create_menu">
+    <property name="title">
+     <string>Create</string>
+    </property>
+    <addaction name="a_create_plugin"/>
+    <addaction name="a_create_map"/>
+    <addaction name="a_create_entity"/>
+    <addaction name="a_create_shader"/>
+    <addaction name="a_create_material"/>
+    <addaction name="a_create_texture"/>
+    <addaction name="a_create_animation"/>
+    <addaction name="a_create_mesh"/>
+   </widget>
+   <addaction name="m_create_menu"/>
+  </widget>
+  <widget class="QToolBar" name="mToolbar">
+   <property name="windowTitle">
+    <string>toolBar</string>
+   </property>
+   <property name="layoutDirection">
+    <enum>Qt::RightToLeft</enum>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>BottomToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="a_del_resource"/>
+   <addaction name="a_edit_resource"/>
+   <addaction name="a_create_resource"/>
+  </widget>
+  <action name="a_create_plugin">
+   <property name="text">
+    <string>Plugin</string>
+   </property>
+  </action>
+  <action name="a_create_map">
+   <property name="text">
+    <string>Map</string>
+   </property>
+  </action>
+  <action name="a_create_entity">
+   <property name="text">
+    <string>Entity</string>
+   </property>
+  </action>
+  <action name="a_create_shader">
+   <property name="text">
+    <string>Shader</string>
+   </property>
+  </action>
+  <action name="a_create_material">
+   <property name="text">
+    <string>Material</string>
+   </property>
+  </action>
+  <action name="a_create_texture">
+   <property name="text">
+    <string>Texture</string>
+   </property>
+  </action>
+  <action name="a_create_animation">
+   <property name="text">
+    <string>Animation</string>
+   </property>
+  </action>
+  <action name="a_create_mesh">
+   <property name="text">
+    <string>Mesh</string>
+   </property>
+  </action>
+  <action name="a_create_resource">
+   <property name="icon">
+    <iconset resource="../toolkit.qrc">
+     <normaloff>:/VecTB/icons/toolbars/New_Map.png</normaloff>
+     <disabledoff>:/VecTB/icons/toolbars/New_Map_Disabled.png</disabledoff>:/VecTB/icons/toolbars/New_Map.png</iconset>
+   </property>
+   <property name="text">
+    <string>Create Resource</string>
+   </property>
+   <property name="toolTip">
+    <string>Create a new resource of whichever resource type is being viewed</string>
+   </property>
+  </action>
+  <action name="a_edit_resource">
+   <property name="icon">
+    <iconset resource="../toolkit.qrc">
+     <normaloff>:/VecTB/icons/toolbars/Edit.png</normaloff>
+     <disabledoff>:/VecTB/icons/toolbars/Edit_Disabled.png</disabledoff>:/VecTB/icons/toolbars/Edit.png</iconset>
+   </property>
+   <property name="text">
+    <string>Edit Resource</string>
+   </property>
+   <property name="toolTip">
+    <string>Edit highlighted resource</string>
+   </property>
+  </action>
+  <action name="a_del_resource">
+   <property name="icon">
+    <iconset resource="../toolkit.qrc">
+     <normaloff>:/VecTB/icons/toolbars/Delete.png</normaloff>
+     <disabledoff>:/VecTB/icons/toolbars/Delete_Disabled.png</disabledoff>:/VecTB/icons/toolbars/Delete.png</iconset>
+   </property>
+   <property name="text">
+    <string>Delete Resource</string>
+   </property>
+   <property name="toolTip">
+    <string>Delete highlighted resource</string>
+   </property>
+  </action>
+ </widget>
+ <resources>
+  <include location="../toolkit.qrc"/>
+ </resources>
+ <connections>
+  <connection>
+   <sender>m_res_type_lw</sender>
+   <signal>itemSelectionChanged()</signal>
+   <receiver>resource_browser</receiver>
+   <slot>change_resource_type()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>57</x>
+     <y>115</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>126</x>
+     <y>25</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>change_resource_type()</slot>
+ </slots>
+</ui>

@@ -11,238 +11,241 @@ This file contains all of the neccessary definitions for the MapView class.
 */
 
 
-#include <preview.h>
+
+
+
+//#include <nsengine.h>
+//#include <nsshader.h>
+//#include <nsshader_manager.h>
+//#include <nsinput_map_manager.h>
+//#include <nstex_manager.h>
+//#include <nsshader_manager.h>
+//#include <nsentity.h>
+//#include <nsmesh.h>
+//#include <nsmesh_manager.h>
+//#include <nsrender_comp.h>
+//#include <nscam_comp.h>
+//#include <nsmaterial.h>
+//#include <nsbuild_system.h>
+//#include <nsrender_system.h>
+//#include <nsmat_manager.h>
+//#include <nstexture.h>
+//#include <nscamera_system.h>
+//#include <nsscene.h>
+//#include <nsinput_system.h>
 
 // Qt Includes
+#include <preview.h>
 #include <qevent.h>
 #include <qtimer.h>
-#include <nsengine.h>
-#include <nsshader.h>
-#include <nsshadermanager.h>
-#include <nsinputmapmanager.h>
 #include <qmessagebox.h>
-#include <nstexmanager.h>
-#include <nsshadermanager.h>
-#include <nsentity.h>
-#include <nsmesh.h>
-#include <nsmeshmanager.h>
-#include <nsrendercomp.h>
-#include <nscamcomp.h>
-#include <nsmaterial.h>
-#include <nsbuildsystem.h>
-#include <nsrendersystem.h>
 #include <toolkit.h>
-#include <nsmatmanager.h>
-#include <nstexture.h>
 #include <outputview.h>
-#include <nscamerasystem.h>
-#include <nsscene.h>
-#include <nsinputsystem.h>
+
 Preview::Preview(QWidget * parent) :
-QOpenGLWidget(parent),
-mTK(NULL)
+QOpenGLWidget(parent)
 {
 }
 
 Preview::~Preview()
 {
-	if (nsengine.makeCurrent(mEngineContextID))
-	{
-		nsengine.shutdown();
-		nsengine.destroyContext(mEngineContextID);
-	}
+//    if (nse.make_current(mEngineContextID))
+//	{
+//        nse.shutdown();
+//        nse.destroyContext(mEngineContextID);
+//	}
 }
 
-void Preview::init(Toolkit * pTK)
+
+void Preview::init()
 {
-	mTK = pTK;
-//	_connect();
+    _connect();
 }
 
 
 void Preview::_connect()
 {
-	QTimer * t = new QTimer();
-	connect(t, SIGNAL(timeout()), this, SLOT(onIdle()));
-	t->start(0);
+//	QTimer * t = new QTimer();
+//	connect(t, SIGNAL(timeout()), this, SLOT(onIdle()));
+//	t->start(0);
 }
 
 void Preview::enterEvent(QEvent * pEvent)
 {
-	nsengine.makeCurrent(mEngineContextID);
-	QPoint p = mapFromGlobal(QCursor::pos());
-	fvec2 pos(nsfloat(p.x()) / nsfloat(width()), 1.0f - nsfloat(p.y()) / nsfloat(height()));
-	nsengine.system<NSBuildSystem>()->toCursor(pos);
-	nsengine.system<NSInputSystem>()->setLastPos(pos);
+//    nse.make_current(mEngineContextID);
+//	QPoint p = mapFromGlobal(QCursor::pos());
+//    fvec2 pos(float(p.x()) / float(width()), 1.0f - float(p.y()) / float(height()));
+//    nse.system<nsbuild_system>()->toCursor(pos);
+//    nse.system<nsinput_system>()->setLastPos(pos);
 }
 
 void Preview::wheelEvent(QWheelEvent * wevent)
 {
-	nsengine.makeCurrent(mEngineContextID);
-	nsfloat normXPos = nsfloat(wevent->pos().x()) / nsfloat(width());
-	nsfloat normYPos = 1.0f - nsfloat(wevent->pos().y()) / nsfloat(height());
+//    nse.make_current(mEngineContextID);
+//    float normXPos = float(wevent->pos().x()) / float(width());
+//    float normYPos = 1.0f - float(wevent->pos().y()) / float(height());
 
-	nsengine.system<NSInputSystem>()->mouseScroll(wevent->delta(), normXPos, normYPos);
+//    nse.system<nsinput_system>()->mouseScroll(wevent->delta(), normXPos, normYPos);
 }
 
 void Preview::keyReleaseEvent(QKeyEvent * kEvent)
 {
-	nsengine.makeCurrent(mEngineContextID);
-	if (kEvent->isAutoRepeat())
-	{
-		QOpenGLWidget::keyPressEvent(kEvent);
-		return;
-	}
+//    nse.make_current(mEngineContextID);
+//	if (kEvent->isAutoRepeat())
+//	{
+//		QOpenGLWidget::keyPressEvent(kEvent);
+//		return;
+//	}
 
-	switch (kEvent->key())
-	{
-	case (Qt::Key_W) :
-		nsengine.system<NSInputSystem>()->keyRelease(NSInputMap::Key_W);
-		break;
-	case (Qt::Key_S) :
-		nsengine.system<NSInputSystem>()->keyRelease(NSInputMap::Key_S);
-		break;
-	case (Qt::Key_A) :
-		nsengine.system<NSInputSystem>()->keyRelease(NSInputMap::Key_A);
-		break;
-	case (Qt::Key_D) :
-		nsengine.system<NSInputSystem>()->keyRelease(NSInputMap::Key_D);
-		break;
-	case (Qt::Key_Z) :
-		nsengine.system<NSInputSystem>()->keyRelease(NSInputMap::Key_Z);
-		break;
-	case (Qt::Key_Y) :
-		nsengine.system<NSInputSystem>()->keyRelease(NSInputMap::Key_Y);
-		break;
-	case (Qt::Key_B) :
-		nsengine.system<NSInputSystem>()->keyRelease(NSInputMap::Key_B);
-		break;
-	case (Qt::Key_P) :
-		nsengine.system<NSInputSystem>()->keyRelease(NSInputMap::Key_P);
-		break;
-	case (Qt::Key_Shift) :
-		nsengine.system<NSInputSystem>()->keyRelease(NSInputMap::Key_LShift);
-		break;
-	case (Qt::Key_Control) :
-		nsengine.system<NSInputSystem>()->keyRelease(NSInputMap::Key_LCtrl);
-		break;
-	default:
-		QOpenGLWidget::keyPressEvent(kEvent);
-	}
+//	switch (kEvent->key())
+//	{
+//	case (Qt::Key_W) :
+//        nse.system<nsinput_system>()->keyRelease(nsinput_map::Key_W);
+//		break;
+//	case (Qt::Key_S) :
+//        nse.system<nsinput_system>()->keyRelease(nsinput_map::Key_S);
+//		break;
+//	case (Qt::Key_A) :
+//        nse.system<nsinput_system>()->keyRelease(nsinput_map::Key_A);
+//		break;
+//	case (Qt::Key_D) :
+//        nse.system<nsinput_system>()->keyRelease(nsinput_map::Key_D);
+//		break;
+//	case (Qt::Key_Z) :
+//        nse.system<nsinput_system>()->keyRelease(nsinput_map::Key_Z);
+//		break;
+//	case (Qt::Key_Y) :
+//        nse.system<nsinput_system>()->keyRelease(nsinput_map::Key_Y);
+//		break;
+//	case (Qt::Key_B) :
+//        nse.system<nsinput_system>()->keyRelease(nsinput_map::Key_B);
+//		break;
+//	case (Qt::Key_P) :
+//        nse.system<nsinput_system>()->keyRelease(nsinput_map::Key_P);
+//		break;
+//	case (Qt::Key_Shift) :
+//        nse.system<nsinput_system>()->keyRelease(nsinput_map::Key_LShift);
+//		break;
+//	case (Qt::Key_Control) :
+//        nse.system<nsinput_system>()->keyRelease(nsinput_map::Key_LCtrl);
+//		break;
+//	default:
+//		QOpenGLWidget::keyPressEvent(kEvent);
+//	}
 }
 
 void Preview::keyPressEvent(QKeyEvent * kEvent)
 {
-	nsengine.makeCurrent(mEngineContextID);
-	if (kEvent->isAutoRepeat())
-	{
-		QOpenGLWidget::keyPressEvent(kEvent);
-		return;
-	}
+//    nse.make_current(mEngineContextID);
+//	if (kEvent->isAutoRepeat())
+//	{
+//		QOpenGLWidget::keyPressEvent(kEvent);
+//		return;
+//	}
 
-	switch (kEvent->key())
-	{
-	case (Qt::Key_W) :
-		nsengine.system<NSInputSystem>()->keyPress(NSInputMap::Key_W);
-		break;
-	case (Qt::Key_Z) :
-		nsengine.system<NSInputSystem>()->keyPress(NSInputMap::Key_Z);
-		break;
-	case (Qt::Key_Y) :
-		nsengine.system<NSInputSystem>()->keyPress(NSInputMap::Key_Y);
-		break;
-	case (Qt::Key_S) :
-		nsengine.system<NSInputSystem>()->keyPress(NSInputMap::Key_S);
-		break;
-	case (Qt::Key_A) :
-		nsengine.system<NSInputSystem>()->keyPress(NSInputMap::Key_A);
-		break;
-	case (Qt::Key_D) :
-		nsengine.system<NSInputSystem>()->keyPress(NSInputMap::Key_D);
-		break;
-	case (Qt::Key_B) :
-		nsengine.system<NSInputSystem>()->keyPress(NSInputMap::Key_B);
-		break;
-	case (Qt::Key_P) :
-		nsengine.system<NSInputSystem>()->keyPress(NSInputMap::Key_P);
-		break;
-	case (Qt::Key_Shift) :
-		nsengine.system<NSInputSystem>()->keyPress(NSInputMap::Key_LShift);
-		break;
-	case (Qt::Key_Control) :
-		nsengine.system<NSInputSystem>()->keyPress(NSInputMap::Key_LCtrl);
-		break;
-	default:
-		QOpenGLWidget::keyPressEvent(kEvent);
-	}
+//	switch (kEvent->key())
+//	{
+//	case (Qt::Key_W) :
+//        nse.system<nsinput_system>()->keyPress(nsinput_map::Key_W);
+//		break;
+//	case (Qt::Key_Z) :
+//        nse.system<nsinput_system>()->keyPress(nsinput_map::Key_Z);
+//		break;
+//	case (Qt::Key_Y) :
+//        nse.system<nsinput_system>()->keyPress(nsinput_map::Key_Y);
+//		break;
+//	case (Qt::Key_S) :
+//        nse.system<nsinput_system>()->keyPress(nsinput_map::Key_S);
+//		break;
+//	case (Qt::Key_A) :
+//        nse.system<nsinput_system>()->keyPress(nsinput_map::Key_A);
+//		break;
+//	case (Qt::Key_D) :
+//        nse.system<nsinput_system>()->keyPress(nsinput_map::Key_D);
+//		break;
+//	case (Qt::Key_B) :
+//        nse.system<nsinput_system>()->keyPress(nsinput_map::Key_B);
+//		break;
+//	case (Qt::Key_P) :
+//        nse.system<nsinput_system>()->keyPress(nsinput_map::Key_P);
+//		break;
+//	case (Qt::Key_Shift) :
+//        nse.system<nsinput_system>()->keyPress(nsinput_map::Key_LShift);
+//		break;
+//	case (Qt::Key_Control) :
+//        nse.system<nsinput_system>()->keyPress(nsinput_map::Key_LCtrl);
+//		break;
+//	default:
+//		QOpenGLWidget::keyPressEvent(kEvent);
+//	}
 }
 
 void Preview::mouseMoveEvent(QMouseEvent * mevent)
 {
-	nsengine.makeCurrent(mEngineContextID);
-	nsfloat normXPos = nsfloat(mevent->pos().x()) / nsfloat(width());
-	nsfloat normYPos = 1.0f - nsfloat(mevent->pos().y()) / nsfloat(height());
+//    nse.make_current(mEngineContextID);
+//    float normXPos = float(mevent->pos().x()) / float(width());
+//    float normYPos = 1.0f - float(mevent->pos().y()) / float(height());
 
-	nsengine.system<NSInputSystem>()->mouseMove(normXPos, normYPos);
-	QOpenGLWidget::mouseMoveEvent(mevent);
+//    nse.system<nsinput_system>()->mouseMove(normXPos, normYPos);
+//	QOpenGLWidget::mouseMoveEvent(mevent);
 }
 
 void Preview::mouseReleaseEvent(QMouseEvent * mevent)
 {
-	nsengine.makeCurrent(mEngineContextID);
-	nsfloat normXPos = nsfloat(mevent->pos().x()) / nsfloat(width());
-	nsfloat normYPos = 1.0f - nsfloat(mevent->pos().y()) / nsfloat(height());
+//    nse.make_current(mEngineContextID);
+//    float normXPos = float(mevent->pos().x()) / float(width());
+//    float normYPos = 1.0f - float(mevent->pos().y()) / float(height());
 
-	if (mevent->button() == Qt::LeftButton)
-		nsengine.system<NSInputSystem>()->mouseRelease(NSInputMap::LeftButton, normXPos, normYPos);
-	else if (mevent->button() == Qt::MiddleButton)
-		nsengine.system<NSInputSystem>()->mouseRelease(NSInputMap::MiddleButton, normXPos, normYPos);
-	else if (mevent->button() == Qt::RightButton)
-		nsengine.system<NSInputSystem>()->mouseRelease(NSInputMap::RightButton, normXPos, normYPos);
-	QOpenGLWidget::mouseReleaseEvent(mevent);
+//	if (mevent->button() == Qt::LeftButton)
+//        nse.system<nsinput_system>()->mouseRelease(nsinput_map::LeftButton, normXPos, normYPos);
+//	else if (mevent->button() == Qt::MiddleButton)
+//        nse.system<nsinput_system>()->mouseRelease(nsinput_map::MiddleButton, normXPos, normYPos);
+//	else if (mevent->button() == Qt::RightButton)
+//        nse.system<nsinput_system>()->mouseRelease(nsinput_map::RightButton, normXPos, normYPos);
+//	QOpenGLWidget::mouseReleaseEvent(mevent);
 }
 
 void Preview::mousePressEvent(QMouseEvent * mevent)
 {
-	nsengine.makeCurrent(mEngineContextID);
-	nsfloat normXPos = nsfloat(mevent->pos().x()) / nsfloat(width());
-	nsfloat normYPos = 1.0f - nsfloat(mevent->pos().y()) / nsfloat(height());
+//    nse.make_current(mEngineContextID);
+//    float normXPos = float(mevent->pos().x()) / float(width());
+//    float normYPos = 1.0f - float(mevent->pos().y()) / float(height());
 
-	if (mevent->button() == Qt::LeftButton)
-		nsengine.system<NSInputSystem>()->mousePress(NSInputMap::LeftButton, normXPos, normYPos);
-	else if (mevent->button() == Qt::MiddleButton)
-		nsengine.system<NSInputSystem>()->mousePress(NSInputMap::MiddleButton, normXPos, normYPos);
-	else if (mevent->button() == Qt::RightButton)
-		nsengine.system<NSInputSystem>()->mousePress(NSInputMap::RightButton, normXPos, normYPos);
-	QOpenGLWidget::mousePressEvent(mevent);
+//	if (mevent->button() == Qt::LeftButton)
+//        nse.system<nsinput_system>()->mousePress(nsinput_map::LeftButton, normXPos, normYPos);
+//	else if (mevent->button() == Qt::MiddleButton)
+//        nse.system<nsinput_system>()->mousePress(nsinput_map::MiddleButton, normXPos, normYPos);
+//	else if (mevent->button() == Qt::RightButton)
+//        nse.system<nsinput_system>()->mousePress(nsinput_map::RightButton, normXPos, normYPos);
+//	QOpenGLWidget::mousePressEvent(mevent);
 }
 
 void Preview::mouseDoubleClickEvent(QMouseEvent * event)
 {
-	nsengine.makeCurrent(mEngineContextID);
+//    nse.make_current(mEngineContextID);
 }
 
 void Preview::onIdle()
 {
-	setFocus();
-	if (hasFocus())
-		update();
+//	setFocus();
+//	if (hasFocus())
+//		update();
 }
 
 void Preview::initializeGL()
 {	
-	// mEngineContextID = nsengine.createContext(false);
-	// nsengine.start();
+    // mEngineContextID = nse.createContext(false);
+    // nse.start();
 
 
 	// Create basic scene with camera and directional light
-	// NSPlugin * plg = nsengine.createPlugin("preview");
-	// NSEngine & nseng = nsengine;
-	// NSScene * scene = plg->create<NSScene>("preview");
-	// nsengine.setCurrentScene(scene);
+    // nsplugin * plg = nse.createPlugin("preview");
+    // nsengine & nseng = nse;
+    // nsscene * scene = plg->create<nsscene>("preview");
+    // nse.setCurrentScene(scene);
 	// scene->setBackgroundColor(fvec3(0.7, 0.7, 0.8));
-	// NSEntity * dl = plg->createDirLight(plg->name() + "dlight", 0.6f, 0.3f);
-	// NSEntity * cam = plg->createCamera(plg->name() + "cam", 60.0f, uivec2(mTK->mapView()->width(), mTK->mapView()->height()), fvec2(DEFAULT_Z_NEAR, DEFAULT_Z_FAR));
+    // nsentity * dl = plg->createDirLight(plg->name() + "dlight", 0.6f, 0.3f);
+    // nsentity * cam = plg->createCamera(plg->name() + "cam", 60.0f, uivec2(mTK->mapView()->width(), mTK->mapView()->height()), fvec2(DEFAULT_Z_NEAR, DEFAULT_Z_FAR));
 	// scene->setCamera(cam);
 	// scene->add(dl);
 	
@@ -251,17 +254,17 @@ void Preview::initializeGL()
 
 void Preview::resizeGL(int width, int height)
 {
-	nsengine.system<NSRenderSystem>()->setScreenfbo(defaultFramebufferObject());
-	nsengine.makeCurrent(mEngineContextID);
+//    nse.system<nsrender_system>()->setScreenfbo(defaultFramebufferObject());
+//    nse.make_current(mEngineContextID);
 
-	NSScene * sc = nsengine.currentScene(); if (sc == NULL) return;
-	NSEntity * cam = sc->camera(); if (cam == NULL) return;
-	cam->get<NSCamComp>()->resize(width, height);
-	glViewport(0, 0, width, height);
+//    nsscene * sc = nse.current_scene(); if (sc == NULL) return;
+//    nsentity * cam = sc->camera(); if (cam == NULL) return;
+//    cam->get<nscam_comp>()->resize(width, height);
+//	glViewport(0, 0, width, height);
 }
 
 void Preview::paintGL()
 {
-	nsengine.makeCurrent(mEngineContextID);
-	nsengine.update();
+//    nse.make_current(mEngineContextID);
+//    nse.update();
 }

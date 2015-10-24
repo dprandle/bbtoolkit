@@ -15,7 +15,7 @@ public:
 	ManageMapsDialog(QWidget * parent = NULL);
 	~ManageMapsDialog();
 
-	void init(Toolkit * pTK);
+    void init();
 
 	public slots:
 
@@ -36,7 +36,6 @@ private:
 	Ui::EditMapDialog mEditMapUI;
 	Ui_ManageMapsDialog mUI;
 	QDialog mEditD;
-	Toolkit * mTK;
 	NewMapDialog * mNewMapD;
 	QColor prevC;
 };

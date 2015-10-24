@@ -1,33 +1,29 @@
 #include <camerasettingsdialog.h>
 #include <nsengine.h>
-#include <nscamerasystem.h>
+#include <nscamera_system.h>
 
 CameraSettingsDialog::CameraSettingsDialog(QWidget * pParent) :
 QDialog(pParent)
-{}
+{
+    mUI.setupUi(this);
+}
 
 CameraSettingsDialog::~CameraSettingsDialog()
 {}
 
-void CameraSettingsDialog::init(Toolkit * pTK)
-{
-	mTK = pTK;
-	mUI.setupUi(this);
-}
-
 void CameraSettingsDialog::showIt()
 {
-	NSCameraSystem * camSys = mEngine->system<NSCameraSystem>();
-	int turn = camSys->sensitivity(NSCameraSystem::Turn);
-	int move = camSys->sensitivity(NSCameraSystem::Strafe);
-	bool invertXFree = camSys->xinv();
-	bool invertYFree = camSys->yinv();
-	bool invertXFoc = camSys->xinv(NSCameraSystem::Focus);
-	bool invertYFoc = camSys->yinv(NSCameraSystem::Focus);
+    nscamera_system * camSys = nse.system<nscamera_system>();
+    int turn = camSys->sensitivity(nscamera_system::sens_turn);
+    int move = camSys->sensitivity(nscamera_system::sens_strafe);
+    bool invertXFree = camSys->x_inverted();
+    bool invertYFree = camSys->y_inverted();
+    bool invertXFoc = camSys->x_inverted(nscamera_system::mode_focus);
+    bool invertYFoc = camSys->y_inverted(nscamera_system::mode_focus);
 
-	mUI.mTurnSldr->blockSignals(true);
-	mUI.mTurnSldr->setValue(turn);
-	mUI.mTurnSldr->blockSignals(false);
+    mUI.mTurnSldr->blockSignals(true);
+    mUI.mTurnSldr->setValue(turn);
+    mUI.mTurnSldr->blockSignals(false);
 
 	mUI.mMoveSldr->blockSignals(true);
 	mUI.mMoveSldr->setValue(move);
@@ -53,36 +49,36 @@ void CameraSettingsDialog::showIt()
 
 void CameraSettingsDialog::onTurnChange(int pVal)
 {
-	NSCameraSystem * camSys = mEngine->system<NSCameraSystem>();
-	camSys->setSensitivity(pVal, NSCameraSystem::Turn);
+    nscamera_system * camSys = nse.system<nscamera_system>();
+    camSys->set_sensitivity(pVal, nscamera_system::sens_turn);
 }
 
 void CameraSettingsDialog::onMoveChange(int pVal)
 {
-	NSCameraSystem * camSys = mEngine->system<NSCameraSystem>();
-	camSys->setSensitivity(pVal, NSCameraSystem::Strafe);
+    nscamera_system * camSys = nse.system<nscamera_system>();
+    camSys->set_sensitivity(pVal, nscamera_system::sens_strafe);
 }
 
 void CameraSettingsDialog::onCamCenterYCB(QString pStr)
 {
-	NSCameraSystem * camSys = mEngine->system<NSCameraSystem>();
-	camSys->setyinv((pStr == "Inverted"));
+    nscamera_system * camSys = nse.system<nscamera_system>();
+    camSys->invert_y(pStr == "Inverted");
 }
 
 void CameraSettingsDialog::onCamCenterXCB(QString pStr)
 {
-	NSCameraSystem * camSys = mEngine->system<NSCameraSystem>();
-	camSys->setxinv((pStr == "Inverted"));
+    nscamera_system * camSys = nse.system<nscamera_system>();
+    camSys->invert_x(pStr == "Inverted");
 }
 
 void CameraSettingsDialog::onObjCenterYCB(QString pStr)
 {
-	NSCameraSystem * camSys = mEngine->system<NSCameraSystem>();
-	camSys->setyinv((pStr == "Inverted"),NSCameraSystem::Focus);
+    nscamera_system * camSys = nse.system<nscamera_system>();
+    camSys->invert_y((pStr == "Inverted"),nscamera_system::mode_focus);
 }
 
 void CameraSettingsDialog::onObjCenterXCB(QString pStr)
 {
-	NSCameraSystem * camSys = mEngine->system<NSCameraSystem>();
-	camSys->setxinv((pStr == "Inverted"), NSCameraSystem::Focus);
+    nscamera_system * camSys = nse.system<nscamera_system>();
+    camSys->invert_x((pStr == "Inverted"), nscamera_system::mode_focus);
 }

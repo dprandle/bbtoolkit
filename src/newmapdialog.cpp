@@ -1,17 +1,22 @@
+#include <nslight_comp.h>
+#include <nstexture.h>
+#include <nscam_comp.h>
 #include <newmapdialog.h>
 #include <qmessagebox.h>
 #include <newtiledialog.h>
 #include <nsengine.h>
-#include <nsentitymanager.h>
+#include <nsentity_manager.h>
 #include <toolkit.h>
 #include <qcolordialog.h>
 #include <nsscene.h>
-#include <nsscenemanager.h>
+#include <nsscene_manager.h>
 #include <nsplugin.h>
-#include <nstilecomp.h>
-#include <nspluginmanager.h>
+#include <nstile_comp.h>
+#include <nsplugin_manager.h>
+#include <nsrender_comp.h>
 #include <ui_selecttiledialog.h>
 #include <ui_selectresdialog.h>
+#include <nsmaterial.h>
 #include <listwidgetcust.h>
 
 NewMapDialog::NewMapDialog(QWidget * parent) :
@@ -22,9 +27,8 @@ QDialog(parent)
 NewMapDialog::~NewMapDialog()
 {}
 
-void NewMapDialog::init(Toolkit * pTK)
+void NewMapDialog::init()
 {
-	mTK = pTK;
 	mNewMapUI.setupUi(this);
 	_setColorStyle();
 	connect(mNewMapUI.mColorBtn, SIGNAL(clicked()), this, SLOT(onColorChange()));
@@ -38,25 +42,25 @@ void NewMapDialog::onChooseSkybox()
 	ui.setupUi(&srd);
 
 	// Go through and add entities to the list widget which have camera component
-	auto plugiter = nsengine.plugins()->begin();
-	while (plugiter != nsengine.plugins()->end())
+	auto plugiter = nse.plugins()->begin();
+	while (plugiter != nse.plugins()->end())
 	{
-		NSPlugin * plg = nsengine.plugin(plugiter->first);
-		auto entiter = plg->manager<NSEntityManager>()->begin();
-		while (entiter != plg->manager<NSEntityManager>()->end())
+		nsplugin * plg = nse.plugin(plugiter->first);
+		auto entiter = plg->manager<nsentity_manager>()->begin();
+		while (entiter != plg->manager<nsentity_manager>()->end())
 		{
-			NSEntity * curent = plg->get<NSEntity>(entiter->first);
-			NSRenderComp * rc = curent->get<NSRenderComp>();
+			nsentity * curent = plg->get<nsentity>(entiter->first);
+			nsrender_comp * rc = curent->get<nsrender_comp>();
 			if (rc != NULL)
 			{
-				NSMaterial * mat = nsengine.resource<NSMaterial>(rc->materialID(0));
+                nsmaterial * mat = nse.resource<nsmaterial>(rc->material_id(0));
 				if (mat != NULL)
 				{
-					NSTexture * cm = nsengine.resource<NSTexture>(mat->mapTextureID(NSMaterial::Diffuse));
-					if (cm != NULL && type_to_hash(*cm) == type_to_hash(NSTexCubeMap))
+                    nstexture * cm = nse.resource<nstexture>(mat->map_tex_id(nsmaterial::diffuse));
+                    if (cm != NULL && type_to_hash(*cm) == type_to_hash(nstex_cubemap))
 					{
 						QListWidgetItem * item = new QListWidgetItem(curent->name().c_str());
-						item->setData(VIEW_WIDGET_ITEM_PLUG, curent->plugid());
+                        item->setData(VIEW_WIDGET_ITEM_PLUG, curent->plugin_id());
 						item->setData(VIEW_WIDGET_ITEM_ENT, curent->id());
 						ui.mListWidget->addItem(item);
 					}
@@ -77,9 +81,9 @@ void NewMapDialog::onChooseSkybox()
 		auto fitem = selitems.first();
 		uivec2 skyboxid(fitem->data(VIEW_WIDGET_ITEM_PLUG).toUInt(), fitem->data(VIEW_WIDGET_ITEM_ENT).toUInt());
 
-		NSEntity * skyboxent = nsengine.resource<NSEntity>(skyboxid);
+		nsentity * skyboxent = nse.resource<nsentity>(skyboxid);
 		mNewMapUI.mSkyboxLE->setText(skyboxent->name().c_str());
-		mNewMapUI.mSkyboxPluginLE->setText(nsengine.plugin(skyboxent->plugid())->name().c_str());
+        mNewMapUI.mSkyboxPluginLE->setText(nse.plugin(skyboxent->plugin_id())->name().c_str());
 	}
 }
 
@@ -91,18 +95,18 @@ void NewMapDialog::onChooseTile()
 	ui.setupUi(&srd);
 
 	// Go through and add entities to the list widget which have tile component
-	auto plugiter = nsengine.plugins()->begin();
-	while (plugiter != nsengine.plugins()->end())
+	auto plugiter = nse.plugins()->begin();
+	while (plugiter != nse.plugins()->end())
 	{
-		NSPlugin * plg = nsengine.plugin(plugiter->first);
-		auto entiter = plg->manager<NSEntityManager>()->begin();
-		while (entiter != plg->manager<NSEntityManager>()->end())
+		nsplugin * plg = nse.plugin(plugiter->first);
+		auto entiter = plg->manager<nsentity_manager>()->begin();
+		while (entiter != plg->manager<nsentity_manager>()->end())
 		{
-			NSEntity * curent = plg->get<NSEntity>(entiter->first);
-			if (curent->has<NSTileComp>())
+			nsentity * curent = plg->get<nsentity>(entiter->first);
+			if (curent->has<nstile_comp>())
 			{
 				QListWidgetItem * item = new QListWidgetItem(curent->name().c_str());
-				item->setData(VIEW_WIDGET_ITEM_PLUG, curent->plugid());
+                item->setData(VIEW_WIDGET_ITEM_PLUG, curent->plugin_id());
 				item->setData(VIEW_WIDGET_ITEM_ENT, curent->id());
 				ui.mListWidget->addItem(item);
 			}
@@ -121,9 +125,9 @@ void NewMapDialog::onChooseTile()
 		auto fitem = selitems.first();
 		uivec2 tileid(fitem->data(VIEW_WIDGET_ITEM_PLUG).toUInt(), fitem->data(VIEW_WIDGET_ITEM_ENT).toUInt());
 
-		NSEntity * tileent = nsengine.resource<NSEntity>(tileid);
+		nsentity * tileent = nse.resource<nsentity>(tileid);
 		mNewMapUI.mTileNameLE->setText(tileent->name().c_str());
-		mNewMapUI.mTilePluginLE->setText(nsengine.plugin(tileent->plugid())->name().c_str());
+        mNewMapUI.mTilePluginLE->setText(nse.plugin(tileent->plugin_id())->name().c_str());
 	}
 }
 
@@ -160,18 +164,18 @@ void NewMapDialog::onChooseCamera()
 	ui.setupUi(&srd);
 
 	// Go through and add entities to the list widget which have camera component
-	auto plugiter = nsengine.plugins()->begin();
-	while (plugiter != nsengine.plugins()->end())
+	auto plugiter = nse.plugins()->begin();
+	while (plugiter != nse.plugins()->end())
 	{
-		NSPlugin * plg = nsengine.plugin(plugiter->first);
-		auto entiter = plg->manager<NSEntityManager>()->begin();
-		while (entiter != plg->manager<NSEntityManager>()->end())
+		nsplugin * plg = nse.plugin(plugiter->first);
+		auto entiter = plg->manager<nsentity_manager>()->begin();
+		while (entiter != plg->manager<nsentity_manager>()->end())
 		{
-			NSEntity * curent = plg->get<NSEntity>(entiter->first);
-			if (curent->has<NSCamComp>())
+			nsentity * curent = plg->get<nsentity>(entiter->first);
+            if (curent->has<nscam_comp>())
 			{
 				QListWidgetItem * item = new QListWidgetItem(curent->name().c_str());
-				item->setData(VIEW_WIDGET_ITEM_PLUG, curent->plugid());
+                item->setData(VIEW_WIDGET_ITEM_PLUG, curent->plugin_id());
 				item->setData(VIEW_WIDGET_ITEM_ENT, curent->id());
 				ui.mListWidget->addItem(item);
 			}
@@ -190,9 +194,9 @@ void NewMapDialog::onChooseCamera()
 		auto fitem = selitems.first();
 		uivec2 camid(fitem->data(VIEW_WIDGET_ITEM_PLUG).toUInt(), fitem->data(VIEW_WIDGET_ITEM_ENT).toUInt());
 
-		NSEntity * cament = nsengine.resource<NSEntity>(camid);
+		nsentity * cament = nse.resource<nsentity>(camid);
 		mNewMapUI.mCamLE->setText(cament->name().c_str());
-		mNewMapUI.mCamPluginLE->setText(nsengine.plugin(cament->plugid())->name().c_str());
+        mNewMapUI.mCamPluginLE->setText(nse.plugin(cament->plugin_id())->name().c_str());
 	}
 }
 
@@ -210,19 +214,19 @@ void NewMapDialog::onChooseDirlight()
 
 	// Go through and add entities to the list widget which have light component
 	// and light component is of type "DirLight"
-	auto plugiter = nsengine.plugins()->begin();
-	while (plugiter != nsengine.plugins()->end())
+	auto plugiter = nse.plugins()->begin();
+	while (plugiter != nse.plugins()->end())
 	{
-		NSPlugin * plg = nsengine.plugin(plugiter->first);
-		auto entiter = plg->manager<NSEntityManager>()->begin();
-		while (entiter != plg->manager<NSEntityManager>()->end())
+		nsplugin * plg = nse.plugin(plugiter->first);
+		auto entiter = plg->manager<nsentity_manager>()->begin();
+		while (entiter != plg->manager<nsentity_manager>()->end())
 		{
-			NSEntity * curent = plg->get<NSEntity>(entiter->first);
-			NSLightComp * lc = curent->get<NSLightComp>();
-			if (lc != NULL && lc->type() == NSLightComp::Directional)
+			nsentity * curent = plg->get<nsentity>(entiter->first);
+			nslight_comp * lc = curent->get<nslight_comp>();
+            if (lc != NULL && lc->type() == nslight_comp::l_dir)
 			{
 				QListWidgetItem * item = new QListWidgetItem(curent->name().c_str());
-				item->setData(VIEW_WIDGET_ITEM_PLUG, curent->plugid());
+                item->setData(VIEW_WIDGET_ITEM_PLUG, curent->plugin_id());
 				item->setData(VIEW_WIDGET_ITEM_ENT, curent->id());
 				ui.mListWidget->addItem(item);
 			}
@@ -241,9 +245,9 @@ void NewMapDialog::onChooseDirlight()
 		auto fitem = selitems.first();
 		uivec2 lid(fitem->data(VIEW_WIDGET_ITEM_PLUG).toUInt(), fitem->data(VIEW_WIDGET_ITEM_ENT).toUInt());
 
-		NSEntity * lightent = nsengine.resource<NSEntity>(lid);
+		nsentity * lightent = nse.resource<nsentity>(lid);
 		mNewMapUI.mDirLightLE->setText(lightent->name().c_str());
-		mNewMapUI.mLightPluginLE->setText(nsengine.plugin(lightent->plugid())->name().c_str());
+        mNewMapUI.mLightPluginLE->setText(nse.plugin(lightent->plugin_id())->name().c_str());
 	}
 }
 
@@ -255,10 +259,10 @@ void NewMapDialog::onNewDirlight()
 void NewMapDialog::onNewTile()
 {
 	NewTileDialog newTileDialog(this);
-	newTileDialog.init(mTK);
+    newTileDialog.init();
 	if (newTileDialog.exec() == QDialog::Accepted)
 	{
-		mTK->refreshViews();
+        bbtk.refresh_views();
 		QString name = newTileDialog.getEntityName();
 		mNewMapUI.mTileNameLE->setText(name);
 	}
@@ -277,10 +281,10 @@ void NewMapDialog::onCreate()
 	nsstring mapName = mNewMapUI.mMapNameLE->text().toStdString();
 	nsstring mapCreator = mNewMapUI.mCreatorLE->text().toStdString();
 	nsstring mapNotes = mNewMapUI.mSceneNotesPTE->toPlainText().toStdString();
-	nsuint maxPlayers = mNewMapUI.mMaxPlayersSB->value();
+	uint32 max_players = mNewMapUI.mMaxPlayersSB->value();
 	fvec3 color = fvec3(prevC.redF(), prevC.greenF(), prevC.blueF());
 
-	NSPlugin * actPlug = nsengine.active();
+	nsplugin * actPlug = nse.active();
 	if (actPlug == NULL)
 	{
 		QMessageBox mb(QMessageBox::Warning, "Plugin Error", "No active plugin detected - cannot create map.", QMessageBox::NoButton, this);
@@ -295,7 +299,7 @@ void NewMapDialog::onCreate()
 		return;
 	}
 
-	NSSceneManager * scenes = actPlug->manager<NSSceneManager>();
+	nsscene_manager * scenes = actPlug->manager<nsscene_manager>();
 	if (scenes->contains(mapName))
 	{
 		QMessageBox mb(QMessageBox::Warning, "Map Name Error", "There is already a map with this name. Please use a different name.", QMessageBox::NoButton, this);
@@ -303,12 +307,12 @@ void NewMapDialog::onCreate()
 		return;
 	}
 
-	NSEntity * tile = NULL;
+	nsentity * tile = NULL;
 	if (mNewMapUI.mLoadGridGB->isChecked())
 	{
 		nsstring tName = mNewMapUI.mTileNameLE->text().toStdString();
 		nsstring plugName = mNewMapUI.mTilePluginLE->text().toStdString();
-		tile = nsengine.resource<NSEntity>(plugName, tName);
+		tile = nse.resource<nsentity>(plugName, tName);
 		if (tile == NULL)
 		{
 			QMessageBox mb(QMessageBox::Warning, "Tile Name Error", "Please specify a valid tile if you want to load a base grid.", QMessageBox::NoButton, this);
@@ -317,12 +321,12 @@ void NewMapDialog::onCreate()
 		}
 	}
 
-	NSEntity * skyb = NULL;
+	nsentity * skyb = NULL;
 	if (mNewMapUI.mLoadSkyboxGB->isChecked())
 	{
 		nsstring sname = mNewMapUI.mSkyboxLE->text().toStdString();
 		nsstring plugName = mNewMapUI.mSkyboxPluginLE->text().toStdString();
-		skyb = nsengine.resource<NSEntity>(plugName, sname);
+		skyb = nse.resource<nsentity>(plugName, sname);
 		if (skyb == NULL)
 		{
 			QMessageBox mb(QMessageBox::Warning, "Skybox Name Error", "Please specify a valid skybox if you want to load a skybox with the map", QMessageBox::NoButton, this);
@@ -331,12 +335,12 @@ void NewMapDialog::onCreate()
 		}
 	}
 
-	NSEntity * dirLight = NULL;
+	nsentity * dirLight = NULL;
 	if (!mNewMapUI.mCreateDefaultDirLightCB->isChecked())
 	{
 		nsstring name = mNewMapUI.mDirLightLE->text().toStdString();
 		nsstring plugName = mNewMapUI.mLightPluginLE->text().toStdString();
-		dirLight = nsengine.resource<NSEntity>(plugName, name);
+		dirLight = nse.resource<nsentity>(plugName, name);
 		if (dirLight == NULL)
 		{
 			QMessageBox mb(QMessageBox::Warning, "Directional Light Error", "Please specify a valid directional light if you want to load a custom one", QMessageBox::NoButton, this);
@@ -345,14 +349,14 @@ void NewMapDialog::onCreate()
 		}
 	}
 	else
-		dirLight = nsengine.active()->createDirLight(mapName + "_dlight", 0.6f, 0.3f);
+        dirLight = nse.active()->create_dir_light(mapName + "_dlight", 0.6f, 0.3f);
 
-	NSEntity * scenecam = NULL;
+	nsentity * scenecam = NULL;
 	if (!mNewMapUI.mCreateDefaultCamCB->isChecked())
 	{
 		nsstring name = mNewMapUI.mCamLE->text().toStdString();
 		nsstring plugName = mNewMapUI.mCamPluginLE->text().toStdString();
-		scenecam = nsengine.resource<NSEntity>(plugName, name);
+		scenecam = nse.resource<nsentity>(plugName, name);
 		if (scenecam == NULL)
 		{
 			QMessageBox mb(QMessageBox::Warning, "Camera Error", "Please specify a valid camera if you want to load a custom one", QMessageBox::NoButton, this);
@@ -361,9 +365,9 @@ void NewMapDialog::onCreate()
 		}
 	}
 	else
-		scenecam = nsengine.active()->createCamera(mapName + "_cam", 60.0f, uivec2(mTK->mapView()->width(), mTK->mapView()->height()), fvec2(DEFAULT_Z_NEAR, DEFAULT_Z_FAR));
+        scenecam = nse.active()->create_camera(mapName + "_cam", 60.0f, uivec2(bbtk.map_view()->width(), bbtk.map_view()->height()), fvec2(DEFAULT_Z_NEAR, DEFAULT_Z_FAR));
 
-	NSScene * scene = scenes->create(mapName);
+	nsscene * scene = scenes->create(mapName);
 	if (scene == NULL)
 	{
 		QMessageBox mb(QMessageBox::Warning, "Map Error", "There was an error in creating map with name " + QString(mapName.c_str()) + ". Try a different name", QMessageBox::NoButton, this);
@@ -371,24 +375,24 @@ void NewMapDialog::onCreate()
 		return;
 	}
 
-	scene->setCreator(mapCreator);
-	scene->setNotes(mapNotes);
-	scene->setMaxPlayers(maxPlayers);
-	scene->setBackgroundColor(color);
+    scene->set_creator(mapCreator);
+    scene->set_notes(mapNotes);
+    scene->set_max_players(max_players);
+    scene->set_bg_color(color);
 
-	NSScene * curScene = nsengine.currentScene();
-	nsengine.setCurrentScene(scene, true, true);
+	nsscene * curScene = nse.current_scene();
+    nse.set_current_scene(scene, true, true);
 	if (tile != NULL)
 	{
 		ivec3 bounds(mNewMapUI.mGridXSB->value(), mNewMapUI.mGridYSB->value(), mNewMapUI.mHeightSB->value());
-		scene->addGridded(tile, bounds);
+        scene->add_gridded(tile, bounds);
 		actPlug->save(scene);
 	}
 	if (skyb != NULL)
-		scene->setSkydome(skyb, true);
-	scene->setCamera(scenecam, true);
+        scene->set_skydome(skyb, true);
+    scene->set_camera(scenecam, true);
 	scene->add(dirLight, fvec3(20.0f, 20.0f, -40.0f), ::orientation(fvec4(0, 1, 0, 10)));
-	nsengine.setCurrentScene(curScene, false, true);
+    nse.set_current_scene(curScene, false, true);
 	accept();
 }
 

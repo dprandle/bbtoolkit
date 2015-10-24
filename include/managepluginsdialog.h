@@ -7,15 +7,14 @@
 #include <qvector.h>
 #include <set>
 #include <nsmath.h>
-#include <nsglobal.h>
 #include <qcolor.h>
 
-class NSEngine;
+class nsengine;
 class Toolkit;
-class NSPlugin;
-class NSPluginManager;
+class nsplugin;
+class nsplugin_manager;
 
-void AddParents(NSPlugin * pCurPlug, QVector<NSPlugin*> & pPlugsToLoad, std::set<nsstring> & pUnloadedPlugs, NSPluginManager * pPlugs);
+void AddParents(nsplugin * pCurPlug, QVector<nsplugin*> & pPlugsToLoad, std::set<nsstring> & pUnloadedPlugs, nsplugin_manager * pPlugs);
 
 class ManagePluginsDialog : public QDialog
 {
@@ -25,7 +24,7 @@ public:
 	ManagePluginsDialog(QWidget * parent = NULL);
 	~ManagePluginsDialog();
 
-	void init(Toolkit * pTK);
+    void init();
 	void addPluginsToTreeWidget();
 
 	/*! 
@@ -54,11 +53,10 @@ public:
 	void onColorChange();
 
 private:
-	nsbool _itemHasCheckedChildren(QTreeWidgetItem* item);
+    bool _itemHasCheckedChildren(QTreeWidgetItem* item);
 	void _setColorStyle();
 
 	Ui_ManagePluginsDialog mUI;
-	Toolkit * mTK;
 	QDialog * mNewPlugDialog;
 	Ui_NewPluginDialog mNewPlugUI;
 	Qt::CheckState mPressedState;

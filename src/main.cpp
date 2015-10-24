@@ -1,13 +1,13 @@
-#include "toolkit.h"
+#include <myGL/glew.h>
+#include <toolkit.h>
 #include <QApplication>
-#include <nsglobal.h>
 #include <qsurfaceformat.h>
 
 int main(int argc, char *argv[])
 {
 	QApplication a(argc, argv);
-	Toolkit w;
-	w.init();
-	w.show();
+    Toolkit tk;
+    tk.init();
+    tk.show();
 	return a.exec();
 }

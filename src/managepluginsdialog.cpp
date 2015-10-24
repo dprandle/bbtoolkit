@@ -1,7 +1,8 @@
+#include <nscam_comp.h>
 #include <qmessagebox.h>
 #include <managepluginsdialog.h>
 #include <nsengine.h>
-#include <nspluginmanager.h>
+#include <nsplugin_manager.h>
 #include <qtreewidget.h>
 #include <nsplugin.h>
 #include <nsresource.h>
@@ -9,11 +10,11 @@
 #include <ui_plugindetailsdialog.h>
 #include <qmessagebox.h>
 #include <toolkit.h>
-#include <nsentitymanager.h>
+#include <nsentity_manager.h>
 #include <qdatetime.h>
-#include <nsscenemanager.h>
+#include <nsscene_manager.h>
 #include <nsscene.h>
-#include <nsselectionsystem.h>
+#include <nsselection_system.h>
 #include <qcolordialog.h>
 #include <ui_editplugindialog.h>
 #include <qrgb.h>
@@ -32,9 +33,8 @@ ManagePluginsDialog::~ManagePluginsDialog()
 {
 }
 
-void ManagePluginsDialog::init(Toolkit * pTK)
+void ManagePluginsDialog::init()
 {
-	mTK = pTK;
 	mUI.setupUi(this);
 	addPluginsToTreeWidget();
 	
@@ -55,7 +55,7 @@ void ManagePluginsDialog::addPluginsToTreeWidget()
 	mUI.mPluginsTblW->clear();
 
 	// Set up the active plugin stuff - if no active plugin is found then set to "None"
-	NSPlugin * activePlug = nsengine.active();
+	nsplugin * activePlug = nse.active();
 	if (activePlug != NULL)
 		mUI.mActivePluginLbl->setText(activePlug->name().c_str());
 	else
@@ -67,14 +67,14 @@ void ManagePluginsDialog::addPluginsToTreeWidget()
 
 	// Populate the table widget with all the plugins found in the plugin manager
 	// The toolkit populates the plugins here on startup by using the plugins folder
-	auto iter = nsengine.plugins()->begin();
-	while (iter != nsengine.plugins()->end())
+	auto iter = nse.plugins()->begin();
+	while (iter != nse.plugins()->end())
 	{
-		NSPlugin * curPlug = nsengine.plugin(iter->first);
+		nsplugin * curPlug = nse.plugin(iter->first);
 		QTreeWidgetItem * item = new QTreeWidgetItem();
 		QString name((curPlug->name()).c_str());
 		item->setText(0, name);
-		item->setText(1, std::to_string(curPlug->resourceCount()).c_str());
+        item->setText(1, std::to_string(curPlug->resource_count()).c_str());
 		item->setCheckState(0, Qt::CheckState(int(curPlug->bound()) * 2));
 		mUI.mPluginsTblW->addTopLevelItem(item);
 		++iter;
@@ -90,11 +90,11 @@ void ManagePluginsDialog::check(QTreeWidgetItem * pItem)
 {
 	if (pItem == NULL)
 		return;
-	NSPlugin * plug = nsengine.plugin(pItem->text(0).toStdString());
+	nsplugin * plug = nse.plugin(pItem->text(0).toStdString());
 	if (plug == NULL)
 		return;
 
-	nsstringset parents = plug->parents();
+    nsstring_set parents = plug->parents();
 	auto parIter = parents.begin();
 	while (parIter != parents.end())
 	{
@@ -119,18 +119,18 @@ void ManagePluginsDialog::uncheck(QTreeWidgetItem * pItem)
 		return;
 	nsstring plugName = pItem->text(0).toStdString();
 
-	nsuint itemCount = mUI.mPluginsTblW->topLevelItemCount();
-	for (nsuint ind = 0; ind < itemCount; ++ind)
+	uint32 itemCount = mUI.mPluginsTblW->topLevelItemCount();
+	for (uint32 ind = 0; ind < itemCount; ++ind)
 	{
 		auto curItem = mUI.mPluginsTblW->topLevelItem(ind);
 		if (curItem == NULL)
 			return;
 
-		NSPlugin * curPlug = nsengine.plugin(curItem->text(0).toStdString());
+		nsplugin * curPlug = nse.plugin(curItem->text(0).toStdString());
 		if (curPlug == NULL)
 			continue;
 
-		if (curPlug->hasParent(plugName))
+        if (curPlug->has_parent(plugName))
 			uncheck(curItem);
 	}
 	pItem->setCheckState(0, Qt::Unchecked);
@@ -159,7 +159,7 @@ void ManagePluginsDialog::onOkay()
 		return;
 	}
 
-	NSPluginManager * plugs = nsengine.plugins();
+	nsplugin_manager * plugs = nse.plugins();
 
 	if (!plugs->contains(activePluginName))
 	{
@@ -171,38 +171,38 @@ void ManagePluginsDialog::onOkay()
 	// If the active plugin has changed and the scene has unsaved changes ask the user if they want to save these changes
 	if (mInitialActive != mUI.mActivePluginLbl->text())
 	{
-		NSScene * curScene = nsengine.currentScene();
-		if (plugs->active() != NULL && nsengine.active()->resourceChanged(curScene))
+		nsscene * curScene = nse.current_scene();
+        if (plugs->active() != NULL && nse.active()->resource_changed(curScene))
 		{
 			int ans;
 			QMessageBox mb(QMessageBox::Warning, "Plugin Changes", "There are unsaved changes to the active plugin - would you like to save or discard these changes?", QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel, this);
 			ans = mb.exec();
 
 			if (ans == QMessageBox::Save)
-				mTK->onSave();
+                bbtk.on_actionSave_triggered();
 			else if (ans == QMessageBox::Cancel)
 				return;
 			// Otherwise continue on!
 		}
 	}
-	nsengine.system<NSSelectionSystem>()->clear();
+	nse.system<nsselection_system>()->clear();
 
 
 	// Build the list of plugins to load - check each one to make sure that it can be found before attempting to load
 	// If any cannot be found, dont load and add to the unloaded list. If any are already loaded, dont load and don't add
 	// to the unloaded list or loaded list. If unloaded and found, dont add to either list either right now. Only after
 	// actually loading should we add to loaded list
-	QVector<NSPlugin*> plugsToLoad;
+	QVector<nsplugin*> plugsToLoad;
 	std::set<nsstring> unloadedPlugs;
 	std::set<nsstring> loadedPlugs;
 
-	nsuint itemCount = mUI.mPluginsTblW->topLevelItemCount();
-	for (nsuint index = 0; index < itemCount; ++index)
+	uint32 itemCount = mUI.mPluginsTblW->topLevelItemCount();
+	for (uint32 index = 0; index < itemCount; ++index)
 	{
 		QTreeWidgetItem * qtwi = mUI.mPluginsTblW->topLevelItem(index);
 		nsstring plugName = qtwi->text(0).toStdString();
 		
-		NSPlugin * curPlug = plugs->get(plugName);
+		nsplugin * curPlug = plugs->get(plugName);
 		// Make sure plugin is found - wont be found for example if the user has deleted the plugin file
 		if (curPlug == NULL)
 		{
@@ -219,7 +219,7 @@ void ManagePluginsDialog::onOkay()
 
 
 	// Set the current scene to NULL before unloading plugins
-	nsengine.setCurrentScene(nullptr);
+    nse.set_current_scene(nullptr);
 
 	// Now go through and add the plugins and load the unloaded that are checked, unload the loaded that are unchecked
 	// But first, check to make sure every plugin has all of its necessary parent plugins before on the list
@@ -230,7 +230,7 @@ void ManagePluginsDialog::onOkay()
 		nsstring plugName = (*plugIter)->name();
 		auto items = mUI.mPluginsTblW->findItems(plugName.c_str(), Qt::MatchExactly);
 		if (items.size() != 1)
-			throw (std::exception("Not exactly one match detected in plugins table widget"));
+            throw std::exception();
 		auto curItem = items.first();
 
 		if (curItem->checkState(0) == Qt::Checked)
@@ -242,43 +242,43 @@ void ManagePluginsDialog::onOkay()
 	}
 
 	// Set the active plugin - if not found then throw exception
-	plugs->setActive(activePluginName);
-	NSPlugin * activePlug = plugs->active();
+    plugs->set_active(activePluginName);
+	nsplugin * activePlug = plugs->active();
 	if (activePlug == NULL)
-		throw std::exception("ManagePluginsDialog::onOkay - No active plugin set");
+        throw std::exception();
 
 	bool openDialog = false;
 
 	// Now load a map from the active plugin.. if there is more than one map included bring up a dialog
 	// to pick which map to load, otherwise load the only map
 	// If there are no maps, then the current scene should remain NULL
-	NSSceneManager * sm = activePlug->manager<NSSceneManager>();
+	nsscene_manager * sm = activePlug->manager<nsscene_manager>();
 	if (!sm->empty())
 	{
 		if (sm->count() > 1)
 			openDialog = true;
 		else
 		{
-			nsengine.setCurrentScene(sm->begin()->first);
-			NSScene * cur = nsengine.currentScene();
-			if (!cur->hasDirLight())
+            nse.set_current_scene(sm->begin()->first);
+			nsscene * cur = nse.current_scene();
+            if (!cur->has_dir_light())
 			{
-				NSEntity * dl = activePlug->createDirLight(cur->name() + "dlight", 0.6f, 0.3f);
+                nsentity * dl = activePlug->create_dir_light(cur->name() + "dlight", 0.6f, 0.3f);
 				cur->add(dl, fvec3(20.0f, 20.0f, -40.0f), ::orientation(fvec4(0, 1, 0, 30)));
 			}
 			if (cur->camera() == NULL)
 			{
-				NSEntity * cam = activePlug->createCamera(cur->name() + "cam", 60.0f, uivec2(mTK->mapView()->width(), mTK->mapView()->height()), fvec2(DEFAULT_Z_NEAR, DEFAULT_Z_FAR));
-				cur->setCamera(cam, true);
+                nsentity * cam = activePlug->create_camera(cur->name() + "cam", 60.0f, uivec2(bbtk.map_view()->width(), bbtk.map_view()->height()), fvec2(DEFAULT_Z_NEAR, DEFAULT_Z_FAR));
+                cur->set_camera(cam, true);
 			}
 		}
 	}
 
 	// Refresh toolkit views and close dialog
-	mTK->refreshViews();
+    bbtk.refresh_views();
 	accept();
 	if (openDialog)
-		mTK->onSwitchMaps();
+        bbtk.on_actionSwitchMap_triggered();
 }
 
 void ManagePluginsDialog::onCancel()
@@ -298,7 +298,7 @@ void ManagePluginsDialog::onNewPluginAccept()
 	nsstring name = mNewPlugUI.mResNameLE->text().toStdString();
 	nsstring creator = mNewPlugUI.mCreatorNameLE->text().toStdString();
 	nsstring plugNotes = mNewPlugUI.mDescriptionTextEdit->toPlainText().toStdString();
-	NSPluginManager * plugs = nsengine.plugins();
+	nsplugin_manager * plugs = nse.plugins();
 
 	if (name.empty())
 	{
@@ -324,7 +324,7 @@ void ManagePluginsDialog::onNewPluginAccept()
 	}
 
 	// From here on out we have to remove the plugin if something goes wrong
-	NSPlugin * plug = plugs->create(name);
+	nsplugin * plug = plugs->create(name);
 	if (plug == NULL)
 	{
 		QMessageBox mb(QMessageBox::Warning, "Plugin Error", "There was an error in creating plugin with name " + QString(name.c_str()) + ". Try a different name", QMessageBox::NoButton, this);
@@ -333,11 +333,11 @@ void ManagePluginsDialog::onNewPluginAccept()
 	}
 
 	QDate date = QDate::currentDate();
-	plug->setCreator(creator);
-	plug->setNotes(plugNotes);
-	plug->setEditDate(date.toString().toStdString());
-	plug->setCreationDate(date.toString().toStdString());
-	nsengine.setActive(plug);
+    plug->set_creator(creator);
+    plug->set_notes(plugNotes);
+    plug->set_edit_date(date.toString().toStdString());
+    plug->set_creation_date(date.toString().toStdString());
+    nse.set_active(plug);
 	mUI.mActivePluginLbl->setText(name.c_str());
 
 	// If the user wants a default map, we will make one here..
@@ -346,33 +346,33 @@ void ManagePluginsDialog::onNewPluginAccept()
 		nsstring sceneName = mNewPlugUI.mSceneNameLE->text().toStdString();
 		nsstring sceneCreator = mNewPlugUI.mSceneCreatorLE->text().toStdString();
 		nsstring sceneNotes = mNewPlugUI.mSceneNotesPTE->toPlainText().toStdString();
-		nsuint maxPlayers = mNewPlugUI.mMaxPlayersSB->value();
+		uint32 max_players = mNewPlugUI.mMaxPlayersSB->value();
 		QColor prev = mNewPlugUI.mColorBtn->palette().color(backgroundRole());
 		fvec3 color = fvec3(prev.redF(), prev.greenF(), prev.blueF());
 
-		if (plug->contains<NSScene>(sceneName))
+		if (plug->contains<nsscene>(sceneName))
 		{
 			QMessageBox mb(QMessageBox::Warning, "Map Name Error", "There is already a map \"" + QString(sceneName.c_str()) + "\". Please use a different map name.", QMessageBox::NoButton, this);
 			mb.exec();
-			nsengine.destroyPlugin(plug);
-			nsengine.setActive(nullptr);
+            nse.destroy_plugin(plug);
+            nse.set_active(nullptr);
 			return;
 		}
 
-		NSScene * scene = plug->create<NSScene>(sceneName);
+		nsscene * scene = plug->create<nsscene>(sceneName);
 		if (scene == NULL)
 		{
 			QMessageBox mb(QMessageBox::Warning, "Map Error", "There was an error in creating map \"" + QString(sceneName.c_str()) + "\". You will have to make a new map.", QMessageBox::NoButton, this);
 			mb.exec();
-			nsengine.destroyPlugin(plug);
-			nsengine.setActive(nullptr);
+            nse.destroy_plugin(plug);
+            nse.set_active(nullptr);
 		}
 
 		// Set up the scene with the values as determined from the dialog
-		scene->setMaxPlayers(maxPlayers);
-		scene->setCreator(sceneCreator);
-		scene->setNotes(sceneNotes);
-		scene->setBackgroundColor(color);
+        scene->set_max_players(max_players);
+        scene->set_creator(sceneCreator);
+        scene->set_notes(sceneNotes);
+        scene->set_bg_color(color);
 		plug->save(scene);
 	}
 
@@ -409,17 +409,17 @@ void ManagePluginsDialog::onSelectionChange()
 	if (item == NULL)
 		return;
 
-	NSPlugin * plug = nsengine.plugin(item->text(0).toStdString());
+	nsplugin * plug = nse.plugin(item->text(0).toStdString());
 
 	if (plug == NULL)
 		return;
 
-	mUI.mNotesTextEdit->setPlainText(plug->notes().c_str());
+    mUI.mNotesTextEdit->setPlainText(plug->notes().c_str());
 	mUI.mCreatorLE->setText(plug->creator().c_str());
-	mUI.mDateCreatedLbl->setText(plug->creationDate().c_str());
-	mUI.mDateModifiedLbl->setText(plug->editDate().c_str());
+    mUI.mDateCreatedLbl->setText(plug->creation_date().c_str());
+    mUI.mDateModifiedLbl->setText(plug->edit_date().c_str());
 
-	const nsstringset & rents = plug->parents();
+    const nsstring_set & rents = plug->parents();
 	auto pIter = rents.begin();
 	while (pIter != rents.end())
 	{
@@ -438,20 +438,20 @@ void ManagePluginsDialog::onItemChanged(QTreeWidgetItem* item, int pColumn)
 {
 	nsstring plugName = item->text(0).toStdString();
 
-	NSPlugin * curPlug = nsengine.plugin(plugName);
+	nsplugin * curPlug = nse.plugin(plugName);
 	if (curPlug == NULL)
-		throw std::exception("Error: entry in table widget does not refer to valid item");
+        throw std::exception();
 
 	if (pColumn == 0 && item->checkState(pColumn) == Qt::Unchecked)
 	{
 		// Go through and check each plugin to see if the unchecked plugin is a parent to any of them.. if it is then it cannot be unchecked
-		nsuint itemCount = mUI.mPluginsTblW->topLevelItemCount();
-		for (nsuint index = 0; index < itemCount; ++index)
+		uint32 itemCount = mUI.mPluginsTblW->topLevelItemCount();
+		for (uint32 index = 0; index < itemCount; ++index)
 		{
 			QTreeWidgetItem * qtwi = mUI.mPluginsTblW->topLevelItem(index);
 			nsstring plugName = qtwi->text(pColumn).toStdString();
 
-			NSPlugin * curPlug = nsengine.plugin(plugName);
+			nsplugin * curPlug = nse.plugin(plugName);
 			if (curPlug == NULL)
 				continue;
 
@@ -480,7 +480,7 @@ void ManagePluginsDialog::onItemChanged(QTreeWidgetItem* item, int pColumn)
 	{
 
 		// Make sure that all parents are activated when a child plugin is enabled
-		nsstringset parents = curPlug->parents();
+        nsstring_set parents = curPlug->parents();
 		auto iter = parents.begin();
 		while (iter != parents.end())
 		{
@@ -488,13 +488,13 @@ void ManagePluginsDialog::onItemChanged(QTreeWidgetItem* item, int pColumn)
 
 			// Better not be more than one match
 			if (matchItems.size() > 1)
-				throw(std::exception("Multiple plugins with same name"));
+                throw std::exception();
 
 			if (matchItems.isEmpty())
 			{
 				// If the plugin being enabled has a parent plugin that cannot be found in the plugins
 				// tbl widget and the parents are not loaded it means that we should definitely not enable this plugin
-				if (!curPlug->parentsLoaded())
+                if (!curPlug->parents_loaded())
 				{
 					item->setCheckState(0, Qt::Unchecked);
 					QMessageBox mb(QMessageBox::Warning, "Parent Plugin Error", "You cannot enable " + item->text(0) + " because its parent plugins cannot be found - add parent plugins to plugins folder.", QMessageBox::NoButton, this);
@@ -536,18 +536,18 @@ void ManagePluginsDialog::onSetActive()
 	// Go through all plugs in tbl widget and check if they have a parent with the name of the plugin
 	// that is trying to be set as active.. if they do they uncheck them..
 	nsstring plugName = item->text(0).toStdString();
-	nsuint itemCount = mUI.mPluginsTblW->topLevelItemCount();
-	for (nsuint i = 0; i < itemCount; ++i)
+	uint32 itemCount = mUI.mPluginsTblW->topLevelItemCount();
+	for (uint32 i = 0; i < itemCount; ++i)
 	{
 		// All operations on column 0
 		auto tmpItem = mUI.mPluginsTblW->topLevelItem(i);
 		if (tmpItem == NULL)
 			continue;
 		nsstring tmpPlugName = tmpItem->text(0).toStdString();
-		NSPlugin * plug = nsengine.plugin(tmpPlugName);
+		nsplugin * plug = nse.plugin(tmpPlugName);
 		if (plug == NULL)
 			continue;
-		if (plug->hasParent(plugName))
+        if (plug->has_parent(plugName))
 			uncheck(tmpItem);
 	}
 
@@ -570,7 +570,7 @@ void ManagePluginsDialog::onDeletePlugin()
 	if (item == NULL)
 		return;
 
-	NSPlugin * plug = nsengine.plugin(item->text(0).toStdString());
+	nsplugin * plug = nse.plugin(item->text(0).toStdString());
 
 	if (plug == NULL)
 		return;
@@ -588,12 +588,12 @@ void ManagePluginsDialog::onDeletePlugin()
 	int ret = mb.exec();
 	if (ret == QMessageBox::Yes)
 	{		
-		nsengine.delPlugin(plug);
+        nse.del_plugin(plug);
 		addPluginsToTreeWidget();
 	}
 	else if (ret == QMessageBox::No)
 	{
-		nsengine.destroyPlugin(plug);
+        nse.destroy_plugin(plug);
 		addPluginsToTreeWidget();
 	}
 	else
@@ -621,12 +621,12 @@ void ManagePluginsDialog::onDetails()
 	if (item == NULL)
 		return;
 
-	NSPlugin * plug = nsengine.plugin(item->text(0).toStdString());
+	nsplugin * plug = nse.plugin(item->text(0).toStdString());
 
 	if (plug == NULL)
 		return;
 
-	pDet.mText->setPlainText(plug->details().c_str());
+    pDet.mText->setPlainText(plug->details().c_str());
 	det->exec();
 }
 
@@ -645,13 +645,13 @@ void ManagePluginsDialog::onEditPlugin()
 	if (item == NULL)
 		return;
 
-	NSPlugin * plug = nsengine.plugin(item->text(0).toStdString());
+	nsplugin * plug = nse.plugin(item->text(0).toStdString());
 
 	if (plug == NULL)
 		return;
 
 	editUI.mCreatorNameLE->setText(plug->creator().c_str());
-	editUI.mDescriptionTextEdit->setPlainText(plug->notes().c_str());
+    editUI.mDescriptionTextEdit->setPlainText(plug->notes().c_str());
 	editUI.mResNameLE->setText(plug->name().c_str());
 
 	if (editPlug->exec() == QDialog::Accepted)
@@ -664,26 +664,26 @@ void ManagePluginsDialog::onEditPlugin()
 				" are plugins that are outside of the plugins folder that depend on this one, they will be unable to find this plugin. So, are you sure?");
 			mb.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
 			if (mb.exec() == QMessageBox::Yes)
-				nsengine.plugins()->rename(plug->name(), newPlugName);
+				nse.plugins()->rename(plug->name(), newPlugName);
 		}
 
 		nsstring newNotes = editUI.mDescriptionTextEdit->toPlainText().toStdString();
-		plug->setNotes(newNotes);
+        plug->set_notes(newNotes);
 
 		nsstring newCreator = editUI.mCreatorNameLE->text().toStdString();
-		plug->setCreator(newCreator);
+        plug->set_creator(newCreator);
 		addPluginsToTreeWidget();
 	}
 }
 
-nsbool ManagePluginsDialog::_itemHasCheckedChildren(QTreeWidgetItem* item)
+bool ManagePluginsDialog::_itemHasCheckedChildren(QTreeWidgetItem* item)
 {
-	NSPlugin * curPlug = nsengine.plugin(item->text(0).toStdString());
+	nsplugin * curPlug = nse.plugin(item->text(0).toStdString());
 
 	if (curPlug == NULL)
 		return false;
 
-	nsstringset parents = curPlug->parents();
+    nsstring_set parents = curPlug->parents();
 	auto iter = parents.begin();
 	nsstring itemStr = item->text(0).toStdString();
 	while (iter != parents.end())
@@ -699,15 +699,15 @@ nsbool ManagePluginsDialog::_itemHasCheckedChildren(QTreeWidgetItem* item)
 /*!
 Add each parent of the plugin to the list, recursively calling this function on each parent.
 */
-void AddParents(NSPlugin * pCurPlug, QVector<NSPlugin*> & pPlugsToLoad, std::set<nsstring> & pUnloadedPlugs, NSPluginManager * pPlugs)
+void AddParents(nsplugin * pCurPlug, QVector<nsplugin*> & pPlugsToLoad, std::set<nsstring> & pUnloadedPlugs, nsplugin_manager * pPlugs)
 {
 	if (pCurPlug->parents().size() > 0)
 	{
-		nsstringset ps = pCurPlug->parents();
+        nsstring_set ps = pCurPlug->parents();
 		auto iter = ps.begin();
 		while (iter != ps.end())
 		{
-			NSPlugin * parentPlug = nsengine.plugin(*iter);
+			nsplugin * parentPlug = nse.plugin(*iter);
 			// Make sure plugin is found - wont be found for example if the user has deleted the plugin file
 			if (parentPlug == NULL)
 			{
@@ -725,7 +725,7 @@ void AddParents(NSPlugin * pCurPlug, QVector<NSPlugin*> & pPlugsToLoad, std::set
 	}
 
 	// Now add this plugin to the to load vector if its not there and not bound
-	if (!pPlugsToLoad.contains(pCurPlug) && !nsengine.plugin(pCurPlug)->bound())
+	if (!pPlugsToLoad.contains(pCurPlug) && !nse.plugin(pCurPlug)->bound())
 		pPlugsToLoad.push_back(pCurPlug);
 }
 

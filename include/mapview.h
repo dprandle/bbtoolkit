@@ -15,16 +15,15 @@ This file contains all of the neccessary declarations for the MapView class.
 
 
 // Includes
-#include <myGL\glew.h>
 #include <qopenglwidget.h>
 #include <toolkitdef.h>
-#include <nsglobal.h>
+#include <nsmath.h>
 
 class Toolkit;
-class NSEngine;
-class NSEntity;
-class NSTexManager;
-class NSShaderManager;
+class nsengine;
+class nsentity;
+class nstex_manager;
+class nsshader_manager;
 
 class MapView : public QOpenGLWidget
 {
@@ -33,8 +32,9 @@ public:
 	MapView(QWidget * parent=NULL);
 	~MapView();
 
-	nsuint glewID();
-	void init(Toolkit * pTK);
+    uint32 glewID();
+    void init();
+    void make_current();
 
 public slots:
 	void onIdle();
@@ -54,10 +54,11 @@ protected:
 	void wheelEvent(QWheelEvent * wevent);
 
 private:
-	void _connect();
+    void _connect();
+    bool _on_key(bool pressed, int key);
+    bool _on_mouse(bool pressed, int mbutton, const fvec2 & norm_mpos);
 
-	Toolkit * mTK;
-	nsuint mGlewID;
+    uint32 m_glew_id;
 };
 
 #endif // MAPWINDOW_H

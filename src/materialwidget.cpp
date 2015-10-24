@@ -14,12 +14,12 @@ MaterialWidget::~MaterialWidget()
 	
 }
 
-void MaterialWidget::setResource(NSResource * res)
+void MaterialWidget::setResource(nsresource * res)
 {
-	mMat = dynamic_cast<NSMaterial*>(res);
+	mMat = dynamic_cast<nsmaterial*>(res);
 }
 
-NSResource * MaterialWidget::resource()
+nsresource * MaterialWidget::resource()
 {
 	return  mMat;
 }

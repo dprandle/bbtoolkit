@@ -4,11 +4,11 @@
 // Inlcudes
 #include <ui_newtile.h>
 #include <toolkitdef.h>
-#include <nsglobal.h>
 
-class NSEngine;
+class nsengine;
 class Preview;
 class Toolkit;
+class nsmaterial;
 
 class NewTileDialog : public QDialog
 {
@@ -17,7 +17,7 @@ public:
 	NewTileDialog(QWidget * parent = NULL);
 	~NewTileDialog();
 
-	void init(Toolkit * pTK);
+    void init();
 
 	QString getEntityName();
 	void reject();
@@ -45,8 +45,7 @@ public:
 
 private:
 	Ui_NewTileDialog mUI;
-	Toolkit * mTK;
-	NSMaterial * mTempMat;
+	nsmaterial * mTempMat;
 	QString mGenFile;
 
 	bool diffuseLoaded;

@@ -3,15 +3,15 @@
 #include <qmessagebox.h>
 #include <addnewbrushdialog.h>
 #include <nsengine.h>
-#include <nsentitymanager.h>
-#include <nstilebrushcomp.h>
+#include <nsentity_manager.h>
+#include <nstile_brush_comp.h>
 #include <toolkit.h>
-#include <nspluginmanager.h>
-#include <nsbuildsystem.h>
+#include <nsplugin_manager.h>
+#include <nsbuild_system.h>
 
 BrushMenuWidget::BrushMenuWidget(QWidget * parent):
-mTB(new QToolBar()),
-QWidget(parent)
+    QWidget(parent),
+    mTB(new QToolBar())
 {
 
 }
@@ -21,9 +21,8 @@ BrushMenuWidget::~BrushMenuWidget()
 
 }
 
-void BrushMenuWidget::init(Toolkit * pTK)
+void BrushMenuWidget::init()
 {
-	mTK = pTK;
 	mUI.setupUi(this);
 	mUI.verticalLayout->addWidget(mTB);
 	mTB->addAction(mUI.actionNewBrush);
@@ -32,18 +31,18 @@ void BrushMenuWidget::init(Toolkit * pTK)
 	mTB->setLayoutDirection(Qt::RightToLeft);
 }
 
-void BrushMenuWidget::setSelectedItem(NSEntity * ent)
+void BrushMenuWidget::setSelectedItem(nsentity * ent)
 {
 	auto fItems = mUI.mBrushedLW->findItems(QString(ent->name().c_str()), Qt::MatchCaseSensitive);
-	for (nsint i = 0; i < fItems.size(); ++i)
+	for (int32 i = 0; i < fItems.size(); ++i)
 	{
 		auto curitem = fItems[i];
-		if (uivec2(curitem->data(VIEW_WIDGET_ITEM_PLUG).toUInt(), curitem->data(VIEW_WIDGET_ITEM_ENT).toUInt()) == ent->fullid())
+        if (uivec2(curitem->data(VIEW_WIDGET_ITEM_PLUG).toUInt(), curitem->data(VIEW_WIDGET_ITEM_ENT).toUInt()) == ent->full_id())
 			mUI.mBrushedLW->setItemSelected(curitem, true);
 	}
 }
 
-NSEntity * BrushMenuWidget::selectedItem()
+nsentity * BrushMenuWidget::selectedItem()
 {
 	auto items = mUI.mBrushedLW->selectedItems();
 	QListWidgetItem * item = NULL;
@@ -52,7 +51,7 @@ NSEntity * BrushMenuWidget::selectedItem()
 		item = items.first();
 
 	if (item != NULL)
-		return nsengine.resource<NSEntity>(uivec2(item->data(VIEW_WIDGET_ITEM_PLUG).toUInt(), item->data(VIEW_WIDGET_ITEM_ENT).toUInt()));
+		return nse.resource<nsentity>(uivec2(item->data(VIEW_WIDGET_ITEM_PLUG).toUInt(), item->data(VIEW_WIDGET_ITEM_ENT).toUInt()));
 
 	return NULL;
 }
@@ -67,26 +66,29 @@ void BrushMenuWidget::setupLW()
 	mUI.mBrushedLW->clear();
 
 
-	auto plugiter = nsengine.plugins()->begin();
-	while (plugiter != nsengine.plugins()->end())
+	auto plugiter = nse.plugins()->begin();
+	while (plugiter != nse.plugins()->end())
 	{
-		NSPlugin * plg = nsengine.plugin(plugiter->first);
+		nsplugin * plg = nse.plugin(plugiter->first);
 
-		NSEntityManager * ents = plg->manager<NSEntityManager>();
+		nsentity_manager * ents = plg->manager<nsentity_manager>();
 
 		auto iter = ents->begin();
 		while (iter != ents->end())
 		{
-			NSEntity * curEnt = ents->get(iter->first);
+			nsentity * curEnt = ents->get(iter->first);
 
-			if (curEnt->has<NSTileBrushComp>())
+			if (curEnt->has<nstile_brush_comp>())
 			{
 				QListWidgetItem * item = new QListWidgetItem(curEnt->name().c_str());
-				item->setData(VIEW_WIDGET_ITEM_PLUG, curEnt->plugid());
+                item->setData(VIEW_WIDGET_ITEM_PLUG, curEnt->plugin_id());
 				item->setData(VIEW_WIDGET_ITEM_ENT, curEnt->id());
+
 				// make else case to give default icon in case no icon assigned
-				if (!curEnt->iconPath().empty())
-					item->setIcon(QIcon(curEnt->iconPath().c_str()));
+                if (!curEnt->icon_path().empty())
+                    item->setIcon(QIcon(curEnt->icon_path().c_str()));
+                else
+                    item->setIcon(QIcon(":/ResourceIcons/icons/default_brush.png"));
 
 				mUI.mBrushedLW->addItem(item);
 			}
@@ -99,13 +101,6 @@ void BrushMenuWidget::setupLW()
 
 	// Set the selected brush back to whatever was selected before remaking the brush list
 	auto fItems = mUI.mBrushedLW->findItems(itemName, Qt::MatchCaseSensitive);
-	for (nsint i = 0; i < fItems.size(); ++i)
-	{
-
-	}
-
-
-
 
 	if (!fItems.isEmpty() && fItems.first() != NULL)
 	{
@@ -126,7 +121,7 @@ void BrushMenuWidget::setupLW()
 
 void BrushMenuWidget::onDeleteBrush()
 {
-	QMessageBox mb(mTK);
+    QMessageBox mb(&bbtk);
 	mb.setText("Are you sure you want to delete the brush?");
 	if (mb.exec() == QMessageBox::Accepted)
 	{
@@ -141,8 +136,8 @@ void BrushMenuWidget::onEditBrush()
 
 void BrushMenuWidget::onNewBrush()
 {
-	AddNewBrushDialog brushD(mTK);
-	brushD.init(mTK);
+    AddNewBrushDialog brushD(&bbtk);
+    brushD.init();
 	if (brushD.exec() == QDialog::Accepted)
 	{
 
@@ -151,10 +146,15 @@ void BrushMenuWidget::onNewBrush()
 
 void BrushMenuWidget::onDoubleClick()
 {
-	emit brushDoubleClick();
+    nsentity * sel_brush = selectedItem();
+    nse.system<nsbuild_system>()->set_tile_brush(sel_brush);
+    bbtk.update_brush_tool_button();
+    bbtk.on_brush_double_click();
 }
 
-void BrushMenuWidget::onItemChanged(QListWidgetItem* pCurrent)
+void BrushMenuWidget::onSelectionChanged()
 {
-	emit brushChange(pCurrent);
+    nsentity * sel_brush = selectedItem();
+    nse.system<nsbuild_system>()->set_tile_brush(sel_brush);
+    bbtk.update_brush_tool_button();
 }

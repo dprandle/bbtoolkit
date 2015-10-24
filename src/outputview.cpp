@@ -33,9 +33,8 @@ QWidget(parent)
 OutputView::~OutputView()
 {}
 
-void OutputView::init(Toolkit * pTK)
+void OutputView::init()
 {
-	mTK = pTK;
 	// Setup toolbar
 	topToolBar->addAction(clrScreen);
 	topToolBar->addAction(selectAll);

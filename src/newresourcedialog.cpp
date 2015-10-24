@@ -6,15 +6,17 @@
   \brief  Dialog for creating new resource
 */
 
+#include <nsengine.h>
+#include <nsplugin.h>
+#include <nsmat_manager.h>
+
 #include <newresourcedialog.h>
 #include <toolkit.h>
 #include <qlayout.h>
 #include <materialwidget.h>
-#include <nsengine.h>
-#include <nsplugin.h>
+
 
 NewResourceDialog::NewResourceDialog(QWidget * parent):
-	mTK(NULL),
 	mContextID(0),
 	gbLayout(new QVBoxLayout),
 	QDialog(parent)
@@ -22,7 +24,7 @@ NewResourceDialog::NewResourceDialog(QWidget * parent):
 	mUI.setupUi(this);
 	mUI.mPropertiesGB->setLayout(gbLayout);
 	// Here we should add all of the resource manager widgets
-	nsstring rm = type_to_guid(NSMatManager);
+	nsstring rm = type_to_guid(nsmat_manager);
 	mResWidgets[rm] = new MaterialWidget(this);
 }
 
@@ -30,11 +32,10 @@ NewResourceDialog::~NewResourceDialog()
 {}
 
 
-void NewResourceDialog::init(Toolkit * tk)
+void NewResourceDialog::init()
 {
-	mTK = tk;
-	mUI.mPreviewWidget->ui().mPreview->init(tk);
-	connect(mUI.mPreviewWidget->ui().mPreview, SIGNAL(opengl_initialized(nsuint)), this, SLOT(onContextInitialized(nsuint)));
+    mUI.mPreviewWidget->ui().mPreview->init();
+	connect(mUI.mPreviewWidget->ui().mPreview, SIGNAL(opengl_initialized(uint32)), this, SLOT(onContextInitialized(uint32)));
 }
 
 void NewResourceDialog::_setResourceType(const nsstring & manager_type, const nsstring & res_type)
@@ -65,13 +66,13 @@ void NewResourceDialog::_setResourceType(const nsstring & manager_type, const ns
 	}
 
 	mUI.mPreviewWidget->ui().mPreview->makeCurrent();
-	nsengine.makeCurrent(mContextID);
-	NSPlugin * plug = nsengine.plugin("preview");
-	NSResource * res = plug->manager(manager_type)->create(res_type,mCurrentResWidget->defaultResName());
+	nse.make_current(mContextID);
+	nsplugin * plug = nse.plugin("preview");
+	nsresource * res = plug->manager(manager_type)->create(res_type,mCurrentResWidget->defaultResName());
 	mCurrentResWidget->setResource(res);
 }
 
-void NewResourceDialog::onContextInitialized(nsuint id)
+void NewResourceDialog::onContextInitialized(uint32 id)
 {
 	if (mCurrentResWidget == NULL)
 		return;
@@ -79,9 +80,9 @@ void NewResourceDialog::onContextInitialized(nsuint id)
 	mContextID = id;
 	// Make the resource now that the engine has been initialized
 	mUI.mPreviewWidget->ui().mPreview->makeCurrent();
-	nsengine.makeCurrent(mContextID);
-	NSPlugin * plug = nsengine.plugin("preview");
-	NSResource * res = plug->manager(mTmpManagerType)->create(mTmpResType,mCurrentResWidget->defaultResName());
+	nse.make_current(mContextID);
+	nsplugin * plug = nse.plugin("preview");
+	nsresource * res = plug->manager(mTmpManagerType)->create(mTmpResType,mCurrentResWidget->defaultResName());
 	mCurrentResWidget->setResource(res);
 
 }
@@ -94,9 +95,9 @@ void NewResourceDialog::onCreate()
 
 void NewResourceDialog::onCancel()
 {
-	NSResource * res = mCurrentResWidget->resource();
+	nsresource * res = mCurrentResWidget->resource();
 	mCurrentResWidget->setResource(NULL);
 	mCurrentResWidget = NULL;
-	NSPlugin * plg = nsengine.plugin(res->plugid());
+    nsplugin * plg = nse.plugin(res->plugin_id());
 	plg->destroy(res);
 }

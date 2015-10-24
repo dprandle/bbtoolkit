@@ -8,15 +8,13 @@ QListWidget(pParent)
 {
 }
 
-void ListWidgetCust::init(Toolkit * pTK)
-{
-	mTK = pTK;
-}
+void ListWidgetCust::init()
+{}
 
 void ListWidgetCust::mousePressEvent(QMouseEvent * pEvent)
 {
 	if (!indexAt(pEvent->pos()).isValid())
 		clearSelection();
 	QListWidget::mousePressEvent(pEvent);
-	mTK->mapView()->setFocus();
+    bbtk.map_view()->setFocus();
 }

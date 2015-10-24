@@ -3,9 +3,6 @@
 #include <qdialog.h>
 #include <ui_camerasettings.h>
 
-class NSEngine;
-class Toolkit;
-
 class CameraSettingsDialog : public QDialog
 {
 	Q_OBJECT
@@ -13,7 +10,6 @@ public:
 	CameraSettingsDialog(QWidget * pParent=NULL);
 	~CameraSettingsDialog();
 
-	void init(Toolkit * pTK);
 	void showIt();
 
 public slots:
@@ -25,8 +21,6 @@ public slots:
 	void onObjCenterXCB(QString);
 
 private:
-	NSEngine * mEngine;
-	Toolkit * mTK;
 	Ui_CameraSettingsDialog mUI;
 };
 

@@ -4,12 +4,11 @@
 // Inlcudes
 #include <ui_entityeditordialog.h>
 #include <toolkitdef.h>
-#include <nsglobal.h>
 
-class NSEngine;
+class nsengine;
 class Preview;
 class Toolkit;
-class NSEntity;
+class nsentity;
 
 class EntityEditorDialog : public QDialog
 {
@@ -20,7 +19,6 @@ public:
 		None,
 		Animation,
 		Camera,
-		Input,
 		Light, 
 		Occupy,
 		Particle,
@@ -36,11 +34,11 @@ public:
 
 	void clear();
 
-	NSEntity * entity();
+	nsentity * entity();
 
-	void init(Toolkit * pTK);
+    void init();
 
-	void setEntity(NSEntity * pEnt);
+	void setEntity(nsentity * pEnt);
 
 	public slots:
 
@@ -60,8 +58,7 @@ public:
 
 private:
 	Ui::EntityEditorDialog mUI;
-	Toolkit * mTK;
-	NSEntity * mEnt;
+	nsentity * mEnt;
 	QMap<QString, CompWidgetIndex> mTypeToIndex;
 };
 #endif

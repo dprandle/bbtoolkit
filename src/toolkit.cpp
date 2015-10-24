@@ -9,197 +9,223 @@ This file contains all of the neccessary definitions for the Toolkit class.
 \date December 11 2013
 \copywrite Earth Banana Games 2013
 */
-#include <toolkitdef.h>
-#include <nsinputsystem.h>
-#include <toolkit.h>
-#include <mapview.h>
-#include <outputview.h>
+
+#include <nsengine.h>
+#include <nsbuild_system.h>
+#include <nsrender_system.h>
+#include <nsselection_system.h>
+#include <nscamera_system.h>
+#include <nstile_brush_comp.h>
+#include <nsscene.h>
+#include <nsentity.h>
+#include <nsplugin.h>
+
 #include <qdockwidget.h>
 #include <qmessagebox.h>
-#include <nsengine.h>
-#include <nsdebug.h>
 #include <qlabel.h>
 #include <qcombobox.h>
 #include <qspinbox.h>
 #include <qcheckbox.h>
 #include <qdir.h>
-#include <nsinputmapmanager.h>
-#include <nsglobal.h>
-#include <addnewbrushdialog.h>
 #include <qmenu.h>
-#include <nsshadermanager.h>
-#include <nsbuildsystem.h>
-#include <nstilebrushcomp.h>
-#include <managemapsdialog.h>
 #include <qwidgetaction.h>
-#include <managepluginsdialog.h>
-#include <nsentitymanager.h>
-#include <nsscenemanager.h>
-#include <brushmenuwidget.h>
-#include <nsselectionsystem.h>
-#include <nspluginmanager.h>
-#include <nstilegrid.h>
-#include <nscamerasystem.h>
 #include <qtimer.h>
-#include <camerasettingsdialog.h>
-#include <nsparticlecomp.h>
 #include <qprogressdialog.h>
-#include <nstexmanager.h>
-#include <nsmatmanager.h>
-#include <nsmaterial.h>
-#include <nstexture.h>
-#include <nsrendersystem.h>
+#include <qcombobox.h>
+
+#include <managemapsdialog.h>
+#include <managepluginsdialog.h>
+#include <brushmenuwidget.h>
+#include <camerasettingsdialog.h>
 #include <entityeditordialog.h>
-#include <nsmath.h>
-#include <resourcebrowser.h>
+#include <toolkitdef.h>
+#include <addnewbrushdialog.h>
+#include <toolkit.h>
+#include <mapview.h>
+#include <outputview.h>
+#include <resource_browser.h>
+#include <resource_dialog.h>
+#include <resource_dialog_prev.h>
+#include <resource_dialog_prev_lighting.h>
 
 Toolkit::Toolkit(QWidget *parent) :
-QMainWindow(parent),
-mBrushHeight(new QSpinBox()),
-mCurrentLayer(new QSpinBox()),
-mLayerCB(new QComboBox()),
-mBrushMenu(new QMenu(this)),
-mBrushMenuWidget(new BrushMenuWidget(this)),
-mCamSettings(new CameraSettingsDialog(this)),
-mResourceBrowser(new ResourceBrowser()),
-mGridX(new QSpinBox()),
-mGridY(new QSpinBox()),
-mEntD(new EntityEditorDialog(this)),
-mLayersAboveHidden(0),
-spinBoxVal(0),
-mPrevLayerText(LAYER_ABOVE_TEXT)
+    QMainWindow(parent),
+    m_brush_height(new QSpinBox()),
+    m_current_layer(new QSpinBox()),
+    m_layer_CB(new QComboBox()),
+    m_brush_menu(new QMenu(this)),
+    m_brush_tool_btn(new QToolButton()),
+    m_brush_menu_widget(new BrushMenuWidget(this)),
+    m_cam_settings(new CameraSettingsDialog(this)),
+    m_resource_browser(new resource_browser(this)),
+    m_grid_x(new QSpinBox()),
+    m_grid_y(new QSpinBox()),
+    m_ent_id(new EntityEditorDialog(this)),
+    m_res_dialog(new resource_dialog(this)),
+    m_res_dialog_prev(new resource_dialog_prev(this)),
+    m_res_dialog_prev_lighting(new resource_dialog_prev_lighting(this)),
+    m_layers_above_hidden(0),
+    m_spinbox_val(0),
+    m_prev_layer_text(LAYER_ABOVE_TEXT)
 {
-	mUI.setupUi(this);
+    m_ui.setupUi(this);
 	setWindowIcon(QIcon(":/Toolkit/bbicon_256px.ico"));
+    m_ptr = this;
 }
 
-MapView * Toolkit::mapView()
+MapView * Toolkit::map_view()
 {
-	return mUI.mMapView;
+    return m_ui.mMapView;
 }
 
-OutputView * Toolkit::outputView()
+OutputView * Toolkit::output_view()
 {
-	return mUI.mOutputView;
+    return m_ui.mOutputView;
 }
 
-void Toolkit::loadPluginFiles(const QDir & startingDir)
+void Toolkit::load_plugin_files(const QDir & startingDir)
 {
-	if (startingDir.exists())
-	{
-		foreach(QFileInfo info, startingDir.entryInfoList(QDir::NoDotAndDotDot | QDir::Files | QDir::AllDirs))
-		{
-			if (info.isFile())
-				nsengine.loadPlugin(info.absoluteFilePath().toStdString());
-			if (info.isDir())
-				loadPluginFiles(info.dir());
-		}
-	}
+    if (startingDir.exists())
+    {
+        foreach(QFileInfo info, startingDir.entryInfoList(QDir::NoDotAndDotDot | QDir::Files | QDir::AllDirs))
+        {
+            if (info.isFile())
+                nse.load_plugin(info.absoluteFilePath().toStdString());
+            if (info.isDir())
+                load_plugin_files(info.dir());
+        }
+    }
+}
+
+
+EntityEditorDialog * Toolkit::entity_dialog()
+{
+    return m_ent_id;
 }
 
 void Toolkit::init()
 {
-	mUI.mMapView->init(this);
+    m_ui.mMapView->init();
 
-	mEntD->init(this);
-	mEntD->setModal(false);
-	mUI.mOutputView->init(this);
-	mUI.mTileView->init(this, mEntD);
-	mUI.mObjectView->init(this, mEntD);
-	mBrushMenuWidget->init(this);
-	mResourceBrowser->init(this);
+    m_ent_id->init();
+    m_ent_id->setModal(false);
+    m_ui.mOutputView->init();
+    m_ui.mTileView->init();
+    m_ui.mObjectView->init();
+    m_brush_menu_widget->init();
 	
-	QWidgetAction * wA = new QWidgetAction(this);
-	wA->setDefaultWidget(mBrushMenuWidget);
-	mBrushMenu->addAction(wA);
-	mBrushHeight->setRange(1, 16);
-	mLayerCB->addItem(LAYER_ABOVE_TEXT);
-	mLayerCB->addItem(LAYER_BELOW_TEXT);
-	mLayerCB->addItem(LAYER_ALL_TEXT);
-	mLayerCB->addItem(LAYER_ONLY_TEXT);
+    QWidgetAction * wA = new QWidgetAction(this);
+    wA->setDefaultWidget(m_brush_menu_widget);
+    m_brush_menu->addAction(wA);
 
+    m_brush_tool_btn->setPopupMode(QToolButton::MenuButtonPopup);
+    m_brush_tool_btn->setMenu(m_brush_menu);
 
-	QAction * act = mBrushMenu->menuAction();
+    m_brush_height->setRange(1, 16);
 
-	mGridX->setRange(-256, 256);
-	mGridY->setRange(-256, 256);
-	mGridX->setValue(0);
-	mGridY->setValue(0);
+    m_layer_CB->addItem(LAYER_ABOVE_TEXT);
+    m_layer_CB->addItem(LAYER_BELOW_TEXT);
+    m_layer_CB->addItem(LAYER_ALL_TEXT);
+    m_layer_CB->addItem(LAYER_ONLY_TEXT);
+
+    m_grid_x->setRange(-256, 256);
+    m_grid_y->setRange(-256, 256);
+    m_grid_x->setValue(0);
+    m_grid_y->setValue(0);
 	
-	mUI.mTopToolbar->insertWidget(mUI.actionUnlock, new QLabel("Brush "));
-	mUI.mTopToolbar->insertAction(mUI.actionUnlock, act);
-	mUI.mTopToolbar->insertWidget(mUI.actionUnlock, new QLabel("Height "));
-	mUI.mTopToolbar->insertWidget(mUI.actionUnlock, mBrushHeight);
-	mUI.mTopToolbar->insertWidget(mUI.actionLayerMode, new QLabel("Hide "));
-	mUI.mTopToolbar->insertWidget(mUI.actionLayerMode, mLayerCB);
-	mUI.mTopToolbar->insertWidget(mUI.actionLayerMode, new QLabel("Layer "));
-	mUI.mTopToolbar->insertWidget(mUI.actionLayerMode, mCurrentLayer);
-	mUI.mTopToolbar->insertWidget(mUI.actionMirrorMode, new QLabel("Mirror Center: "));
-	mUI.mTopToolbar->insertWidget(mUI.actionMirrorMode, new QLabel("x"));
-	mUI.mTopToolbar->insertWidget(mUI.actionMirrorMode, mGridX);
-	mUI.mTopToolbar->insertWidget(mUI.actionMirrorMode, new QLabel("y"));
-	mUI.mTopToolbar->insertWidget(mUI.actionMirrorMode, mGridY);
+    m_ui.mTopToolbar->insertWidget(m_ui.actionUnlock, m_brush_tool_btn);
+    m_ui.mTopToolbar->insertWidget(m_ui.actionUnlock, new QLabel("Height "));
+    m_ui.mTopToolbar->insertWidget(m_ui.actionUnlock, m_brush_height);
+    m_ui.mTopToolbar->insertWidget(m_ui.actionLayerMode, new QLabel("Hide "));
+    m_ui.mTopToolbar->insertWidget(m_ui.actionLayerMode, m_layer_CB);
+    m_ui.mTopToolbar->insertWidget(m_ui.actionLayerMode, new QLabel("Layer "));
+    m_ui.mTopToolbar->insertWidget(m_ui.actionLayerMode, m_current_layer);
+    m_ui.mTopToolbar->insertWidget(m_ui.actionMirrorMode, new QLabel("Mirror Center: "));
+    m_ui.mTopToolbar->insertWidget(m_ui.actionMirrorMode, new QLabel("x"));
+    m_ui.mTopToolbar->insertWidget(m_ui.actionMirrorMode, m_grid_x);
+    m_ui.mTopToolbar->insertWidget(m_ui.actionMirrorMode, new QLabel("y"));
+    m_ui.mTopToolbar->insertWidget(m_ui.actionMirrorMode, m_grid_y);
 
-	QAction * deb = new QAction(QIcon(":/VecTB/Resources/Textures/Icons/Toolbars/Debug_Icon.png"), "Debug View", this);
-	QAction * ez = new QAction(QIcon(":/VecTB/Resources/Textures/Icons/Toolbars/EarlyZ.png"), "Toggle EarlyZ", this);
-	deb->setCheckable(true);
-	ez->setCheckable(true);
+    QAction * deb = new QAction(QIcon(":/VecTB/icons/toolbars/Debug_Icon.png"), "Debug View", this);
+    deb->setCheckable(true);
+    m_ui.mTopToolbar->addAction(deb);
+    connect(deb, SIGNAL(toggled(bool)), this, SLOT(on_debug_view(bool)));
 
-	mUI.mTopToolbar->addAction(deb);
-	mUI.mTopToolbar->addAction(ez);
+    QAction * deb_spaces = new QAction(QIcon(":/VecTB/icons/toolbars/occupied_grid.png"), "Show Map Occupied Spaces", this);
+    deb_spaces->setCheckable(true);
+    m_ui.mTopToolbar->addAction(deb_spaces);
+    connect(deb_spaces, SIGNAL(toggled(bool)), this, SLOT(on_view_occupied_spaces(bool)));
 
-	connect(deb, SIGNAL(toggled(bool)), this, SLOT(onDebugView(bool)));
-	connect(ez, SIGNAL(toggled(bool)), this, SLOT(onToggleEarlyZ(bool)));
-
+    m_current_layer->setRange(-256, 256);
 	
+    connect(m_brush_height, SIGNAL(valueChanged(int)), this, SLOT(on_brush_height_change(int)));
+    connect(m_current_layer, SIGNAL(valueChanged(int)), this, SLOT(on_change_layer(int)));
+    connect(m_layer_CB, SIGNAL(currentIndexChanged(const QString &)), this, SLOT(on_layer_index_change(const QString &)));
+    connect(m_grid_x, SIGNAL(valueChanged(int)), this, SLOT(on_mirror_center_change()));
+    connect(m_grid_y, SIGNAL(valueChanged(int)), this, SLOT(on_mirror_center_change()));
 
-	mCurrentLayer->setRange(-256, 256);
-	
-	connect(mBrushMenuWidget, SIGNAL(brushChange(QListWidgetItem*)), this, SLOT(onBrushChange(QListWidgetItem*)));
-	connect(mBrushMenuWidget, SIGNAL(brushDoubleClick()), this, SLOT(onBrushDoubleClick()));
-	connect(mBrushHeight, SIGNAL(valueChanged(int)), this, SLOT(onBrushHeightChange(int)));
-	connect(mCurrentLayer, SIGNAL(valueChanged(int)), this, SLOT(onChangeLayer(int)));
-	connect(mLayerCB, SIGNAL(currentIndexChanged(const QString &)), this, SLOT(onLayerIndexChange(const QString &)));
-	connect(mGridX, SIGNAL(valueChanged(int)), this, SLOT(onMirrorCenterChange(int)));
-	connect(mGridY, SIGNAL(valueChanged(int)), this, SLOT(onMirrorCenterChange(int)));
-
-	setTabPosition(Qt::AllDockWidgetAreas, QTabWidget::North);
-	show();
-	onLoad();
+    setTabPosition(Qt::AllDockWidgetAreas, QTabWidget::North);
+    show();
+    on_actionLoad_triggered();
 }
 
-void Toolkit::onCameraSettings()
+resource_browser * Toolkit::res_browser()
 {
-	mCamSettings->showIt();
+    return m_resource_browser;
+}
+
+void Toolkit::on_view_occupied_spaces(bool draw_)
+{
+    nse.system<nsselection_system>()->enable_draw_occupied_grid(draw_);
+}
+
+void Toolkit::on_actionCameraSettings_triggered()
+{
+    m_cam_settings->showIt();
 }
 
 Toolkit::~Toolkit()
 {
 }
 
-CameraSettingsDialog * Toolkit::camSettings()
+CameraSettingsDialog * Toolkit::camera_settings()
 {
-	return mCamSettings;
+    return m_cam_settings;
 }
 
 void Toolkit::closeEvent(QCloseEvent *pEvent)
 {
-	NSPlugin * activePlug = nsengine.active();
+    nsplugin * activePlug = nse.active();
 
-	if (activePlug != NULL)
-	{
-		QMessageBox mb(QMessageBox::Warning, "Unsaved Changed", "There are unsaved changes. Would you like to save before exiting?", QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel, this);
-		int ret = mb.exec();
-		if (ret == QMessageBox::Cancel)
-		{
-			pEvent->ignore();
-			return;
-		}
-		bool saveChanges = (ret == QMessageBox::Yes);
-		if (saveChanges)
-			onSave();
-		pEvent->accept();
-	}
+    if (activePlug != NULL)
+    {
+        QMessageBox mb(QMessageBox::Warning, "Unsaved Changed", "There are unsaved changes. Would you like to save before exiting?", QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel, this);
+        int ret = mb.exec();
+        if (ret == QMessageBox::Cancel)
+        {
+            pEvent->ignore();
+            return;
+        }
+        bool saveChanges = (ret == QMessageBox::Yes);
+        if (saveChanges)
+            on_actionSave_triggered();
+        pEvent->accept();
+    }
+}
+
+resource_dialog * Toolkit::res_dialog()
+{
+    return m_res_dialog;
+}
+
+resource_dialog_prev * Toolkit::res_dialog_prev()
+{
+    return m_res_dialog_prev;
+}
+
+resource_dialog_prev_lighting * Toolkit::res_dialog_prev_lighting()
+{
+    return m_res_dialog_prev_lighting;
 }
 
 /*!
@@ -207,653 +233,515 @@ Update call which happens every frame
 If there is a slow down be sure to comment this out and check if the slowdown still occurs - I have found that this function
 is very sensative and things like posting to the status bar here will significantly slow program operations
 */
-void Toolkit::updateUI()
+void Toolkit::update_ui()
 {
-	bool chk = mUI.actionEraserBrush->isChecked() || mUI.actionObjectBrush->isChecked() || mUI.actionTileBrush->isChecked();
-	mUI.actionNewBrush->setEnabled(nsengine.system<NSSelectionSystem>()->brushValid() && !chk);
-	mUI.actionSwapTiles->setEnabled(nsengine.system<NSSelectionSystem>()->tileSwapValid() && !chk && !mUI.mTileView->getUI()->mListWidget->selectedItems().isEmpty());
-	mUI.actionDeleteSelection->setEnabled(!nsengine.system<NSSelectionSystem>()->empty() && !chk);
+    bool chk = m_ui.actionEraserBrush->isChecked() || m_ui.actionObjectBrush->isChecked() || m_ui.actionTileBrush->isChecked();
+    m_ui.actionNewBrush->setEnabled(nse.system<nsselection_system>()->valid_brush() && !chk);
+    m_ui.actionSwapTiles->setEnabled(nse.system<nsselection_system>()->valid_tile_swap() && !chk && !m_ui.mTileView->ui()->mListWidget->selectedItems().isEmpty());
+    m_ui.actionDeleteSelection->setEnabled(!nse.system<nsselection_system>()->empty() && !chk);
 
-	mCurrentLayer->setEnabled(mUI.actionLayerMode->isChecked() || mUI.actionEraserBrush->isChecked() || mUI.actionObjectBrush->isChecked() || mUI.actionTileBrush->isChecked());
+    m_current_layer->setEnabled(m_ui.actionLayerMode->isChecked() || m_ui.actionEraserBrush->isChecked() || m_ui.actionObjectBrush->isChecked() || m_ui.actionTileBrush->isChecked());
 
-	NSScene * curScene = nsengine.currentScene();
-	NSPlugin * activePlug = nsengine.active();
-	QString winTitle = "Build and Battle Toolkit [Active Plugin: ";
+    nsscene * curScene = nse.current_scene();
+    nsplugin * activePlug = nse.active();
+    QString winTitle = "Build and Battle Toolkit [Active Plugin: ";
 
-	if (activePlug != NULL)
-	{
-		winTitle += QString(activePlug->name().c_str());
-	}
+    if (activePlug != NULL)
+    {
+        winTitle += QString(activePlug->name().c_str());
+    }
 	
-	winTitle += "] [Scene: ";
+    winTitle += "] [Scene: ";
 
-	mUI.mCamToolbar->setEnabled(curScene != NULL);
-	if (curScene != NULL)
-	{
-		winTitle += QString(curScene->name().c_str()) + ".map";
+    m_ui.mCamToolbar->setEnabled(curScene != NULL);
+    if (curScene != NULL)
+    {
+        winTitle += QString(curScene->name().c_str()) + ".map";
 
-		uivec3 selObj = nsengine.system<NSSelectionSystem>()->center();
-		NSEntity * ent = curScene->entity(selObj.xy());
+        uivec3 selObj = nse.system<nsselection_system>()->center();
+        nsentity * ent = curScene->entity(selObj.xy());
 
-		if (ent != NULL && (!mUI.actionLayerMode->isChecked()||nsengine.system<NSBuildSystem>()->enabled()))
-		{
-			NSTFormComp * tComp = ent->get<NSTFormComp>();
-			if (tComp != NULL)
-			{
-				nsint layer = NSTileGrid::grid(tComp->wpos(selObj.z)).z;
-				nsint tmpVal = spinBoxVal;
-				mCurrentLayer->blockSignals(true);
-				mCurrentLayer->setValue(layer*-1);
-				mCurrentLayer->blockSignals(false);
-				spinBoxVal = layer*-1;
-				if (mUI.actionLayerMode->isChecked() && tmpVal != spinBoxVal)
-					onLayerMode(true);
-			}
-		}
-		nsengine.system<NSBuildSystem>()->setLayer(spinBoxVal*-1);
+        if (ent != NULL && (!m_ui.actionLayerMode->isChecked()||nse.system<nsbuild_system>()->enabled()))
+        {
+            nstform_comp * tComp = ent->get<nstform_comp>();
+            if (tComp != NULL)
+            {
+                int32 layer = nstile_grid::grid(tComp->wpos(selObj.z)).z;
+                int32 tmpVal = m_spinbox_val;
+                m_current_layer->blockSignals(true);
+                m_current_layer->setValue(layer*-1);
+                m_current_layer->blockSignals(false);
+                m_spinbox_val = layer*-1;
+                if (m_ui.actionLayerMode->isChecked() && tmpVal != m_spinbox_val)
+                    on_actionLayerMode_toggled(true);
+            }
+        }
+      nse.system<nsbuild_system>()->set_layer(m_spinbox_val*-1);
+    }
 
-		if (ent != NULL)
-		{
-			NSTFormComp * tComp = ent->get<NSTFormComp>();
-			mUI.actionEnableXFB->setEnabled(true);
-			mUI.actionEnableXFB->blockSignals(true);
-			mUI.actionEnableXFB->setChecked(tComp->transformFeedback());
-			mUI.actionEnableXFB->blockSignals(false);
-		}
-		else
-		{
-			mUI.actionEnableXFB->blockSignals(true);
-			mUI.actionEnableXFB->setChecked(false);
-			mUI.actionEnableXFB->blockSignals(false);
-			mUI.actionEnableXFB->setEnabled(false);
-		}
-		// Show selected center in taskbar
-	}
-
-	winTitle += "]";
-	if (winTitle != windowTitle())
-		setWindowTitle(winTitle);
+    winTitle += "]";
+    if (winTitle != windowTitle())
+        setWindowTitle(winTitle);
 }
 
-void Toolkit::_disableSideTBActions()
+void Toolkit::_disable_side_tb_actions()
 {
-	mUI.actionSelect->setChecked(false);
-	mUI.actionSelectArea->setChecked(false);
-	mUI.actionTileBrush->setChecked(false);
-	mUI.actionObjectBrush->setChecked(false);
-	mUI.actionEraserBrush->setChecked(false);
+    m_ui.actionSelect->setChecked(false);
+    m_ui.actionSelectArea->setChecked(false);
+    m_ui.actionTileBrush->setChecked(false);
+    m_ui.actionObjectBrush->setChecked(false);
+    m_ui.actionEraserBrush->setChecked(false);
 }
 
-void Toolkit::onSelect(bool pVal)
+void Toolkit::on_actionSelect_triggered(bool pVal)
 {
-	if (pVal)
-	{
-		_disableSideTBActions();
-		nsengine.system<NSBuildSystem>()->enable(false, fvec2());
-	}
-	mUI.actionSelect->setChecked(true);
-	mUI.mMapView->setFocus();
+    if (pVal)
+    {
+        _disable_side_tb_actions();
+        nse.system<nsbuild_system>()->enable(false);
+    }
+    m_ui.actionSelect->setChecked(true);
+    m_ui.mMapView->setFocus();
 }
 
-void Toolkit::onSelectArea(bool pVal)
+void Toolkit::on_actionSelectArea_triggered(bool pVal)
 {
-	if (pVal)
-	{
-		_disableSideTBActions();
-		nsengine.system<NSBuildSystem>()->enable(false, fvec2());
-		
-	}
-	mUI.actionSelectArea->setChecked(true);
-	mUI.mMapView->setFocus();
+    output_view()->writeToScreen("This behaviour has not yet been implemented");
 }
 
-void Toolkit::onToggleLighting(bool pChange)
+void Toolkit::on_actionToggleLighting_toggled(bool pChange)
 {
-	nsengine.system<NSRenderSystem>()->enableLighting(pChange);
+    nse.system<nsrender_system>()->enable_lighting(pChange);
 }
 
-void Toolkit::onToggleEarlyZ(bool pEnable)
+void Toolkit::on_actionTileBrush_triggered(bool pVal)
 {
-	nsengine.system<NSRenderSystem>()->enableEarlyZ(pEnable);
+    if (pVal)
+    {
+        _disable_side_tb_actions();
+
+        nse.system<nsbuild_system>()->set_brush_type(nsbuild_system::brush_tile);
+        nse.system<nsbuild_system>()->set_mode(nsbuild_system::build_mode);
+        nse.system<nsbuild_system>()->set_active_brush_color(fvec4(0.0f, 1.0f, 0.0f, 0.8f));
+        // Selecting item in tile view should set the current build tile
+        nse.system<nsbuild_system>()->enable(true);
+    }
+    m_ui.actionTileBrush->setChecked(true);
+    m_ui.mMapView->setFocus();
 }
 
-void Toolkit::onTileBrush(bool pVal)
+void Toolkit::on_change_layer(int pVal)
 {
-	if (pVal)
-	{
-		_disableSideTBActions();
+    bool toggle = m_ui.actionLayerMode->isChecked();
 
-		nsengine.system<NSBuildSystem>()->setBrushMode(NSBuildSystem::Tile);
-		nsengine.system<NSBuildSystem>()->setMode(NSBuildSystem::Build);
-		nsengine.system<NSBuildSystem>()->setActiveBrushColor(fvec4(0.0f, 1.0f, 0.0f, 0.8f));
-		
-		auto items = mUI.mTileView->getUI()->mListWidget->selectedItems();
-		if (items.isEmpty())
-			nsengine.system<NSBuildSystem>()->setBuildEnt(NULL);
-		else
-		{
-			uivec2 id(items.first()->data(VIEW_WIDGET_ITEM_PLUG).toUInt(), items.first()->data(VIEW_WIDGET_ITEM_ENT).toUInt());
-			nsengine.system<NSBuildSystem>()->setBuildEnt(nsengine.resource<NSEntity>(id));
-		}
+    if (toggle)
+        on_actionLayerMode_toggled(false);
 
-		QPoint p = mUI.mMapView->mapFromGlobal(QCursor::pos());
-		nsfloat normXPos = nsfloat(p.x()) / nsfloat(mUI.mMapView->width());
-		nsfloat normYPos = 1.0f - nsfloat(p.y()) / nsfloat(mUI.mMapView->height());
-		nsengine.system<NSBuildSystem>()->enable(true, fvec2(normXPos, normYPos));
-	}
-	mUI.actionTileBrush->setChecked(true);
-	mUI.mMapView->setFocus();
+    int32 delta = pVal - m_spinbox_val;
+    m_spinbox_val = pVal;
+
+    if (nse.system<nsbuild_system>()->enabled())
+        nse.system<nsselection_system>()->change_layer(delta);
+
+    m_ui.mMapView->setFocus();
+
+    if (toggle)
+        on_actionLayerMode_toggled(toggle);
 }
 
-void Toolkit::onChangeLayer(int pVal)
+void Toolkit::on_actionObjectBrush_triggered(bool pVal)
 {
-	bool toggle = mUI.actionLayerMode->isChecked();
+    if (pVal)
+    {
+        _disable_side_tb_actions();
 
-	if (toggle)
-		onLayerMode(false);
-
-	nsint delta = pVal - spinBoxVal;
-	spinBoxVal = pVal;
-
-	if (nsengine.system<NSBuildSystem>()->enabled())
-		nsengine.system<NSSelectionSystem>()->changeLayer(delta);
-
-	mUI.mMapView->setFocus();
-
-	if (toggle)
-		onLayerMode(toggle);
+        nse.system<nsbuild_system>()->set_brush_type(nsbuild_system::brush_object);
+        nse.system<nsbuild_system>()->set_mode(nsbuild_system::build_mode);
+        nse.system<nsbuild_system>()->set_active_brush_color(fvec4(0.0f, 1.0f, 0.0f, 0.8f));
+        nse.system<nsbuild_system>()->enable(true);
+    }
+    m_ui.actionObjectBrush->setChecked(true);
+    m_ui.mMapView->setFocus();
 }
 
-void Toolkit::onObjectBrush(bool pVal)
+void Toolkit::on_actionEraserBrush_triggered(bool pVal)
 {
-	if (pVal)
-	{
-		_disableSideTBActions();
+    if (pVal)
+    {
+        _disable_side_tb_actions();
 
-		nsengine.system<NSBuildSystem>()->setBrushMode(NSBuildSystem::Object);
-		nsengine.system<NSBuildSystem>()->setMode(NSBuildSystem::Build);
-		nsengine.system<NSBuildSystem>()->setActiveBrushColor(fvec4(0.0f, 1.0f, 0.0f, 0.8f));
-
-		QPoint p = mUI.mMapView->mapFromGlobal(QCursor::pos());
-		nsfloat normXPos = nsfloat(p.x()) / nsfloat(mUI.mMapView->width());
-		nsfloat normYPos = 1.0f - nsfloat(p.y()) / nsfloat(mUI.mMapView->height());
-
-		auto items = mUI.mTileView->getUI()->mListWidget->selectedItems();
-		if (items.isEmpty())
-			nsengine.system<NSBuildSystem>()->setBuildEnt(NULL);
-		else
-		{
-			uivec2 id(items.first()->data(VIEW_WIDGET_ITEM_PLUG).toUInt(), items.first()->data(VIEW_WIDGET_ITEM_ENT).toUInt());
-			nsengine.system<NSBuildSystem>()->setBuildEnt(nsengine.resource<NSEntity>(id));
-		}
-
-		nsengine.system<NSBuildSystem>()->enable(true, fvec2(normXPos, normYPos));
-	}
-	mUI.actionObjectBrush->setChecked(true);
-	mUI.mMapView->setFocus();
+        nse.system<nsbuild_system>()->set_brush_type(nsbuild_system::brush_tile);
+        nse.system<nsbuild_system>()->set_mode(nsbuild_system::erase_mode);
+        nse.system<nsbuild_system>()->set_active_brush_color(fvec4(1.0f, 0.0f, 0.0f, 0.8f));
+        nse.system<nsbuild_system>()->enable(true);
+    }
+    m_ui.actionEraserBrush->setChecked(true);
+    m_ui.mMapView->setFocus();
 }
 
-void Toolkit::onEraserBrush(bool pVal)
+void Toolkit::on_actionMirrorMode_toggled(bool pEnable)
 {
-	if (pVal)
-	{
-		_disableSideTBActions();
-
-		nsengine.system<NSBuildSystem>()->setBrushMode(NSBuildSystem::Tile);
-		nsengine.system<NSBuildSystem>()->setMode(NSBuildSystem::Erase);
-		nsengine.system<NSBuildSystem>()->setActiveBrushColor(fvec4(1.0f, 0.0f, 0.0f, 0.8f));
-		nsengine.system<NSBuildSystem>()->setBuildEnt(NULL);
-
-		QPoint p = mUI.mMapView->mapFromGlobal(QCursor::pos());
-		nsfloat normXPos = nsfloat(p.x()) / nsfloat(mUI.mMapView->width());
-		nsfloat normYPos = 1.0f - nsfloat(p.y()) / nsfloat(mUI.mMapView->height());
-
-		nsengine.system<NSBuildSystem>()->enable(true, fvec2(normXPos, normYPos));
-	}
-	mUI.actionEraserBrush->setChecked(true);
-	mUI.mMapView->setFocus();
+    nse.system<nsselection_system>()->enable_mirror_selection(pEnable);
+    nse.system<nsbuild_system>()->enable_mirror(pEnable);
+    m_ui.mMapView->setFocus();
 }
 
-void Toolkit::onMirrorMode(bool pEnable)
+void Toolkit::on_mirror_center_change()
 {
-	NSBuildSystem * bsys = nsengine.system<NSBuildSystem>();
-	bool enabled = bsys->enabled();
-
-	if (enabled)
-		bsys->toggle(fvec2());
-
-	nsengine.system<NSBuildSystem>()->enableMirror(pEnable);
-
-	if (enabled)
-		bsys->toggle(fvec2());
-
-	mUI.mMapView->setFocus();
+    ivec3 grid(m_grid_x->value(), m_grid_y->value());
+    fvec3 pos = nstile_grid::world(grid);
+    nse.system<nsbuild_system>()->set_center(pos);
+    m_ui.mMapView->setFocus();
 }
 
-void Toolkit::onMirrorCenterChange(int pNewVal)
+void Toolkit::on_actionNew_triggered()
 {
-	ivec3 grid(mGridX->value(), mGridY->value());
-	fvec3 pos = NSTileGrid::world(grid);
-
-	bool tmp = nsengine.system<NSBuildSystem>()->enabled();
-	if (tmp)
-		nsengine.system<NSBuildSystem>()->toggle(fvec2());
-
-	nsengine.system<NSBuildSystem>()->setCenter(pos);
-
-	if (tmp)
-		nsengine.system<NSBuildSystem>()->toggle(fvec2());
-
-	mUI.mMapView->setFocus();
+//    m_ui.mMapView->setFocus();
 }
 
-void Toolkit::onNew()
+void Toolkit::on_actionLoad_triggered()
 {
-	mUI.mMapView->setFocus();
+    if (!m_ui.actionSelect->isChecked())
+        on_actionSelect_triggered(true);
+
+    ManagePluginsDialog mPlugs(this);
+    mPlugs.init();
+
+    if (mPlugs.exec() == QDialog::Accepted)
+    {
+
+    }
+    m_ui.mMapView->setFocus();
 }
 
-void Toolkit::onLoad()
+void Toolkit::on_brush_height_change(int pHeight)
 {
-	if (!mUI.actionSelect->isChecked())
-		onSelect(true);
+    nsentity * ent = nse.system<nsbuild_system>()->tile_brush();
+    if (ent == NULL)
+        return;
 
-	ManagePluginsDialog mPlugs(this);
-	mPlugs.init(this);
+    nstile_brush_comp * comp = ent->get<nstile_brush_comp>();
+    if (comp != NULL)
+        comp->set_height(pHeight);
 
-	if (mPlugs.exec() == QDialog::Accepted)
-	{
-
-	}
-	mUI.mMapView->setFocus();
+    m_ui.mMapView->setFocus();
 }
 
-void Toolkit::onBrushHeightChange(int pHeight)
+void Toolkit::on_actionShowAllHidden_toggled(bool pState)
 {
-	NSEntity * ent = mBrushMenuWidget->selectedItem();
+    nsscene * scene = nse.current_scene();
+    if (scene == NULL)
+        return;
 
-	if (ent == NULL)
-		return;
-
-	NSTileBrushComp * comp = ent->get<NSTileBrushComp>();
-
-	if (comp != NULL)
-		comp->setHeight(pHeight);
-
-	mUI.mMapView->setFocus();
+    auto ents = scene->entities();
+    auto iter = ents.begin();
+    while (iter != ents.end())
+    {
+        nstform_comp * tComp = (*iter)->get<nstform_comp>();
+        tComp->set_hidden_state(nstform_comp::hide_none, pState);
+        ++iter;
+    }
 }
 
-void Toolkit::onShowAllHidden(bool pState)
+void Toolkit::on_actionSwitchMap_triggered()
 {
-	NSScene * scene = nsengine.currentScene();
-	if (scene == NULL)
-		return;
+//	ManageMapsDialog mMaps(this);
+//	mMaps.init(this);
 
-	nspentityset ents = scene->entities();
-	auto iter = ents.begin();
-	while (iter != ents.end())
-	{
-		NSTFormComp * tComp = (*iter)->get<NSTFormComp>();
-		tComp->setHiddenState(NSTFormComp::Show, pState);
-		++iter;
-	}
+//	if (mMaps.exec() == QDialog::Accepted)
+//	{
+
+//	}
+//    m_ui.mMapView->setFocus();
 }
 
-void Toolkit::onSwitchMaps()
+void Toolkit::on_actionSave_triggered()
 {
-	ManageMapsDialog mMaps(this);
-	mMaps.init(this);
+//    nsbuild_system::BrushMode tmpBrushMode = nse.system<nsbuild_system>()->brushMode();
+//    nsbuild_system::Mode tmpMode = nse.system<nsbuild_system>()->mode();
+//    fvec4 tmpCol = nse.system<nsbuild_system>()->activeBrushColor();
+//    nsentity * tmpEnt = nse.system<nsbuild_system>()->buildent();
 
-	if (mMaps.exec() == QDialog::Accepted)
-	{
+//    bool toggle = m_ui.actionLayerMode->isChecked();
+//    int tmpCurLayer = m_spinbox_val;
+//	if (toggle)
+//        on_layer_mode(false);
 
-	}
-	mUI.mMapView->setFocus();
-}
-
-void Toolkit::onSave()
-{
-	NSBuildSystem::BrushMode tmpBrushMode = nsengine.system<NSBuildSystem>()->brushMode();
-	NSBuildSystem::Mode tmpMode = nsengine.system<NSBuildSystem>()->mode();
-	fvec4 tmpCol = nsengine.system<NSBuildSystem>()->activeBrushColor();
-	NSEntity * tmpEnt = nsengine.system<NSBuildSystem>()->buildent();
-
-	bool toggle = mUI.actionLayerMode->isChecked();
-	int tmpCurLayer = spinBoxVal;
-	if (toggle)
-		onLayerMode(false);
-
-	if (!mUI.actionSelect->isChecked())
-		nsengine.system<NSBuildSystem>()->enable(false, fvec2());
+//    if (!m_ui.actionSelect->isChecked())
+//        nse.system<nsbuild_system>()->enable(false, fvec2());
 	
-	nsengine.savePlugin(nsengine.active(), true);
+//    nse.savePlugin(nse.active(), true);
 
-	if (!mUI.actionSelect->isChecked())
-	{
-		nsengine.system<NSBuildSystem>()->setBrushMode(tmpBrushMode);
-		nsengine.system<NSBuildSystem>()->setMode(tmpMode);
-		nsengine.system<NSBuildSystem>()->setActiveBrushColor(tmpCol);
-		nsengine.system<NSBuildSystem>()->setBuildEnt(tmpEnt);
-		nsengine.system<NSBuildSystem>()->enable(true, fvec2());
-		spinBoxVal = 0;
-		onChangeLayer(tmpCurLayer);
-	}
+//    if (!m_ui.actionSelect->isChecked())
+//	{
+//        nse.system<nsbuild_system>()->setBrushMode(tmpBrushMode);
+//        nse.system<nsbuild_system>()->setMode(tmpMode);
+//        nse.system<nsbuild_system>()->setActiveBrushColor(tmpCol);
+//        nse.system<nsbuild_system>()->setBuildEnt(tmpEnt);
+//        nse.system<nsbuild_system>()->enable(true, fvec2());
+//        m_spinbox_val = 0;
+//        on_change_layer(tmpCurLayer);
+//	}
 
-	if (toggle)
-		onLayerMode(toggle);
+//	if (toggle)
+//        on_layer_mode(toggle);
 
-	mUI.mMapView->setFocus();
+//    m_ui.mMapView->setFocus();
 }
 
-void Toolkit::onToggleXFB(bool pEnable)
+void Toolkit::on_actionUnlock_toggled(bool pVal)
 {
-	NSScene * curScene = nsengine.currentScene();
-	if (curScene != NULL)
-	{
-		uivec3 selObj = nsengine.system<NSSelectionSystem>()->center();
-		NSEntity * ent = curScene->entity(selObj.xy());
-		if (ent != NULL)
-		{
-			NSTFormComp * tComp = ent->get<NSTFormComp>();
-			tComp->enableTransformFeedback(pEnable);
-		}
-	}
+    nse.system<nsbuild_system>()->enable_overwrite(!pVal);
+    m_ui.mMapView->setFocus();
 }
 
-void Toolkit::onUnlock(bool pVal)
+ObjectView * Toolkit::object_view()
 {
-	nsengine.system<NSBuildSystem>()->enableOverwrite(!pVal);
-	mUI.mMapView->setFocus();
+    return m_ui.mObjectView;
 }
 
-ObjectView * Toolkit::objectView()
+TileView *  Toolkit::tile_view()
 {
-	return mUI.mObjectView;
+    return m_ui.mTileView;
 }
 
-TileView *  Toolkit::tileView()
+void Toolkit::on_actionSwapTiles_triggered()
 {
-	return mUI.mTileView;
-}
-
-void Toolkit::onReplaceTile()
-{
-	auto selItems = mUI.mTileView->getUI()->mListWidget->selectedItems();
-	if (selItems.isEmpty())
-		return;
-	QListWidgetItem * item = selItems.first();
-	if (item == NULL)
-		return;
-
-	uivec2 id(item->data(VIEW_WIDGET_ITEM_PLUG).toUInt(), item->data(VIEW_WIDGET_ITEM_ENT).toUInt());
-	NSEntity * newTile = nsengine.resource<NSEntity>(id);
+    nsentity * newTile = nse.system<nsbuild_system>()->tile_build_ent();
 	if (newTile == NULL)
 		return;
 
-	nsengine.system<NSSelectionSystem>()->tileswap(newTile);
-	mUI.mMapView->setFocus();
+    nse.system<nsselection_system>()->tile_swap(newTile);
+    m_ui.mMapView->setFocus();
 }
 
-void Toolkit::onResourceBrowser()
+void Toolkit::on_actionResource_Browser_triggered()
 {
-	mResourceBrowser->show();
+    m_resource_browser->show();
 }
 
-void Toolkit::refreshViews()
+void Toolkit::refresh_views()
 {
-	mUI.mTileView->refresh();
-	mUI.mObjectView->refresh();
-	mBrushMenuWidget->setupLW();
+    m_ui.mTileView->refresh();
+    m_ui.mObjectView->refresh();
+    m_brush_menu_widget->setupLW();
+    update_brush_tool_button();
 }
 
-void Toolkit::onDebugView(bool pNewVal)
+void Toolkit::on_debug_view(bool pNewVal)
 {
-	nsengine.system<NSRenderSystem>()->enableDebugDraw(pNewVal);
+    map_view()->make_current();
+    nse.system<nsrender_system>()->enable_debug_draw(pNewVal);
 }
 
-void Toolkit::onDelSelection()
+void Toolkit::on_actionDeleteSelection_triggered()
 {
-	nsengine.system<NSSelectionSystem>()->del();
-	mUI.mMapView->setFocus();
+    nse.system<nsselection_system>()->del();
+    m_ui.mMapView->setFocus();
 }
 
-void Toolkit::onNewBrush()
+void Toolkit::on_actionNewBrush_triggered()
 {
-	AddNewBrushDialog brushD(this);
+    AddNewBrushDialog brushD(this);
 
-	brushD.init(this);
-	brushD.setFromEngineSelection();
+    brushD.init();
+    brushD.setFromEngineSelection();
 
-	if (brushD.exec() == QDialog::Accepted)
-	{
+    if (brushD.exec() == QDialog::Accepted)
+    {
 
-	}
-	mUI.mMapView->setFocus();
+    }
+    m_ui.mMapView->setFocus();
 }
 
-void Toolkit::onSetCurrentBrush(NSEntity * pBrush)
+void Toolkit::on_set_current_brush(nsentity * pBrush)
 {
-	if (pBrush == NULL)
-		return;
+//	if (pBrush == NULL)
+//		return;
 
-	mBrushMenuWidget->setupLW();
-	nsengine.system<NSBuildSystem>()->setTileBrush(pBrush);
+//    m_brush_menu_widget->setupLW();
+//    nse.system<nsbuild_system>()->setTileBrush(pBrush);
 
-	if (mUI.actionEraserBrush->isChecked())
-		onEraserBrush(true);
-	else if (mUI.actionTileBrush->isChecked())
-		onTileBrush(true);
+//    if (m_ui.actionEraserBrush->isChecked())
+//        on_eraser_brush(true);
+//    else if (m_ui.actionTileBrush->isChecked())
+//        on_tile_brush(true);
 
-	if (!pBrush->iconPath().empty())
-		mBrushMenu->setIcon(QIcon(pBrush->iconPath().c_str()));
+//	if (!pBrush->iconPath().empty())
+//        m_brush_menu->setIcon(QIcon(pBrush->iconPath().c_str()));
 
-	mBrushMenuWidget->setSelectedItem(pBrush);
+//    m_brush_menu_widget->setSelectedItem(pBrush);
 
-	NSTileBrushComp * comp = pBrush->get<NSTileBrushComp>();
-	if (comp != NULL)
-		comp->setHeight(mBrushHeight->value());
-	mUI.mMapView->setFocus();
+//    nstile_brush_comp * comp = pBrush->get<nstile_brush_comp>();
+//	if (comp != NULL)
+//        comp->setHeight(m_brush_height->value());
+//    m_ui.mMapView->setFocus();
 }
 
-void Toolkit::onBrushChange(QListWidgetItem* pCurrent)
+void Toolkit::on_brush_change(QListWidgetItem* pCurrent)
 {
-	if (pCurrent == NULL)
-	{
-		mBrushMenu->setIcon(QIcon());
-		return;
-	}
+//	if (pCurrent == NULL)
+//	{
+//        m_brush_menu->setIcon(QIcon());
+//		return;
+//	}
 
-	uivec2 id(pCurrent->data(VIEW_WIDGET_ITEM_PLUG).toUInt(), pCurrent->data(VIEW_WIDGET_ITEM_ENT).toUInt());
-	NSEntity * ent = nsengine.resource<NSEntity>(id);
-	if (ent == NULL)
-	{
-		QMessageBox mb(QMessageBox::Warning, "Error in brush", "The brush with name " + pCurrent->text() + " can not be found for some reason...", QMessageBox::NoButton, this);
-		mb.exec();
-		return;
-	}
+//	uivec2 id(pCurrent->data(VIEW_WIDGET_ITEM_PLUG).toUInt(), pCurrent->data(VIEW_WIDGET_ITEM_ENT).toUInt());
+//    nsentity * ent = nse.resource<nsentity>(id);
+//	if (ent == NULL)
+//	{
+//		QMessageBox mb(QMessageBox::Warning, "Error in brush", "The brush with name " + pCurrent->text() + " can not be found for some reason...", QMessageBox::NoButton, this);
+//		mb.exec();
+//		return;
+//	}
 
-	nsengine.system<NSBuildSystem>()->setTileBrush(ent);
-	NSTileBrushComp * comp = ent->get<NSTileBrushComp>();
-	if (comp != NULL)
-		comp->setHeight(mBrushHeight->value());
+//    nse.system<nsbuild_system>()->setTileBrush(ent);
+//    nstile_brush_comp * comp = ent->get<nstile_brush_comp>();
+//	if (comp != NULL)
+//        comp->setHeight(m_brush_height->value());
 
-	if (mUI.actionEraserBrush->isChecked())
-		onEraserBrush(true);
-	else if (mUI.actionTileBrush->isChecked())
-		onTileBrush(true);
+//    if (m_ui.actionEraserBrush->isChecked())
+//        on_eraser_brush(true);
+//    else if (m_ui.actionTileBrush->isChecked())
+//        on_tile_brush(true);
 
-	mBrushMenu->setIcon(pCurrent->icon());
-	mUI.mMapView->setFocus();
+//    m_brush_menu->setIcon(pCurrent->icon());
+//    m_ui.mMapView->setFocus();
 }
 
-void Toolkit::onLayerIndexChange(const QString & pItem)
+void Toolkit::on_layer_index_change(const QString & pItem)
 {
-	if (mUI.actionLayerMode->isChecked())
-	{
-		mLayerCB->blockSignals(true);
-		mLayerCB->setCurrentText(mPrevLayerText);
-		onLayerMode(false);
-		mLayerCB->setCurrentText(pItem);
-		mPrevLayerText = pItem;
-		mLayerCB->blockSignals(false);
-		onLayerMode(true);
-	}
+    if (m_ui.actionLayerMode->isChecked())
+    {
+        m_layer_CB->blockSignals(true);
+        m_layer_CB->setCurrentText(m_prev_layer_text);
+        on_actionLayerMode_toggled(false);
+        m_layer_CB->setCurrentText(pItem);
+        m_prev_layer_text = pItem;
+        m_layer_CB->blockSignals(false);
+        on_actionLayerMode_toggled(true);
+    }
 }
 
-void Toolkit::onLayerMode(bool pVal)
+void Toolkit::on_actionLayerMode_toggled(bool pVal)
 {
-	NSScene * scene = nsengine.currentScene();
-	if (scene == NULL)
-		return;
+    nsscene * scene = nse.current_scene();
+    if (scene == NULL)
+        return;
 
-	int val = mCurrentLayer->value();
-	if (pVal)
-		mLayersAboveHidden = val;
-	else
-	{
-		val = mLayersAboveHidden;
-		mLayersAboveHidden = 0;
-	}
+    int val = m_current_layer->value();
+    if (pVal)
+        m_layers_above_hidden = val;
+    else
+    {
+        val = m_layers_above_hidden;
+        m_layers_above_hidden = 0;
+    }
 
-	if (mLayerCB->currentText() == LAYER_ABOVE_TEXT)
-		scene->hideLayersAbove(val, pVal);
-	else if (mLayerCB->currentText() == LAYER_BELOW_TEXT)
-		scene->hideLayersBelow(val, pVal);
-	else if (mLayerCB->currentText() == LAYER_ALL_TEXT)
-	{
-		scene->hideLayersAbove(val, pVal);
-		scene->hideLayersBelow(val, pVal);
-	}
-	else
-		scene->hideLayer(val, pVal);
+    if (m_layer_CB->currentText() == LAYER_ABOVE_TEXT)
+        scene->hide_layers_above(val, pVal);
+    else if (m_layer_CB->currentText() == LAYER_BELOW_TEXT)
+        scene->hide_layers_below(val, pVal);
+    else if (m_layer_CB->currentText() == LAYER_ALL_TEXT)
+    {
+        scene->hide_layers_above(val, pVal);
+        scene->hide_layers_below(val, pVal);
+    }
+    else
+        scene->hide_layer(val, pVal);
 
-	mUI.mMapView->setFocus();
+    m_ui.mMapView->setFocus();
 }
 
-void Toolkit::onBrushDoubleClick()
+void Toolkit::on_brush_double_click()
 {
-	mBrushMenu->hide();
-	mUI.mMapView->setFocus();
+    m_brush_menu->hide();
+    m_ui.mMapView->setFocus();
 }
 
-void Toolkit::onStampMode(bool pVal)
+void Toolkit::on_actionStampMode_toggled(bool pVal)
 {
-	NSInputMap * input = nsengine.resource<NSInputMap>(nsengine.system<NSInputSystem>()->inputMap());
-	NSInputMap::Trigger trigger1(INSERT_OBJECT, NSInputMap::Key_None, NSInputMap::Key_None, NSInputMap::LeftButton);
-	NSInputMap::Trigger trigger2(INSERT_OBJECT, NSInputMap::Key_LCtrl, NSInputMap::Key_None, NSInputMap::LeftButton);
-	if (pVal)
-	{
-		input->removeMouseButtonTrigger(BUILD_MODE_CONTEXT, NSInputMap::Movement, trigger1);
-		input->removeMouseButtonTrigger(BUILD_MODE_CONTEXT, NSInputMap::Movement, trigger2);
-	}
-	else
-	{
-		input->addMouseButtonTrigger(BUILD_MODE_CONTEXT, NSInputMap::Movement, trigger1);
-		input->addMouseButtonTrigger(BUILD_MODE_CONTEXT, NSInputMap::Movement, trigger2);
-	}
+    nse.system<nsbuild_system>()->enable_stamp_mode(pVal);
 }
 
-void Toolkit::onHideSelection()
+void Toolkit::on_actionHideSelection_triggered()
 {
-	NSSelectionSystem * selsys = nsengine.system<NSSelectionSystem>();
-	selsys->setHiddenState(NSTFormComp::ObjectHide, true);
+    nse.system<nsselection_system>()->set_hidden_state(nstform_comp::hide_object, true);
 }
 
-void Toolkit::onUnhideSelection()
+void Toolkit::on_actionUnhideSelection_triggered()
 {
-	NSSelectionSystem * selsys = nsengine.system<NSSelectionSystem>();
-	selsys->setHiddenState(NSTFormComp::ObjectHide, false);
+    nse.system<nsselection_system>()->set_hidden_state(nstform_comp::hide_object, false);
 }
 
-void Toolkit::onCamCenter(bool pVal)
-{
-	if (pVal)
-	{
-		mUI.actionObjectCenter->setChecked(!pVal);
-		nsengine.system<NSCameraSystem>()->setMode(NSCameraSystem::Free);
-	}
-	mUI.actionCameraCenter->setChecked(true);
-	mUI.mMapView->setFocus();
+void Toolkit::on_actionCameraCenter_triggered(bool pVal)
+{    
+    if (pVal)
+    {
+        m_ui.actionObjectCenter->setChecked(!pVal);
+        nse.system<nscamera_system>()->set_mode(nscamera_system::mode_free);
+    }
+    m_ui.actionCameraCenter->setChecked(true);
+    m_ui.mMapView->setFocus();
 }
 
-void Toolkit::onCamFront(bool pVal)
+void Toolkit::on_actionFrontView_triggered()
 {
-	if (pVal)
-	{
-		mUI.actionIsoView->setChecked(false);
-		mUI.actionTopDown->setChecked(false);
-
-		NSCameraSystem * camSys = nsengine.system<NSCameraSystem>();
-		camSys->setView(NSCameraSystem::Front);
-	}
-	else
-	{
-		NSCameraSystem * camSys = nsengine.system<NSCameraSystem>();
-		camSys->setView(NSCameraSystem::Normal);
-	}
-	mUI.mMapView->setFocus();
+    nse.system<nscamera_system>()->set_view(nscamera_system::view_front_0);
 }
 
-void Toolkit::onObjectCenter(bool pVal)
+void Toolkit::on_actionIsoView_triggered()
 {
-	if (pVal)
-	{
-		mUI.actionCameraCenter->setChecked(!pVal);
-		nsengine.system<NSCameraSystem>()->setMode(NSCameraSystem::Focus);
-	}
-	mUI.actionObjectCenter->setChecked(true);
-	mUI.mMapView->setFocus();
+    nse.system<nscamera_system>()->set_view(nscamera_system::view_iso_0);
 }
 
-void Toolkit::onCamIso(bool pVal)
+void Toolkit::on_actionTopDown_triggered()
 {
-	if (pVal)
-	{
-		mUI.actionFrontView->setChecked(false);
-		mUI.actionTopDown->setChecked(false);
-
-		NSCameraSystem * camSys = nsengine.system<NSCameraSystem>();
-		camSys->setView(NSCameraSystem::Iso);
-	}
-	else
-	{
-		mUI.actionIsoView->setChecked(false);
-		mUI.actionTopDown->setChecked(false);
-
-		NSCameraSystem * camSys = nsengine.system<NSCameraSystem>();
-		camSys->setView(NSCameraSystem::Normal);
-	}
-	mUI.mMapView->setFocus();
+    nse.system<nscamera_system>()->set_view(nscamera_system::view_top_0);
 }
 
-void Toolkit::onCamTop(bool pVal)
+void Toolkit::on_actionObjectCenter_triggered(bool pVal)
 {
-	if (pVal)
-	{
-		mUI.actionFrontView->setChecked(false);
-		mUI.actionIsoView->setChecked(false);
-
-		NSCameraSystem * camSys = nsengine.system<NSCameraSystem>();
-		camSys->setView(NSCameraSystem::Top);
-	}
-	else
-	{
-		mUI.actionIsoView->setChecked(false);
-		mUI.actionTopDown->setChecked(false);
-
-		NSCameraSystem * camSys = nsengine.system<NSCameraSystem>();
-		camSys->setView(NSCameraSystem::Normal);
-	}
-	mUI.mMapView->setFocus();
+    if (pVal)
+    {
+        m_ui.actionCameraCenter->setChecked(!pVal);
+        nse.system<nscamera_system>()->set_mode(nscamera_system::mode_focus);
+    }
+    m_ui.actionObjectCenter->setChecked(true);
+    m_ui.mMapView->setFocus();
 }
 
-void Toolkit::onRedo()
+void Toolkit::update_brush_tool_button()
 {
-	mUI.mMapView->setFocus();
+    nsentity * ent = nse.system<nsbuild_system>()->tile_brush();
+    if (ent == NULL)
+    {
+        m_brush_tool_btn->setIcon(QIcon());
+        return;
+    }
+
+    QString icon_path = ent->icon_path().c_str();
+    if (!icon_path.isEmpty())
+        m_brush_tool_btn->setIcon(QIcon(icon_path));
+    else
+        m_brush_tool_btn->setIcon(QIcon(":/ResourceIcons/icons/default_brush.png"));
 }
 
-void Toolkit::onUndo()
+void Toolkit::on_actionRedo_triggered()
 {
-	mUI.mMapView->setFocus();
+//    m_ui.mMapView->setFocus();
+}
+
+void Toolkit::on_actionUndo_triggered()
+{
+//    m_ui.mMapView->setFocus();
+}
+
+Toolkit * Toolkit::m_ptr = NULL;
+
+Toolkit & Toolkit::inst()
+{
+    return *m_ptr;
 }
 
 

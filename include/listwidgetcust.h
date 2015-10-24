@@ -3,7 +3,7 @@
 #ifndef CUSTOMLIST_H
 #define CUSTOMLIST_H
 class Toolkit;
-class NSEngine;
+class nsengine;
 
 class ListWidgetCust : public QListWidget
 {
@@ -11,7 +11,7 @@ class ListWidgetCust : public QListWidget
 public:
 	ListWidgetCust(QWidget * pParent = NULL);
 
-	void init(Toolkit * pTK);
+    void init();
 
 protected:
 

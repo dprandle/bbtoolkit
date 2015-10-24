@@ -1,17 +1,14 @@
-#include <objectview.h>
 #include <nsengine.h>
+#include <nsbuild_system.h>
 #include <nsentity.h>
-#include <nsentitymanager.h>
+#include <nsplugin_manager.h>
+#include <nsentity_manager.h>
+
 #include <toolkit.h>
-#include <nstilecomp.h>
-#include <nspluginmanager.h>
-#include <nsentity.h>
+#include <objectview.h>
 #include <entityeditordialog.h>
 
-
 ObjectView::ObjectView(QWidget * parent) :
-mTK(NULL),
-mEntD(NULL),
 QMainWindow(parent)
 {}
 
@@ -20,36 +17,35 @@ ObjectView::~ObjectView()
 
 }
 
-void ObjectView::init(Toolkit * pTK, EntityEditorDialog * pEntityEditorDialog)
+void ObjectView::init()
 {
-	mTK = pTK;
-	mEntD = pEntityEditorDialog;
-
-	mUI.setupUi(this);
+    m_ui.setupUi(this);
 }
 
 void ObjectView::refresh()
 {
-	mUI.mListWidget->clear();
+    m_ui.mListWidget->clear();
 
-	auto plugiter = nsengine.plugins()->begin();
-	while (plugiter != nsengine.plugins()->end())
+	auto plugiter = nse.plugins()->begin();
+	while (plugiter != nse.plugins()->end())
 	{
-		NSPlugin * plg = nsengine.plugin(plugiter->first);
+		nsplugin * plg = nse.plugin(plugiter->first);
 
-		auto iter = plg->manager<NSEntityManager>()->begin();
-		while (iter != plg->manager<NSEntityManager>()->end())
+		auto iter = plg->manager<nsentity_manager>()->begin();
+		while (iter != plg->manager<nsentity_manager>()->end())
 		{
-			NSEntity * ent = (NSEntity*)iter->second;
+			nsentity * ent = (nsentity*)iter->second;
 			QListWidgetItem * item = new QListWidgetItem();
 			item->setText(ent->name().c_str());
-			if (!ent->iconPath().empty())
-				item->setIcon(QIcon(ent->iconPath().c_str()));
+            if (!ent->icon_path().empty())
+                item->setIcon(QIcon(ent->icon_path().c_str()));
+            else
+                item->setIcon(QIcon(":/ResourceIcons/icons/default_object.png"));
 
-			item->setData(VIEW_WIDGET_ITEM_PLUG, ent->plugid());
+            item->setData(VIEW_WIDGET_ITEM_PLUG, ent->plugin_id());
 			item->setData(VIEW_WIDGET_ITEM_ENT, ent->id());
 
-			mUI.mListWidget->addItem(item);
+            m_ui.mListWidget->addItem(item);
 			++iter;
 		}
 
@@ -63,25 +59,35 @@ void ObjectView::onActionNew()
 
 void ObjectView::onActionDelete()
 {
-
 }
 
 void ObjectView::onActionEdit()
 {
-	auto items = mUI.mListWidget->selectedItems();
+    auto items = m_ui.mListWidget->selectedItems();
 	if (items.isEmpty())
 		return;
 
 	auto item = items.first();
 	uivec2 fid(item->data(VIEW_WIDGET_ITEM_PLUG).toUInt(), item->data(VIEW_WIDGET_ITEM_ENT).toUInt());
-	NSEntity * ent = nsengine.resource<NSEntity>(fid);
-	mEntD->setEntity(ent);
-	mEntD->show();
+	nsentity * ent = nse.resource<nsentity>(fid);
+    bbtk.entity_dialog()->setEntity(ent);
+    bbtk.entity_dialog()->show();
 }
 
-void ObjectView::onItemPressed(QListWidgetItem* pItem)
+void ObjectView::onSelectionChanged()
 {
-	uivec2 fid(pItem->data(VIEW_WIDGET_ITEM_PLUG).toUInt(), pItem->data(VIEW_WIDGET_ITEM_ENT).toUInt());
-	NSEntity * ent = nsengine.resource<NSEntity>(fid);
-	mEntD->setEntity(ent);
+    QListWidgetItem * item = NULL;
+    auto items = m_ui.mListWidget->selectedItems();
+    if (!items.isEmpty())
+        item = items[0];
+
+    if (item == NULL)
+    {
+        nse.system<nsbuild_system>()->set_object_build_ent(NULL);
+        return;
+    }
+
+    uivec2 itid(item->data(VIEW_WIDGET_ITEM_PLUG).toUInt(), item->data(VIEW_WIDGET_ITEM_ENT).toUInt());
+    nsentity * ent = nse.resource<nsentity>(itid);
+    nse.system<nsbuild_system>()->set_object_build_ent(ent);
 }
