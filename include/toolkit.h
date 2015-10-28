@@ -64,8 +64,6 @@ public:
 
     TileView *  tile_view();
 
-    EntityEditorDialog * entity_dialog();
-
     CameraSettingsDialog * camera_settings();
 
     resource_browser * res_browser();
@@ -151,7 +149,6 @@ private:
     BrushMenuWidget * m_brush_menu_widget;
     CameraSettingsDialog * m_cam_settings;
     resource_browser * m_resource_browser;
-    EntityEditorDialog * m_ent_id;
 
     resource_dialog * m_res_dialog;
     resource_dialog_prev * m_res_dialog_prev;

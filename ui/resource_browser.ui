@@ -141,8 +141,7 @@
     <property name="title">
      <string>Create</string>
     </property>
-    <addaction name="a_create_plugin"/>
-    <addaction name="a_create_map"/>
+    <addaction name="a_create_input_map"/>
     <addaction name="a_create_entity"/>
     <addaction name="a_create_shader"/>
     <addaction name="a_create_material"/>
@@ -169,14 +168,9 @@
    <addaction name="a_edit_resource"/>
    <addaction name="a_create_resource"/>
   </widget>
-  <action name="a_create_plugin">
+  <action name="a_create_input_map">
    <property name="text">
-    <string>Plugin</string>
-   </property>
-  </action>
-  <action name="a_create_map">
-   <property name="text">
-    <string>Map</string>
+    <string>Input Map</string>
    </property>
   </action>
   <action name="a_create_entity">

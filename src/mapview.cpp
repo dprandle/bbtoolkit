@@ -38,7 +38,8 @@ MapView::MapView(QWidget * parent) :
 }
 
 MapView::~MapView()
-{}
+{
+}
 
 uint32 MapView::glewID()
 {
@@ -315,10 +316,6 @@ void MapView::mouseDoubleClickEvent(QMouseEvent *)
     mb.exec();
 }
 
-void MapView::onIdle()
-{
-	update();
-}
 
 void MapView::wheelEvent(QWheelEvent * wevent)
 {
@@ -328,14 +325,25 @@ void MapView::wheelEvent(QWheelEvent * wevent)
 
 fvec2 platform_normalized_mpos()
 {
-    QPoint p = bbtk.map_view()->mapFromGlobal(QCursor::pos());
-    fvec2 pos(float(p.x()) / float(bbtk.map_view()->width()), 1.0f - float(p.y()) / float(bbtk.map_view()->height()));
+    QWidget * current_widget = QApplication::focusWidget();
+    if (current_widget == 0)
+        return fvec2();
+
+    QPoint p = current_widget->mapFromGlobal(QCursor::pos());
+    fvec2 pos(float(p.x()) / float(current_widget->width()), 1.0f - float(p.y()) / float(current_widget->height()));
     return pos;
 }
 
+void MapView::onIdle()
+{
+    if (hasFocus())
+        update();
+}
 
 void MapView::initializeGL()
 {
+    bbtk.output_view()->writeToScreen("Initializing mapview opengL");
+
     m_glew_id = nse.create_context();
 
 #ifdef NSDEBUG
@@ -352,7 +360,7 @@ void MapView::initializeGL()
 
     // Setup build brush (simple one)
     nsinput_map * imap = plg->get<nsinput_map>("bb_toolkit");
-    nse.set_current_scene("mainscene");
+    nse.set_current_scene("mainscene", false, false);
     nse.system<nsrender_system>()->set_fog_factor(uivec2(60,110));
     nse.system<nsrender_system>()->set_fog_color(fvec4(nse.current_scene()->bg_color(),1.0f));
     nse.system<nsinput_system>()->set_input_map(imap->full_id());
@@ -361,16 +369,15 @@ void MapView::initializeGL()
 	// Load from file all plugins - dont actually call load unless checked in load plugins screen
     bbtk.load_plugin_files(QDir(nse.plugin_dir().c_str()));
 
+    bbtk.refresh_views();
+    bbtk.statusBar()->setSizeGripEnabled(false);
+    bbtk.statusBar()->showMessage("Ready");
+
     // Initialize stuff that needs to be initialized after the engine
     bbtk.res_browser()->init();
     bbtk.res_dialog()->init();
     bbtk.res_dialog_prev()->init();
     bbtk.res_dialog_prev_lighting()->init();
-
-
-    bbtk.refresh_views();
-    bbtk.statusBar()->setSizeGripEnabled(false);
-    bbtk.statusBar()->showMessage("Ready");
 }
 
 void MapView::make_current()

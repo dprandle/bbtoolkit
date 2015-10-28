@@ -16,7 +16,7 @@
 #include <nstform_comp.h>
 #include <nstile_brush_comp.h>
 #include <nstile_comp.h>
-#include <ui_selectresdialog.h>
+#include <ui_select_res_dialog.h>
 #include <qtimer.h>
 
 EntityEditorDialog::EntityEditorDialog(QWidget * parent) :
@@ -182,23 +182,23 @@ void EntityEditorDialog::onAddComp()
 {
 
 	QDialog addCompD(this);
-	Ui::SelectResDialog ui;
+    Ui::select_res_dialog ui;
 	ui.setupUi(&addCompD);
-	ui.mListWidget->addItem(ANIM_COMP_TYPESTRING);
-	ui.mListWidget->addItem(CAM_COMP_TYPESTRING);
-	ui.mListWidget->addItem(LIGHT_COMP_TYPESTRING);
-	ui.mListWidget->addItem(OCCUPY_COMP_TYPESTRING);
-	ui.mListWidget->addItem(RENDER_COMP_TYPESTRING);
-	ui.mListWidget->addItem(PARTICLE_COMP_TYPESTRING);
-	ui.mListWidget->addItem(SEL_COMP_TYPESTRING);
-	ui.mListWidget->addItem(TILEBRUSH_COMP_TYPESTRING);
-	ui.mListWidget->addItem(TILE_COMP_TYPESTRING);
+    ui.m_lw->addItem(ANIM_COMP_TYPESTRING);
+    ui.m_lw->addItem(CAM_COMP_TYPESTRING);
+    ui.m_lw->addItem(LIGHT_COMP_TYPESTRING);
+    ui.m_lw->addItem(OCCUPY_COMP_TYPESTRING);
+    ui.m_lw->addItem(RENDER_COMP_TYPESTRING);
+    ui.m_lw->addItem(PARTICLE_COMP_TYPESTRING);
+    ui.m_lw->addItem(SEL_COMP_TYPESTRING);
+    ui.m_lw->addItem(TILEBRUSH_COMP_TYPESTRING);
+    ui.m_lw->addItem(TILE_COMP_TYPESTRING);
 
 	addCompD.setWindowTitle("Choose Component");
 
 	if (addCompD.exec() == QDialog::Accepted)
 	{
-		auto lwitems = ui.mListWidget->selectedItems();
+        auto lwitems = ui.m_lw->selectedItems();
 		if (lwitems.isEmpty())
 			return;
 		auto lwitem = lwitems.first();

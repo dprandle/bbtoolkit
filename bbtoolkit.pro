@@ -13,7 +13,7 @@ UI_DIR = $$PWD/ui
 FORMS += $$PWD/ui/*.ui
 RESOURCES = $$PWD/toolkit.qrc
 QT += opengl
-QMAKE_CXXFLAGS += -pipe
+QMAKE_CXXFLAGS += -pipe -O0
 
 CONFIG(debug, debug|release){
 DEFINES += NSDEBUG

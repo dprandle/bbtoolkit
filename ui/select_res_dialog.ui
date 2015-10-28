@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>SelectResDialog</class>
- <widget class="QDialog" name="SelectResDialog">
+ <class>select_res_dialog</class>
+ <widget class="QDialog" name="select_res_dialog">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -15,7 +15,7 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <widget class="QListWidget" name="mListWidget"/>
+    <widget class="QListWidget" name="m_lw"/>
    </item>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
@@ -33,14 +33,14 @@
       </spacer>
      </item>
      <item>
-      <widget class="QPushButton" name="mSelectBtn">
+      <widget class="QPushButton" name="m_select_btn">
        <property name="text">
         <string>Select</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="mCancelBtn">
+      <widget class="QPushButton" name="m_cancel_btn">
        <property name="text">
         <string>Cancel</string>
        </property>
@@ -53,9 +53,9 @@
  <resources/>
  <connections>
   <connection>
-   <sender>mSelectBtn</sender>
+   <sender>m_select_btn</sender>
    <signal>pressed()</signal>
-   <receiver>SelectResDialog</receiver>
+   <receiver>select_res_dialog</receiver>
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -69,9 +69,9 @@
    </hints>
   </connection>
   <connection>
-   <sender>mCancelBtn</sender>
+   <sender>m_cancel_btn</sender>
    <signal>pressed()</signal>
-   <receiver>SelectResDialog</receiver>
+   <receiver>select_res_dialog</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">

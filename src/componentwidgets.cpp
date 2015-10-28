@@ -19,7 +19,7 @@
 #include <toolkit.h>
 #include <nsengine.h>
 #include <nsmesh_manager.h>
-#include <ui_selectresdialog.h>
+#include <ui_select_res_dialog.h>
 #include <nsrender_system.h>
 
 CompWidget::CompWidget(QWidget * pParent) :
@@ -588,7 +588,7 @@ void ParticleCompWidget::onChooseMat()
 		return;
 
 	QDialog selMatD(this);
-	Ui::SelectResDialog ui;
+    Ui::select_res_dialog ui;
 	ui.setupUi(&selMatD);
 	selMatD.setWindowTitle("Select Material");
 
@@ -604,7 +604,7 @@ void ParticleCompWidget::onChooseMat()
 			QListWidgetItem * toAdd = new QListWidgetItem(miter->second->name().c_str());
             toAdd->setData(VIEW_WIDGET_ITEM_PLUG, miter->second->plugin_id());
 			toAdd->setData(VIEW_WIDGET_ITEM_ENT, miter->second->id());
-			ui.mListWidget->addItem(toAdd);
+            ui.m_lw->addItem(toAdd);
 			++miter;
 		}
 
@@ -613,7 +613,7 @@ void ParticleCompWidget::onChooseMat()
 
 	if (selMatD.exec() == QDialog::Accepted)
 	{
-		auto lwitems = ui.mListWidget->selectedItems();
+        auto lwitems = ui.m_lw->selectedItems();
 		if (lwitems.isEmpty())
 			return;
 		auto lwitem = lwitems.first();
@@ -652,7 +652,7 @@ void ParticleCompWidget::onChooseShader()
 		return;
 
 	QDialog selShaderD(this);
-	Ui::SelectResDialog ui;
+    Ui::select_res_dialog ui;
 	ui.setupUi(&selShaderD);
 	selShaderD.setWindowTitle("Select Shader");
 
@@ -667,7 +667,7 @@ void ParticleCompWidget::onChooseShader()
 			QListWidgetItem * lwitem = new QListWidgetItem(siter->second->name().c_str());
             lwitem->setData(VIEW_WIDGET_ITEM_PLUG, siter->second->plugin_id());
 			lwitem->setData(VIEW_WIDGET_ITEM_ENT, siter->second->id());
-			ui.mListWidget->addItem(lwitem);
+            ui.m_lw->addItem(lwitem);
 			++siter;
 		}
 		++plugiter;
@@ -675,7 +675,7 @@ void ParticleCompWidget::onChooseShader()
 
 	if (selShaderD.exec() == QDialog::Accepted)
 	{
-		auto lwitems = ui.mListWidget->selectedItems();
+        auto lwitems = ui.m_lw->selectedItems();
 		if (lwitems.isEmpty())
 			return;
 		auto lwitem = lwitems.first();
@@ -700,7 +700,7 @@ void ParticleCompWidget::onChooseRandTex()
 		return;
 
 	QDialog selTextureD(this);
-	Ui::SelectResDialog ui;
+    Ui::select_res_dialog ui;
 	ui.setupUi(&selTextureD);
 	selTextureD.setWindowTitle("Select Texture");
 
@@ -717,14 +717,14 @@ void ParticleCompWidget::onChooseRandTex()
 			QListWidgetItem * lwitem = new QListWidgetItem(txiter->second->name().c_str());
             lwitem->setData(VIEW_WIDGET_ITEM_PLUG, tex->plugin_id());
 			lwitem->setData(VIEW_WIDGET_ITEM_ENT, tex->id());
-			ui.mListWidget->addItem(lwitem);
+            ui.m_lw->addItem(lwitem);
 			++txiter;
 		}
 		++plugiter;
 	}
 	if (selTextureD.exec() == QDialog::Accepted)
 	{
-		auto lwitems = ui.mListWidget->selectedItems();
+        auto lwitems = ui.m_lw->selectedItems();
 		if (lwitems.isEmpty())
 			return;
 		auto lwitem = lwitems.first();
@@ -1181,7 +1181,7 @@ void RenderCompWidget::onChooseMat()
 	QTreeWidgetItem * twItem = items.first();
 
 	QDialog selMatD(this);
-	Ui::SelectResDialog ui;
+    Ui::select_res_dialog ui;
 	ui.setupUi(&selMatD);
 	selMatD.setWindowTitle("Select Material");
 
@@ -1197,7 +1197,7 @@ void RenderCompWidget::onChooseMat()
 			QListWidgetItem * toAdd = new QListWidgetItem(miter->second->name().c_str());
             toAdd->setData(VIEW_WIDGET_ITEM_PLUG, miter->second->plugin_id());
 			toAdd->setData(VIEW_WIDGET_ITEM_ENT, miter->second->id());
-			ui.mListWidget->addItem(toAdd);
+            ui.m_lw->addItem(toAdd);
 			++miter;
 		}
 
@@ -1206,7 +1206,7 @@ void RenderCompWidget::onChooseMat()
 
 	if (selMatD.exec() == QDialog::Accepted)
 	{
-		auto lwitems = ui.mListWidget->selectedItems();
+        auto lwitems = ui.m_lw->selectedItems();
 		if (lwitems.isEmpty())
 			return;
 		auto lwitem = lwitems.first();
@@ -1233,7 +1233,7 @@ void RenderCompWidget::onChooseMesh()
 		return;
 
 	QDialog selMeshD(this);
-	Ui::SelectResDialog ui;
+    Ui::select_res_dialog ui;
 	ui.setupUi(&selMeshD);
 
 	selMeshD.setWindowTitle("Select Mesh");
@@ -1250,7 +1250,7 @@ void RenderCompWidget::onChooseMesh()
 			QListWidgetItem * toAdd = new QListWidgetItem(miter->second->name().c_str());
             toAdd->setData(VIEW_WIDGET_ITEM_PLUG, miter->second->plugin_id());
 			toAdd->setData(VIEW_WIDGET_ITEM_ENT, miter->second->id());
-			ui.mListWidget->addItem(toAdd);
+            ui.m_lw->addItem(toAdd);
 			++miter;
 		}
 
@@ -1259,7 +1259,7 @@ void RenderCompWidget::onChooseMesh()
 
 	if (selMeshD.exec() == QDialog::Accepted)
 	{
-		auto lwitems = ui.mListWidget->selectedItems();
+        auto lwitems = ui.m_lw->selectedItems();
 		if (lwitems.isEmpty())
 			return;
 		auto lwitem = lwitems.first();

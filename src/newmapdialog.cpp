@@ -15,7 +15,7 @@
 #include <nsplugin_manager.h>
 #include <nsrender_comp.h>
 #include <ui_selecttiledialog.h>
-#include <ui_selectresdialog.h>
+#include <ui_select_res_dialog.h>
 #include <nsmaterial.h>
 #include <listwidgetcust.h>
 
@@ -38,7 +38,7 @@ void NewMapDialog::onChooseSkybox()
 {
 	QDialog srd(this);
 
-	Ui::SelectResDialog ui;
+    Ui::select_res_dialog ui;
 	ui.setupUi(&srd);
 
 	// Go through and add entities to the list widget which have camera component
@@ -62,7 +62,7 @@ void NewMapDialog::onChooseSkybox()
 						QListWidgetItem * item = new QListWidgetItem(curent->name().c_str());
                         item->setData(VIEW_WIDGET_ITEM_PLUG, curent->plugin_id());
 						item->setData(VIEW_WIDGET_ITEM_ENT, curent->id());
-						ui.mListWidget->addItem(item);
+                        ui.m_lw->addItem(item);
 					}
 				}
 			}
@@ -75,7 +75,7 @@ void NewMapDialog::onChooseSkybox()
 	// camera to use
 	if (srd.exec() == QDialog::Accepted)
 	{
-		auto selitems = ui.mListWidget->selectedItems();
+        auto selitems = ui.m_lw->selectedItems();
 		if (selitems.isEmpty())
 			return;
 		auto fitem = selitems.first();
@@ -91,7 +91,7 @@ void NewMapDialog::onChooseTile()
 {
 	QDialog srd(this);
 
-	Ui::SelectResDialog ui;
+    Ui::select_res_dialog ui;
 	ui.setupUi(&srd);
 
 	// Go through and add entities to the list widget which have tile component
@@ -108,7 +108,7 @@ void NewMapDialog::onChooseTile()
 				QListWidgetItem * item = new QListWidgetItem(curent->name().c_str());
                 item->setData(VIEW_WIDGET_ITEM_PLUG, curent->plugin_id());
 				item->setData(VIEW_WIDGET_ITEM_ENT, curent->id());
-				ui.mListWidget->addItem(item);
+                ui.m_lw->addItem(item);
 			}
 			++entiter;
 		}
@@ -119,7 +119,7 @@ void NewMapDialog::onChooseTile()
 	// directional light to use
 	if (srd.exec() == QDialog::Accepted)
 	{
-		auto selitems = ui.mListWidget->selectedItems();
+        auto selitems = ui.m_lw->selectedItems();
 		if (selitems.isEmpty())
 			return;
 		auto fitem = selitems.first();
@@ -160,7 +160,7 @@ void NewMapDialog::onChooseCamera()
 {
 	QDialog srd(this);
 
-	Ui::SelectResDialog ui;
+    Ui::select_res_dialog ui;
 	ui.setupUi(&srd);
 
 	// Go through and add entities to the list widget which have camera component
@@ -177,7 +177,7 @@ void NewMapDialog::onChooseCamera()
 				QListWidgetItem * item = new QListWidgetItem(curent->name().c_str());
                 item->setData(VIEW_WIDGET_ITEM_PLUG, curent->plugin_id());
 				item->setData(VIEW_WIDGET_ITEM_ENT, curent->id());
-				ui.mListWidget->addItem(item);
+                ui.m_lw->addItem(item);
 			}
 			++entiter;
 		}
@@ -188,7 +188,7 @@ void NewMapDialog::onChooseCamera()
 	// camera to use
 	if (srd.exec() == QDialog::Accepted)
 	{
-		auto selitems = ui.mListWidget->selectedItems();
+        auto selitems = ui.m_lw->selectedItems();
 		if (selitems.isEmpty())
 			return;
 		auto fitem = selitems.first();
@@ -209,7 +209,7 @@ void NewMapDialog::onChooseDirlight()
 {
 	QDialog srd(this);
 
-	Ui::SelectResDialog ui;
+    Ui::select_res_dialog ui;
 	ui.setupUi(&srd);
 
 	// Go through and add entities to the list widget which have light component
@@ -228,7 +228,7 @@ void NewMapDialog::onChooseDirlight()
 				QListWidgetItem * item = new QListWidgetItem(curent->name().c_str());
                 item->setData(VIEW_WIDGET_ITEM_PLUG, curent->plugin_id());
 				item->setData(VIEW_WIDGET_ITEM_ENT, curent->id());
-				ui.mListWidget->addItem(item);
+                ui.m_lw->addItem(item);
 			}
 			++entiter;
 		}
@@ -239,7 +239,7 @@ void NewMapDialog::onChooseDirlight()
 	// directional light to use
 	if (srd.exec() == QDialog::Accepted)
 	{
-		auto selitems = ui.mListWidget->selectedItems();
+        auto selitems = ui.m_lw->selectedItems();
 		if (selitems.isEmpty())
 			return;
 		auto fitem = selitems.first();

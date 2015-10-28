@@ -8,6 +8,6 @@ resource_dialog_prev_lighting::resource_dialog_prev_lighting(QWidget * parent):
 
 void resource_dialog_prev_lighting::init()
 {
-
+    m_ui.m_preview->init();
 }
 

@@ -6,6 +6,7 @@
 #include <qopenglwidget.h>
 #include <toolkitdef.h>
 #include <nstypes.h>
+#include <nsmath.h>
 
 class Toolkit;
 
@@ -17,12 +18,16 @@ class Preview : public QOpenGLWidget
 	~Preview();
 
     void init();
+
+    void make_current();
+
+    uint32 glew_id();
 						  
   public slots:
 	void onIdle();
 
   signals:
-    void opengl_initialized(uint32);
+    void opengl_initialized();
 
   protected:
 	void initializeGL();
@@ -39,8 +44,10 @@ class Preview : public QOpenGLWidget
 	void wheelEvent(QWheelEvent * wevent);
 
   private:
-	
-    uint32 mEngineContextID;
+    bool _on_key(bool pressed, int key);
+    bool _on_mouse(bool pressed, int mbutton, const fvec2 & norm_mpos);
+
+    uint32 m_glew_id;
 	void _connect();
 };
 

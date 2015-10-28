@@ -33,14 +33,7 @@
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_6">
       <item>
-       <widget class="QWidget" name="m_preview" native="true">
-        <property name="minimumSize">
-         <size>
-          <width>300</width>
-          <height>300</height>
-         </size>
-        </property>
-       </widget>
+       <widget class="Preview" name="m_preview"/>
       </item>
       <item>
        <widget class="QGroupBox" name="m_lighting_gb">
@@ -426,6 +419,11 @@
   </layout>
  </widget>
  <customwidgets>
+  <customwidget>
+   <class>Preview</class>
+   <extends>QOpenGLWidget</extends>
+   <header>preview.h</header>
+  </customwidget>
   <customwidget>
    <class>ClickableFrame</class>
    <extends>QFrame</extends>

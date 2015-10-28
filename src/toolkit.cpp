@@ -60,7 +60,6 @@ Toolkit::Toolkit(QWidget *parent) :
     m_resource_browser(new resource_browser(this)),
     m_grid_x(new QSpinBox()),
     m_grid_y(new QSpinBox()),
-    m_ent_id(new EntityEditorDialog(this)),
     m_res_dialog(new resource_dialog(this)),
     m_res_dialog_prev(new resource_dialog_prev(this)),
     m_res_dialog_prev_lighting(new resource_dialog_prev_lighting(this)),
@@ -98,17 +97,10 @@ void Toolkit::load_plugin_files(const QDir & startingDir)
 }
 
 
-EntityEditorDialog * Toolkit::entity_dialog()
-{
-    return m_ent_id;
-}
-
 void Toolkit::init()
 {
     m_ui.mMapView->init();
 
-    m_ent_id->init();
-    m_ent_id->setModal(false);
     m_ui.mOutputView->init();
     m_ui.mTileView->init();
     m_ui.mObjectView->init();

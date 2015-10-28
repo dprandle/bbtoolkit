@@ -219,7 +219,7 @@ void ManagePluginsDialog::onOkay()
 
 
 	// Set the current scene to NULL before unloading plugins
-    nse.set_current_scene(nullptr);
+    nse.set_current_scene(nullptr, false, false);
 
 	// Now go through and add the plugins and load the unloaded that are checked, unload the loaded that are unchecked
 	// But first, check to make sure every plugin has all of its necessary parent plugins before on the list
@@ -259,7 +259,7 @@ void ManagePluginsDialog::onOkay()
 			openDialog = true;
 		else
 		{
-            nse.set_current_scene(sm->begin()->first);
+            nse.set_current_scene(sm->begin()->first, false, false);
 			nsscene * cur = nse.current_scene();
             if (!cur->has_dir_light())
 			{

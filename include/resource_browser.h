@@ -31,13 +31,13 @@ class resource_browser : public QMainWindow
 
   public slots:
     void on_a_create_entity_triggered();
-    void on_a_create_map_triggered();
-    void on_a_create_plugin_triggered();
+    void on_a_create_input_map_triggered();
     void on_a_create_shader_triggered();
     void on_a_create_material_triggered();
     void on_a_create_texture_triggered();
     void on_a_create_animation_triggered();
     void on_a_create_mesh_triggered();
+
     void on_a_edit_resource_triggered();
     void on_a_create_resource_triggered();
     void on_a_del_resource_triggered();

@@ -70,8 +70,6 @@ void ObjectView::onActionEdit()
 	auto item = items.first();
 	uivec2 fid(item->data(VIEW_WIDGET_ITEM_PLUG).toUInt(), item->data(VIEW_WIDGET_ITEM_ENT).toUInt());
 	nsentity * ent = nse.resource<nsentity>(fid);
-    bbtk.entity_dialog()->setEntity(ent);
-    bbtk.entity_dialog()->show();
 }
 
 void ObjectView::onSelectionChanged()
