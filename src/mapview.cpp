@@ -349,7 +349,7 @@ void MapView::initializeGL()
 #ifdef NSDEBUG
     nse.debug()->set_message_callback(OutputView::debugCallback, bbtk.output_view());
 #else
-    mUI.mOutputView->hide();
+    bbtk.output_view()->hide();
 #endif
 
     nse.start();

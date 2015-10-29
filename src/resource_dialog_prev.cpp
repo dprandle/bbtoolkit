@@ -22,7 +22,7 @@
 #include <QFileDialog>
 
 resource_dialog_prev::resource_dialog_prev(QWidget * parent):
-    QDialog::QDialog(parent),
+    QDialog(parent),
     m_editing_res(NULL),
     m_tex_widget(new texture_widget(parent))
 {
