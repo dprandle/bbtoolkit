@@ -16,7 +16,7 @@
   <property name="styleSheet">
    <string notr="true">QWidget {
 color: white;
-background-color: rgb(55,55,55);
+background-color: rgb(200,55,55);
 }
 
 QComboBox
@@ -406,7 +406,7 @@ QTabBar::tab:!selected
      <x>0</x>
      <y>0</y>
      <width>1600</width>
-     <height>20</height>
+     <height>21</height>
     </rect>
    </property>
    <property name="styleSheet">
