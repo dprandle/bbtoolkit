@@ -2,7 +2,7 @@
 #define MANAGEMAPSDIALOG_H
 
 // Inlcudes
-#include <ui_managemapsdialog.h>
+#include <ui_manage_maps_dialog.h>
 #include <ui_editmapdialog.h>
 
 class Toolkit;

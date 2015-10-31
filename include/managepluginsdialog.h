@@ -2,7 +2,7 @@
 #define MANAGEPLUGINSDIALOG_H
 
 // Inlcudes
-#include <ui_managepluginsdialog.h>
+#include <ui_manage_plugins_dialog.h>
 #include <ui_newplugindialog.h>
 #include <qvector.h>
 #include <set>
