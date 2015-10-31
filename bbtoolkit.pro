@@ -77,12 +77,6 @@ DEFINES += GLEW_STATIC GLEW_MX
 
 unix {
 QMAKE_CXXFLAGS += -pipe -O0
-CONFIG(debug, debug|release){
-    PRE_TARGETDEPS += -L$$PWD/../nsengine/lib/$$ARCH/nsengined.a
-}
-CONFIG(release, debug|release){
-    PRE_TARGETDEPS += -L$$PWD/../nsengine/lib/$$ARCH/nsengine.a
-}
 }
 
 win32 {
@@ -92,12 +86,6 @@ win32 {
     ARCH = x64
 }
 system(\"$$PWD/config.bat\" \"$$PWD\")
-CONFIG(debug, debug|release){
-    PRE_TARGETDEPS += -L$$PWD/../nsengine/lib/$$ARCH/nsengined.lib
-}
-CONFIG(release, debug|release){
-    PRE_TARGETDEPS += -L$$PWD/../nsengine/lib/$$ARCH/nsengine.lib
-}
 }
 
 CONFIG(debug, debug|release){
