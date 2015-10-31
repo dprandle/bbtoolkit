@@ -2,6 +2,7 @@
 #include <QGraphicsScene>
 #include <QEvent>
 #include <QGraphicsItem>
+#include <QKeyEvent>
 
 
 BrushGraphicsView::BrushGraphicsView(QWidget * parent):
