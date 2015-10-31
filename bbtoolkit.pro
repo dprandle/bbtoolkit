@@ -8,7 +8,7 @@ INCLUDEPATH += $$PWD/../nsengine/include
 UI_DIR = $$PWD/ui
 FORMS += $$PWD/ui/*.ui
 RESOURCES = $$PWD/toolkit.qrc
-QT += opengl
+QT += opengl gui
 
 ARCH = x64
 
@@ -24,6 +24,7 @@ win32 {
     } else {
         ARCH = x64
     }
+    system(\"$$PWD/config.bat\" \"$$PWD\")
 }
 
 CONFIG(debug, debug|release){

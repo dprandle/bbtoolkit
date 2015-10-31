@@ -1,7 +1,7 @@
 #include <brushgraphicsview.h>
-#include <qgraphicsscene.h>
-#include <qevent.h>
-#include <qgraphicsitem.h>
+#include <QGraphicsScene>
+#include <QEvent>
+#include <QGraphicsItem>
 
 
 BrushGraphicsView::BrushGraphicsView(QWidget * parent):

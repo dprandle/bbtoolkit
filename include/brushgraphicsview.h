@@ -2,7 +2,7 @@
 #define BRUSHGRAPHICSVIEW_H
 
 // Inlcudes
-#include <qgraphicsview.h>
+#include <QGraphicsView>
 
 class BrushGraphicsView : public QGraphicsView
 {
