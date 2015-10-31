@@ -15,14 +15,13 @@ This file contains all of the neccessary declarations for the Toolkit class.
 
 #include <QMainWindow>
 #include <ui_toolkit.h>
-#include <qdir.h>
-#include <qlist.h>
+#include <QDir>
+#include <QList>
 
 #define LAYER_ABOVE_TEXT "Above"
 #define LAYER_BELOW_TEXT "Below"
 #define LAYER_ALL_TEXT "All Except"
 #define LAYER_ONLY_TEXT "Only"
-
 
 class QMessageBox;
 class MapView;

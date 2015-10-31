@@ -1,6 +1,67 @@
 TEMPLATE = app
-HEADERS += $$PWD/include/*.h*
-SOURCES += $$PWD/src/*.c*
+
+SOURCES += \
+    src/addnewbrushdialog.cpp \
+    src/brushgraphicsview.cpp \
+    src/brushmenuwidget.cpp \
+    src/camerasettingsdialog.cpp \
+    src/clickableframe.cpp \
+    src/componentwidgets.cpp \
+    src/entityeditordialog.cpp \
+    src/listwidgetcust.cpp \
+    src/main.cpp \
+    src/managemapsdialog.cpp \
+    src/managepluginsdialog.cpp \
+    src/mapview.cpp \
+    src/materialwidget.cpp \
+    src/newmapdialog.cpp \
+    src/newresourcedialog.cpp \
+    src/newtiledialog.cpp \
+    src/objectview.cpp \
+    src/outputview.cpp \
+    src/preview.cpp \
+    src/previewwidget.cpp \
+    src/resource_browser.cpp \
+    src/resource_dialog.cpp \
+    src/resource_dialog_prev.cpp \
+    src/resource_dialog_prev_lighting.cpp \
+    src/resourceinfowidget.cpp \
+    src/texture_widget.cpp \
+    src/tileview.cpp \
+    src/toolkit.cpp
+
+HEADERS += \
+    include/addnewbrushdialog.h \
+    include/brushgraphicsview.h \
+    include/brushmenuwidget.h \
+    include/camerasettingsdialog.h \
+    include/clickableframe.h \
+    include/componentwidgets.h \
+    include/entityeditordialog.h \
+    include/listwidgetcust.h \
+    include/managemapsdialog.h \
+    include/managepluginsdialog.h \
+    include/mapview.h \
+    include/materialwidget.h \
+    include/newmapdialog.h \
+    include/newresourcedialog.h \
+    include/newtiledialog.h \
+    include/objectview.h \
+    include/outputview.h \
+    include/preview.h \
+    include/previewwidget.h \
+    include/resource_browser.h \
+    include/resource_dialog.h \
+    include/resource_dialog_prev.h \
+    include/resource_dialog_prev_lighting.h \
+    include/resource1.h \
+    include/resourceinfowidget.h \
+    include/resourcewidget.h \
+    include/texture_widget.h \
+    include/tileview.h \
+    include/toolkit.h \
+    include/toolkitdef.h
+
 CONFIG += qt debug_and_release
 INCLUDEPATH += $$PWD/include
 INCLUDEPATH += $$PWD/../nsengine/include/nsengine
@@ -16,15 +77,27 @@ DEFINES += GLEW_STATIC GLEW_MX
 
 unix {
 QMAKE_CXXFLAGS += -pipe -O0
+CONFIG(debug, debug|release){
+    PRE_TARGETDEPS += -L$$PWD/../nsengine/lib/$$ARCH/nsengined.a
+}
+CONFIG(release, debug|release){
+    PRE_TARGETDEPS += -L$$PWD/../nsengine/lib/$$ARCH/nsengine.a
+}
 }
 
 win32 {
-    !contains(QMAKE_TARGET.arch, x86_64) {
-        ARCH = x86
-    } else {
-        ARCH = x64
-    }
-    system(\"$$PWD/config.bat\" \"$$PWD\")
+!contains(QMAKE_TARGET.arch, x86_64) {
+    ARCH = x86
+} else {
+    ARCH = x64
+}
+system(\"$$PWD/config.bat\" \"$$PWD\")
+CONFIG(debug, debug|release){
+    PRE_TARGETDEPS += -L$$PWD/../nsengine/lib/$$ARCH/nsengined.lib
+}
+CONFIG(release, debug|release){
+    PRE_TARGETDEPS += -L$$PWD/../nsengine/lib/$$ARCH/nsengine.lib
+}
 }
 
 CONFIG(debug, debug|release){

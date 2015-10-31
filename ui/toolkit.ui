@@ -319,7 +319,6 @@ QToolButton::menu-arrow:open {
     top: 1px; left: 1px; /* shift it a bit */
 }
 
-/*
 QToolButton:checked 
 {
 background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.547, fx:0.5, fy:0.5, stop:0 rgba(77, 77, 77, 255), stop:1 rgba(27, 27, 27, 255));
@@ -327,7 +326,7 @@ border: 1px inset rgb(45, 45, 45);
 padding: 3px;
 border-radius: 5px;
 }
-*/
+
 
 /* END TOOLBUTTON */
 
@@ -407,7 +406,7 @@ QTabBar::tab:!selected
      <x>0</x>
      <y>0</y>
      <width>1600</width>
-     <height>22</height>
+     <height>20</height>
     </rect>
    </property>
    <property name="styleSheet">

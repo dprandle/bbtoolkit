@@ -37,7 +37,9 @@ public slots:
     void on_m_cancel_btn_pressed();
 
     void on_m_plugin_tb_pressed();
+
     void on_m_folder_tb_pressed();
+
     void on_m_icon_path_tb_pressed();
 
 private:
