@@ -28,7 +28,8 @@ SOURCES += \
     src/resourceinfowidget.cpp \
     src/texture_widget.cpp \
     src/tileview.cpp \
-    src/toolkit.cpp
+    src/toolkit.cpp \
+    src/select_res_dialog.cpp
 
 HEADERS += \
     include/addnewbrushdialog.h \
@@ -60,7 +61,8 @@ HEADERS += \
     include/texture_widget.h \
     include/tileview.h \
     include/toolkit.h \
-    include/toolkitdef.h
+    include/toolkitdef.h \
+    include/select_res_dialog.h
 
 CONFIG += qt debug_and_release
 INCLUDEPATH += $$PWD/include
@@ -70,7 +72,6 @@ UI_DIR = $$PWD/ui
 FORMS += $$PWD/ui/*.ui
 RESOURCES = $$PWD/toolkit.qrc
 QT += opengl gui
-
 ARCH = x64
 
 DEFINES += GLEW_STATIC GLEW_MX

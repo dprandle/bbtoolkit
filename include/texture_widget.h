@@ -28,6 +28,7 @@ signals:
 
     void cubemap_triggered();
     void tex2d_triggered();
+    void tex1d_triggered();
 
 public slots:
     void on_m_tex_type_cmb_currentIndexChanged(int);
@@ -38,7 +39,6 @@ public slots:
     void on_m_cm_left_tb_pressed();
     void on_m_cm_top_tb_pressed();
     void on_m_cm_bottom_tb_pressed();
-    void on_m_random_cb_toggled(bool);
 
 };
 

@@ -42,6 +42,8 @@ public slots:
 
     void on_m_icon_path_tb_pressed();
 
+    void on_m_icon_create_btn_pressed();
+
 private:
     void _reset_fields();
 

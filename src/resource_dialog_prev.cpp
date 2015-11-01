@@ -13,12 +13,16 @@
 #include <nsrender_system.h>
 #include <nsshader.h>
 #include <nstex_manager.h>
+#include <nsfile_os.h>
 
+#include <QPixmap>
+#include <QBitmap>
 #include <resource_dialog_prev.h>
 #include <texture_widget.h>
 #include <ui_texture_widget.h>
 #include <QMessageBox>
 #include <toolkit.h>
+#include <select_res_dialog.h>
 #include <QFileDialog>
 
 resource_dialog_prev::resource_dialog_prev(QWidget * parent):
@@ -63,7 +67,7 @@ void resource_dialog_prev::set_texture(nstexture * tex_)
 
     nse.make_current(bbtk.map_view()->glewID());
 
-    nsstring plug_name = "resource_dialog_prev";
+    nsstring plug_name = nse.active()->name();
     if (tex_ != NULL)
         plug_name = nse.plugin(tex_->plugin_id())->name();
 
@@ -82,7 +86,7 @@ void resource_dialog_prev::set_texture(nstexture * tex_)
 
     scn->add(dir_light,fvec3(-30,20,20));
     scn->set_camera(camera);
-    scn->set_bg_color(fvec3(0.7,0.7,0.9));
+    scn->set_bg_color(fvec4(0.7f,0.7f,0.9f,1.0f));
 
     // Setup mesh plane
     nsmesh_plane * plane = plg->create<nsmesh_plane>("2dplane");
@@ -90,7 +94,7 @@ void resource_dialog_prev::set_texture(nstexture * tex_)
 
     // Setup material for the plane
     nsmaterial * tex_mat = plg->create<nsmaterial>("2dplane");
-    tex_mat->set_color(fvec4(0.2,1.0,0.1,1.0));
+    tex_mat->set_color(fvec4(0.2f,1.0f,0.1f,1.0f));
     tex_mat->enable_culling(false);
 
     // Setup skybox material
@@ -112,15 +116,16 @@ void resource_dialog_prev::set_texture(nstexture * tex_)
     rc->set_material(0, sb_mat->full_id());
     _setup_preview_controls();
 
+    m_ui.m_plugin_le->setText(plug_name.c_str());
+    m_starting_plug = plug_name;
+
     if (tex_ != NULL)
     {
         m_ui.m_name_le->setText(tex_->name().c_str());
         m_ui.m_folder_le->setText(tex_->subdir().c_str());
-        m_ui.m_plugin_le->setText(plug_name.c_str());
         m_ui.m_icon_path_le->setText(tex_->icon_path().c_str());
 
         m_starting_res = tex_->name();
-        m_starting_plug = plug_name;
         m_starting_subdir = tex_->subdir();
 
         if (tex_->texture_type() == nstexture::tex_cubemap)
@@ -138,10 +143,6 @@ void resource_dialog_prev::set_texture(nstexture * tex_)
             else
                 tex_cubemap_triggered();
         }
-        else if (tex_->texture_type() == nstexture::tex_1d)
-        {
-            m_tex_widget->ui->m_random_cb->setChecked(true);
-        }
         else
         {
             nstex_manager * tm = plg->manager<nstex_manager>();
@@ -156,7 +157,9 @@ void resource_dialog_prev::set_texture(nstexture * tex_)
 
     }
     else
+    {
         tex_tex2d_triggered();
+    }
 
     // main camera controls
 }
@@ -345,22 +348,58 @@ void resource_dialog_prev::on_m_okay_btn_pressed()
         nsstring fname = m_editing_res->subdir() + m_editing_res->name() + m_editing_res->extension();
         uint32 res_type_id = m_editing_res->type();
 
-        // Make main window current and remove the old resource from fil
+        // Make main window current and remove the old resource from file if there was one
         bbtk.map_view()->make_current();
-        nsplugin * eng_plug = nse.plugin(m_starting_plug);
-        nsresource * res = eng_plug->get(res_type_id, m_starting_res);
-        eng_plug->del(res);
+        if (!m_starting_res.empty())
+        {
+            nsplugin * eng_plug = nse.plugin(m_starting_plug);
+            nsresource * res = eng_plug->get(res_type_id, m_starting_res);
+            eng_plug->del(res);
+        }
 
         // Propagate name change
         nse.name_change(uivec2(hash_id(m_starting_plug),hash_id(m_starting_res)), m_editing_res->full_id());
 
         // Make this current and save to file
         m_ui.m_preview->make_current();
+
+        // If the plugin name le is different than the current plugin name, rename the plugin
+        nsstring new_plg_name = m_ui.m_plugin_le->text().toStdString();
+        if (plg->name() != new_plg_name)
+            plg->rename(new_plg_name);
+
+        // Now save under this plugin name
+        nsstring icon_pth = m_ui.m_icon_path_le->text().toStdString();
         plg->save(m_editing_res);
+        if (!icon_pth.empty())
+        {
+            nsfile_os::create_dir(icon_pth);
+            if (!m_ui.m_icon_lbl->pixmap()->save(icon_pth.c_str()))
+                icon_pth = "";
+        }
 
         // Make engine current again and load from fname
         bbtk.map_view()->make_current();
-        eng_plug->load(res_type_id, fname);
+        nsplugin * new_plug = nse.plugin(new_plg_name);
+        if (new_plug == NULL)
+        {
+            QMessageBox mb(this);
+            mb.setText("Could not find plugin file specified!");
+            mb.setWindowTitle("Plugin Error");
+            mb.exec();
+        }
+        else
+        {
+            nsresource * res = new_plug->load(res_type_id, fname);
+            if (res == NULL)
+            {
+                QMessageBox mb(this);
+                mb.setText("Could not load resource in to plugin - Some kind of mischeif has crept in to the system!");
+                mb.setWindowTitle("Plugin Error");
+                mb.exec();
+            }
+            res->set_icon_path(icon_pth);
+        }
 
         // Finally make this current again
         m_ui.m_preview->make_current();
@@ -386,7 +425,15 @@ void resource_dialog_prev::on_m_cancel_btn_pressed()
 
 void resource_dialog_prev::on_m_plugin_tb_pressed()
 {
-
+    bbtk.map_view()->make_current();
+    select_res_dialog get_plug(this);
+    get_plug.show_type<nsplugin>();
+    if (get_plug.exec() == QDialog::Accepted)
+    {
+        nsplugin * plg = get_plug.selected_resource<nsplugin>();
+        m_ui.m_plugin_le->setText(plg->name().c_str());
+    }
+    m_ui.m_preview->make_current();
 }
 
 void resource_dialog_prev::on_m_folder_tb_pressed()
@@ -397,7 +444,6 @@ void resource_dialog_prev::on_m_folder_tb_pressed()
                                                  QFileDialog::DontUseNativeDialog | QFileDialog::ShowDirsOnly);
     nsstring to_set = nsres_manager::name_from_filename(fname.toStdString());
     m_ui.m_folder_le->setText(to_set.c_str());
-    m_ui.m_folder_btn->setDown(false);
 }
 
 void resource_dialog_prev::on_m_icon_path_tb_pressed()
@@ -409,5 +455,50 @@ void resource_dialog_prev::on_m_icon_path_tb_pressed()
                                                  0,
                                                  QFileDialog::DontUseNativeDialog);
     m_ui.m_icon_path_le->setText(fname);
-    m_ui.m_icon_path_tb->setDown(false);
+}
+
+
+void resource_dialog_prev::on_m_icon_create_btn_pressed()
+{
+    nsstring name = m_ui.m_name_le->text().toStdString();
+
+    if (m_editing_res == NULL)
+    {
+        QMessageBox mb(this);
+        mb.setText("The editing resource is NULL - just like the brain of Alex! What did you do???");
+        mb.setWindowTitle("Icon Error");
+        mb.exec();
+        return;
+    }
+
+    if (name.empty())
+    {
+        QMessageBox mb(this);
+        mb.setText("Please provide a name for the resource before making the icon");
+        mb.setWindowTitle("Icon Error");
+        mb.exec();
+        return;
+    }
+
+    QPixmap pixMap = QPixmap::grabWidget(m_ui.m_preview).scaled(70,70);// = QPixmap::grabWidget(m_ui.m_preview).scaled(70,70);
+    pixMap.setMask(pixMap.createMaskFromColor(QColor(int(0.7f*255),int(0.7f*255),int(0.9f*255))));
+
+    bbtk.map_view()->make_current();
+    nsplugin * plg = nse.plugin(m_ui.m_plugin_le->text().toStdString());
+    if (plg == NULL)
+    {
+        m_ui.m_preview->make_current();
+        QMessageBox mb(this);
+        mb.setText("Could not find plugin specified - Cannot create icon!");
+        mb.setWindowTitle("Icon Error");
+        mb.exec();
+        return;
+    }
+
+    nsstring icon_path = plg->manager<nstex_manager>()->res_dir() +
+            plg->manager<nstex_manager>()->local_dir() +
+            "icons/" + name + ".png";
+    m_ui.m_preview->make_current();
+    m_ui.m_icon_lbl->setPixmap(pixMap);
+    m_ui.m_icon_path_le->setText(icon_path.c_str());
 }

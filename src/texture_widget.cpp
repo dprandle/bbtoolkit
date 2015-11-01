@@ -35,20 +35,11 @@ void texture_widget::on_m_tex_type_cmb_currentIndexChanged(int new_index)
 {
     bool set_cm = new_index == 1;
 
-    if (!set_cm)
-    {
-        ui->m_cm_gb->setEnabled(false);
-        ui->m_image_file_le->setEnabled(!ui->m_random_cb->isChecked());
-        ui->m_image_file_lbl->setEnabled(!ui->m_random_cb->isChecked());
-        ui->m_image_file_tb->setEnabled(!ui->m_random_cb->isChecked());
-    }
-    else
-    {
-        ui->m_image_file_le->setEnabled(false);
-        ui->m_image_file_lbl->setEnabled(false);
-        ui->m_image_file_tb->setEnabled(false);
-        ui->m_cm_gb->setEnabled(!ui->m_random_cb->isChecked());
-    }
+    ui->m_cm_gb->setEnabled(set_cm);
+    ui->m_image_file_le->setEnabled(!set_cm);
+    ui->m_image_file_lbl->setEnabled(!set_cm);
+    ui->m_image_file_tb->setEnabled(!set_cm);
+
 
     if (new_index == 0)
         emit tex2d_triggered();
@@ -146,18 +137,4 @@ void texture_widget::on_m_cm_bottom_tb_pressed()
     ui->m_cm_bottom_le->setText(fname);
     ui->m_cm_bottom_tb->setDown(false);
     emit cubemap_triggered();
-}
-
-void texture_widget::on_m_random_cb_toggled(bool rand)
-{
-    if (ui->m_tex_type_cmb->currentIndex() != 1)
-    {
-        ui->m_image_file_lbl->setEnabled(!rand);
-        ui->m_image_file_le->setEnabled(!rand);
-        ui->m_image_file_tb->setEnabled(!rand);
-    }
-    else
-    {
-        ui->m_cm_gb->setEnabled(!rand);
-    }
 }

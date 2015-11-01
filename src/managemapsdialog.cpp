@@ -127,7 +127,7 @@ void ManageMapsDialog::onEditMap()
     mEditMapUI.mMaxPlayersSB_2->setValue(map->max_players());
     mEditMapUI.mSceneNotesPTE_2->setPlainText(map->notes().c_str());
 
-    fvec3 col = map->bg_color();
+    fvec4 col = map->bg_color();
 	prevC.setRgbF(col.x, col.y, col.z);
 
 	QString rgbcol = "rgb(" + QString::number(prevC.red()) + "," + QString::number(prevC.green()) + "," + QString::number(prevC.blue()) + ");";
@@ -158,8 +158,8 @@ void ManageMapsDialog::onEditMap()
 		if (map->notes() != notes)
             map->set_notes(notes);
 
-        fvec3 col(map->bg_color());
-		fvec3 nCol(prevC.redF(), prevC.greenF(), prevC.blueF());
+        fvec4 col(map->bg_color());
+        fvec4 nCol(prevC.redF(), prevC.greenF(), prevC.blueF(),1.0f);
 		if (col != nCol)
             map->set_bg_color(nCol);
 
