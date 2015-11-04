@@ -11,6 +11,7 @@ This file contains all of the neccessary definitions for the MapView class.
 */
 
 // Engine includes
+#include <nsrender_comp.h>
 #include <nsdebug.h>
 #include <nsinput_system.h>
 #include <nsrender_system.h>
@@ -18,6 +19,7 @@ This file contains all of the neccessary definitions for the MapView class.
 #include <nsentity.h>
 #include <nsplugin.h>
 #include <nsscene.h>
+#include <nsanim_comp.h>
 
 // Qt Includes
 #include <qevent.h>
@@ -358,6 +360,19 @@ void MapView::initializeGL()
     plg->bind();
     nse.set_active(plg);
 
+    nsentity * tile = plg->create_tile("water","./import/diffuseWater.png",
+                                       "./import/normalWater.png",
+                                       fvec3(),
+                                       4.0f,
+                                       0.3f,
+                                       fvec3(),
+                                       true,
+                                       nsplugin::tile_half);
+
+    nsentity * ent = plg->get<nsentity>("tree");
+    nsoccupy_comp * occ_comp = ent->get<nsoccupy_comp>();
+    occ_comp->build(plg->get<nsmesh>(ent->get<nsrender_comp>()->mesh_id().y)->aabb());
+
     // Setup build brush (simple one)
     nsinput_map * imap = plg->get<nsinput_map>("bb_toolkit");
     nse.set_current_scene("mainscene", false, false);
@@ -365,6 +380,19 @@ void MapView::initializeGL()
     nse.system<nsrender_system>()->set_fog_color(nse.current_scene()->bg_color());
     nse.system<nsinput_system>()->set_input_map(imap->full_id());
     nse.system<nsinput_system>()->push_context("Main");
+
+    nsentity * dwarf = plg->load_model("dwarf", "dwarf.x",true);
+    nsmesh * dwarf_mesh = plg->get<nsmesh>(dwarf->get<nsrender_comp>()->mesh_id().y);
+    dwarf_mesh->bake_node_scaling(fvec3(0.1f, 0.1f, 0.1f));
+    dwarf_mesh->bake_node_rotation(orientation(fvec4(1,0,0,-90)));
+    dwarf->get<nsoccupy_comp>()->build(dwarf_mesh->aabb());
+    dwarf->get<nsoccupy_comp>()->enable_draw(true);
+    dwarf->get<nsanim_comp>()->set_loop(true);
+    dwarf->get<nsanim_comp>()->set_current_animation(
+        plg->get<nsanim_set>(
+            dwarf->get<nsanim_comp>()->anim_set_id().y)->begin()->first);
+    dwarf->get<nsanim_comp>()->set_animate(true);
+    nse.current_scene()->add(dwarf, fvec3(-10,-10,0));
 
 	// Load from file all plugins - dont actually call load unless checked in load plugins screen
     bbtk.load_plugin_files(QDir(nse.plugin_dir().c_str()));

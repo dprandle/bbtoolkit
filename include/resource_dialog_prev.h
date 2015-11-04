@@ -3,10 +3,15 @@
 
 #include <ui_resource_dialog_prev.h>
 
+#define BG_R 0.2f
+#define BG_G 0.2f
+#define BG_B 0.2f
+
 class texture_widget;
 class nstexture;
 class nsmesh;
 class nsresource;
+class mesh_widget;
 
 class resource_dialog_prev : public QDialog
 {
@@ -24,13 +29,17 @@ public:
 
     void set_texture(nstexture * tex_=NULL);
 
-    void set_mesh(nsmesh * mesh_=NULL);
+    void set_mesh(nsmesh * mesh_);
+
+    void set_mesh(const nsstring & model_fname);
 
 public slots:
 
     void tex_cubemap_triggered();
 
     void tex_tex2d_triggered();
+
+    void mesh_wireframe_toggled(bool new_val);
 
     void on_m_okay_btn_pressed();
 
@@ -47,11 +56,14 @@ public slots:
 private:
     void _reset_fields();
 
-    void _setup_preview_controls();
+    void _setup_preview_controls_tex();
+
+    void _setup_preview_controls_mesh();
 
     Ui::resource_dialog_prev m_ui;
 
     texture_widget * m_tex_widget;
+    mesh_widget * m_mesh_widget;
 
     nsresource * m_editing_res;
 

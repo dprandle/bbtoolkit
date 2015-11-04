@@ -146,7 +146,7 @@ void resource_browser::on_a_create_animation_triggered()
 
 void resource_browser::on_a_create_mesh_triggered()
 {
-    bbtk.res_dialog_prev()->set_mesh();
+    bbtk.res_dialog_prev()->set_mesh("");
     bbtk.res_dialog_prev()->exec();
 }
 

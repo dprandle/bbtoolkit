@@ -5,6 +5,7 @@
 #include <nstypes.h>
 #include <nsstring.h>
 #include <nsmap.h>
+#include <nsengine.h>
 
 class nsresource;
 

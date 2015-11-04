@@ -1,5 +1,4 @@
 TEMPLATE = app
-
 SOURCES += \
     src/addnewbrushdialog.cpp \
     src/brushgraphicsview.cpp \
@@ -29,7 +28,8 @@ SOURCES += \
     src/texture_widget.cpp \
     src/tileview.cpp \
     src/toolkit.cpp \
-    src/select_res_dialog.cpp
+    src/select_res_dialog.cpp \
+    src/mesh_widget.cpp
 
 HEADERS += \
     include/addnewbrushdialog.h \
@@ -62,14 +62,56 @@ HEADERS += \
     include/tileview.h \
     include/toolkit.h \
     include/toolkitdef.h \
-    include/select_res_dialog.h
+    include/select_res_dialog.h \
+    include/mesh_widget.h
 
-CONFIG += qt debug_and_release
+FORMS += \
+    ui/transformcompwidget.ui \
+    ui/toolkit.ui \
+    ui/tileview.ui \
+    ui/tilecompwidget.ui \
+    ui/tilebrushcompwidget.ui \
+    ui/texture_widget.ui \
+    ui/selecttiledialog.ui \
+    ui/select_res_dialog.ui \
+    ui/selcompwidget.ui \
+    ui/resourceinfowidget.ui \
+    ui/resource_dialog_prev_lighting.ui \
+    ui/resource_dialog_prev.ui \
+    ui/resource_dialog.ui \
+    ui/resource_browser.ui \
+    ui/rendercompwidget.ui \
+    ui/previewwidget.ui \
+    ui/plugindetailsdialog.ui \
+    ui/particlecompwidget.ui \
+    ui/occupycompwidget.ui \
+    ui/objectview.ui \
+    ui/newtile.ui \
+    ui/newresourcedialog.ui \
+    ui/newplugindialog.ui \
+    ui/newmap.ui \
+    ui/newfilterdialog.ui \
+    ui/materialwidget.ui \
+    ui/materialdialog.ui \
+    ui/manage_plugins_dialog.ui \
+    ui/manage_maps_dialog.ui \
+    ui/lightcompwidget.ui \
+    ui/inputcompwidget.ui \
+    ui/entityeditordialog.ui \
+    ui/editplugindialog.ui \
+    ui/editmapdialog.ui \
+    ui/camerasettings.ui \
+    ui/camcompwidget.ui \
+    ui/brushmenuwidget.ui \
+    ui/animcompwidget.ui \
+    ui/addnewbrushdialog.ui \
+    ui/mesh_widget.ui
+
+CONFIG += qt debug_and_release c++14
 INCLUDEPATH += $$PWD/include
 INCLUDEPATH += $$PWD/../nsengine/include/nsengine
 INCLUDEPATH += $$PWD/../nsengine/include
 UI_DIR = $$PWD/ui
-FORMS += $$PWD/ui/*.ui
 RESOURCES = $$PWD/toolkit.qrc
 QT += opengl gui
 ARCH = x64
@@ -77,7 +119,8 @@ ARCH = x64
 DEFINES += GLEW_STATIC GLEW_MX
 
 unix {
-QMAKE_CXXFLAGS += -pipe -O0
+QMAKE_CXXFLAGS += -pipe
+system($$PWD/config.sh $$PWD)
 }
 
 win32 {
@@ -89,21 +132,34 @@ win32 {
 system(\"$$PWD/config.bat\" \"$$PWD\")
 }
 
-CONFIG(debug, debug|release){
-DEFINES += NSDEBUG
 LIBS += -L$$PWD/../nsengine/lib/$$ARCH
 LIBS += -L$$PWD/../nsengine/deps/assimp-3.1.1/lib/$$ARCH
 LIBS += -L$$PWD/../nsengine/deps/devil-1.7.8/lib/$$ARCH
-LIBS += -lOpenGL32 -lnsengined -lIL -lassimpd
+
+CONFIG(debug, debug|release){
+DEFINES += NSDEBUG
+
+win32 {
+LIBS += -lOpenGL32
+}
+
+LIBS += -lnsengined -lIL -lassimpd
 DCONFIG = Debug
 TARGET = bbtoolkitd
+
+unix {
+QMAKE_CXXFLAGS += -O0
+}
+
 }
 
 CONFIG(release, debug|release){
-LIBS += -L$$PWD/../nsengine/lib/$$ARCH
-LIBS += -L$$PWD/../nsengine/deps/assimp-3.1.1/lib/$$ARCH
-LIBS += -L$$PWD/../nsengine/deps/devil-1.7.8/lib/$$ARCH
-LIBS += -lOpenGL32 -lnsengine -lIL -lassimp
+
+win32 {
+LIBS += -lOpenGL32
+}
+
+LIBS += -lnsengine -lIL -lassimp
 DCONFIG = Release
 TARGET = bbtoolkit
 }
