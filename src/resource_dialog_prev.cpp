@@ -25,6 +25,8 @@
 #include <ui_mesh_widget.h>
 #include <ui_texture_widget.h>
 #include <QMessageBox>
+#include <edit_submesh_data_widget.h>
+#include <ui_edit_submesh_data_widget.h>
 #include <toolkit.h>
 #include <select_res_dialog.h>
 #include <QFileDialog>
@@ -39,12 +41,30 @@ resource_dialog_prev::resource_dialog_prev(QWidget * parent):
     connect(m_tex_widget, SIGNAL(cubemap_triggered()), this, SLOT(tex_cubemap_triggered()));
     connect(m_tex_widget, SIGNAL(tex2d_triggered()), this, SLOT(tex_tex2d_triggered()));
     connect(m_mesh_widget->ui->cb_wireframe, SIGNAL(toggled(bool)), this, SLOT(mesh_wireframe_toggled(bool)));
+    connect(m_mesh_widget->ui->btn_verts, SIGNAL(pressed()), this, SLOT(mesh_show_verts()));
 }
 
 void resource_dialog_prev::init()
 {
     m_ui.m_preview->init();
     m_tex_widget->init();
+}
+
+
+void resource_dialog_prev::mesh_show_verts()
+{
+    m_ui.m_preview->make_current();
+
+    if (m_editing_res == NULL)
+        return;
+
+    nsmesh * msg = nse.resource<nsmesh>(m_editing_res->full_id());
+    if (msg == NULL)
+        return;
+
+    edit_submesh_data_widget sw(this);
+    sw.init(msg, m_mesh_widget->ui->sb_submesh->value()-1);
+    sw.exec();
 }
 
 void resource_dialog_prev::set_mesh(const nsstring & model_fname)

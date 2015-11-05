@@ -40,6 +40,8 @@ public slots:
 
     void tex_tex2d_triggered();
 
+    void mesh_show_verts();
+
     void mesh_wireframe_toggled(bool new_val);
 
     void on_m_okay_btn_pressed();

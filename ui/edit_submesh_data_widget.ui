@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Submesh Vert Data</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_2">
    <item>
@@ -91,12 +91,18 @@
          <property name="text">
           <string>Vertices</string>
          </property>
+         <property name="checked">
+          <bool>true</bool>
+         </property>
         </widget>
        </item>
        <item>
         <widget class="QCheckBox" name="cb_normals">
          <property name="text">
           <string>Normals</string>
+         </property>
+         <property name="checked">
+          <bool>true</bool>
          </property>
         </widget>
        </item>
@@ -156,14 +162,7 @@
      <item>
       <widget class="QPushButton" name="btn_cancel">
        <property name="text">
-        <string>Cancel</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="btn_okay">
-       <property name="text">
-        <string>Okay</string>
+        <string>Done</string>
        </property>
       </widget>
      </item>
@@ -177,31 +176,15 @@
    <sender>btn_cancel</sender>
    <signal>pressed()</signal>
    <receiver>edit_submesh_data_widget</receiver>
-   <slot>reject()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>221</x>
-     <y>270</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>161</x>
-     <y>276</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>btn_okay</sender>
-   <signal>pressed()</signal>
-   <receiver>edit_submesh_data_widget</receiver>
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>327</x>
-     <y>277</y>
+     <x>618</x>
+     <y>413</y>
     </hint>
     <hint type="destinationlabel">
-     <x>379</x>
-     <y>282</y>
+     <x>540</x>
+     <y>412</y>
     </hint>
    </hints>
   </connection>
