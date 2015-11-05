@@ -15,11 +15,14 @@
 #include <resource_dialog.h>
 #include <resource_dialog_prev.h>
 #include <resource_dialog_prev_lighting.h>
+#include <import_resources_dialog.h>
+#include <ui_import_resources_dialog.h>
 #include <QMessageBox>
 #include <QCheckBox>
 
 resource_browser::resource_browser(QWidget * parent) :
-	QMainWindow(parent)
+    QMainWindow(parent),
+    m_import_res_dialog(new import_resources_dialog(this))
 {
     m_ui.setupUi(this);
 }
@@ -146,8 +149,46 @@ void resource_browser::on_a_create_animation_triggered()
 
 void resource_browser::on_a_create_mesh_triggered()
 {
-    bbtk.res_dialog_prev()->set_mesh("");
-    bbtk.res_dialog_prev()->exec();
+    m_import_res_dialog->ui->cb_mesh->setChecked(true);
+    m_import_res_dialog->ui->cb_materials->setChecked(false);
+    m_import_res_dialog->ui->cb_anim_set->setChecked(false);
+    if (m_import_res_dialog->exec() == QDialog::Accepted)
+    {
+        bool load_mesh = m_import_res_dialog->ui->cb_mesh->isChecked();
+        bool load_mats = m_import_res_dialog->ui->cb_materials->isChecked();
+        bool load_anim = m_import_res_dialog->ui->cb_anim_set->isChecked();
+        nsstring fname = m_import_res_dialog->ui->le_model_fname->text().toStdString();
+        if (load_mats)
+        {
+            bbtk.map_view()->make_current();
+            if (!nse.active()->load_model_mats(fname, false))
+            {
+                QMessageBox mb(this);
+                mb.setIcon(QMessageBox::Question);
+                mb.setText("Could not load materials from model specified with path " + QString(fname.c_str()) + " - continue loading?");
+                mb.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+                int ret = mb.exec();
+                if (ret == QMessageBox::No)
+                    return;
+            }
+        }
+        if (load_anim)
+        {
+            bbtk.map_view()->make_current();
+            if (!nse.active()->load_model_anim(fname, false))
+            {
+                QMessageBox mb(this);
+                mb.setIcon(QMessageBox::Question);
+                mb.setText("Could not load animation from model specified with path " + QString(fname.c_str()) + " - continue loading?");
+                mb.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+                int ret = mb.exec();
+                if (ret == QMessageBox::No)
+                    return;
+            }
+        }
+        bbtk.res_dialog_prev()->set_mesh(fname);
+        bbtk.res_dialog_prev()->exec();
+    }
 }
 
 void resource_browser::on_a_edit_resource_triggered()
@@ -272,6 +313,7 @@ void resource_browser::on_a_del_resource_triggered()
         if (!deleted)
         {
             QMessageBox mb2(this);
+            mb.setIcon(QMessageBox::Critical);
             mb2.setText("Could not delete resource - Error code : 123Alex44is999Dumb");
             mb2.exec();
         }

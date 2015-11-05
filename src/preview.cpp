@@ -334,6 +334,13 @@ void Preview::initializeGL()
     m_glew_id = nse.create_context(false); // also sets context to current
 
     nse.start();
+
+#ifdef NSDEBUG
+    nse.debug()->set_message_callback(OutputView::debugCallback, bbtk.output_view());
+#else
+    bbtk.output_view()->hide();
+#endif
+
     emit opengl_initialized();
 }
 

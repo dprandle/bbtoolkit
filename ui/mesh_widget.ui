@@ -651,60 +651,6 @@ border: 1px solid rgb(30,30,30);
             </property>
            </widget>
           </item>
-          <item>
-           <widget class="QPushButton" name="btn_node">
-            <property name="minimumSize">
-             <size>
-              <width>27</width>
-              <height>0</height>
-             </size>
-            </property>
-            <property name="styleSheet">
-             <string notr="true">QPushButton {
-background-color: qlineargradient(spread:reflect, x1:0, y1:0.051, x2:0, y2:1, stop:0 rgba(97, 97, 97, 255), stop:0.642045 rgba(30, 30, 30, 255), stop:1 rgba(48, 48, 48, 255));
-border-radius: 3px;
-border: 1px solid rgb(100,100,100);
-padding: 5px;
-color: white;
-min-width: 15px;
-max-width: 15px;
-}
-
-QPushButton:disabled {
-background-color: rgb(100,100,100);
-color: rgb(200,200,200);
-border: 1px solid rgb(100,100,100);
-min-width: 15px;
-max-width: 15px;
-}
-
-QPushButton:hover {
-background-color: qlineargradient(spread:reflect, x1:0, y1:0.051, x2:0, y2:1, stop:0 rgba(236, 100, 0, 255), stop:0.625 rgba(255, 118, 18, 255), stop:1 rgba(196, 66, 0, 255));
-}
-
-QPushButton:pressed {
-background-color: qlineargradient(spread:reflect, x1:0, y1:0.051, x2:0, y2:1, stop:0 rgba(209, 88, 0, 255), stop:0.625 rgba(118, 55, 8, 255), stop:1 rgba(176, 59, 0, 255));
-border: 1px solid rgb(30,30,30);
-}</string>
-            </property>
-            <property name="text">
-             <string/>
-            </property>
-            <property name="icon">
-             <iconset resource="../toolkit.qrc">
-              <normaloff>:/VecTB/icons/toolbars/Edit.png</normaloff>:/VecTB/icons/toolbars/Edit.png</iconset>
-            </property>
-            <property name="iconSize">
-             <size>
-              <width>16</width>
-              <height>16</height>
-             </size>
-            </property>
-            <property name="checkable">
-             <bool>false</bool>
-            </property>
-           </widget>
-          </item>
          </layout>
         </item>
         <item row="6" column="0">
@@ -813,7 +759,7 @@ border: 1px solid rgb(30,30,30);
             </property>
             <property name="icon">
              <iconset resource="../toolkit.qrc">
-              <normaloff>:/VecTB/icons/toolbars/Edit.png</normaloff>:/VecTB/icons/toolbars/Edit.png</iconset>
+              <normaloff>:/VecTB/icons/toolbars/Visable.png</normaloff>:/VecTB/icons/toolbars/Visable.png</iconset>
             </property>
             <property name="iconSize">
              <size>
@@ -907,7 +853,7 @@ border: 1px solid rgb(30,30,30);
             </property>
             <property name="icon">
              <iconset resource="../toolkit.qrc">
-              <normaloff>:/VecTB/icons/toolbars/Edit.png</normaloff>:/VecTB/icons/toolbars/Edit.png</iconset>
+              <normaloff>:/VecTB/icons/toolbars/Visable.png</normaloff>:/VecTB/icons/toolbars/Visable.png</iconset>
             </property>
             <property name="iconSize">
              <size>

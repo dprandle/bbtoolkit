@@ -12,6 +12,7 @@ class nstexture;
 class nsmesh;
 class nsresource;
 class mesh_widget;
+class nsplugin;
 
 class resource_dialog_prev : public QDialog
 {
@@ -54,6 +55,10 @@ public slots:
     void on_m_icon_create_btn_pressed();
 
 private:
+    void _set_mesh_widget_fields(nsmesh * msh, nsplugin * plg);
+
+    void _update_submesh_info(nsmesh * msh, uint32 sub_index);
+
     void _reset_fields();
 
     void _setup_preview_controls_tex();

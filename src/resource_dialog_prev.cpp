@@ -49,61 +49,39 @@ void resource_dialog_prev::init()
 
 void resource_dialog_prev::set_mesh(const nsstring & model_fname)
 {
-    if (model_fname.empty())
-    {
-        QMessageBox mb(this);
-        mb.setText("Internal error - must set valid mesh. You gotta wonder - who writes these messages anyways??");
-        mb.exec();
-        rejected();
-        return;
-    }
-
     m_ui.m_scroll_area->takeWidget();
     m_ui.m_scroll_area->setWidget(m_mesh_widget);
  //   m_mesh_widget->clear_fields();
     _reset_fields();
 
-    // Get the engine main context active plugin name
+    // make main window context current and get the passed in meshes owning plugin name
     nse.make_current(bbtk.map_view()->glewID());
     nsstring plug_name = nse.active()->name();
 
-    // Make the preveiw context current
+    // Now make the preview context current
     m_ui.m_preview->make_current();
+
+    // This is a mesh that has not been loaded in to the engine yet
+    m_starting_res = "";
+    m_starting_subdir = "";
+    m_starting_plug = plug_name;
 
     // Create a plugin in this context with the same name and set it to active
     nsplugin * plg = nse.create_plugin(plug_name);
     nse.set_active(plg);
 
-    // Create the scene for viewing the preview and set it to current
-    nsscene * scn = plg->create<nsscene>("preview_map");
-    nse.set_current_scene(scn, true, false);
-
-    // For the mesh we want focus mode
-    nse.system<nscamera_system>()->set_mode(nscamera_system::mode_focus);
-
-    // Create our directional light and camera and add it to the scene
-    nsentity * dir_light = plg->create_dir_light("preview_dir_light",0.0f,1.0f);
-    nsentity * camera = plg->create_camera("preview_cam",60.0f, uivec2(m_ui.m_preview->width(), m_ui.m_preview->height()), fvec2(DEFAULT_Z_NEAR, DEFAULT_Z_FAR));
-    scn->add(dir_light,fvec3(-30,20,20));
-    scn->set_camera(camera);
-
-    // Set the background color to light blue - this color will be used later to mask out the background
-    scn->set_bg_color(fvec4(BG_R,BG_G,BG_B,1.0f));
-
-    // Now lets set up the mesh
-
-
-    // Set the dialog and mesh_widget fields to match
-    m_ui.m_plugin_le->setText(plug_name.c_str());
-    //m_ui.m_name_le->setText(mesh_->name().c_str());
-    //m_ui.m_folder_le->setText(mesh_->subdir().c_str());
-    //m_ui.m_icon_path_le->setText(mesh_->icon_path().c_str());
-    if (!m_ui.m_icon_path_le->text().isEmpty())
-        m_ui.m_icon_lbl->setPixmap(QPixmap(m_ui.m_icon_path_le->text()));
-
-    m_starting_plug = plug_name;
-
-    _setup_preview_controls_mesh();
+    // Now lets set up the mesh in the preview context
+    nsmesh * msh = plg->load_model_mesh(model_fname, false);
+    if (msh == NULL)
+    {
+        QMessageBox mb(this);
+        mb.setText("Could not find mesh specified with path " + QString(model_fname.c_str()));
+        mb.exec();
+        rejected();
+        return;
+    }
+    m_editing_res = msh;
+    _set_mesh_widget_fields(msh, plg);
 }
 
 void resource_dialog_prev::mesh_wireframe_toggled(bool new_val)
@@ -135,10 +113,65 @@ void resource_dialog_prev::set_mesh(nsmesh * mesh_)
     // Now make the preview context current
     m_ui.m_preview->make_current();
 
+    // indicate that we are editing an already loaded mesh by filling in these fields
+    m_starting_res = mesh_->name();
+    m_starting_subdir = mesh_->subdir();
+    m_starting_plug = plug_name;
+
     // Create a plugin in this context with the same name and set it to active
     nsplugin * plg = nse.create_plugin(plug_name);
     nse.set_active(plg);
 
+    // Now lets set up the mesh in the preview context
+    nsmesh * msh = plg->load<nsmesh>(mesh_->subdir() + mesh_->name() + mesh_->extension());
+    msh->set_icon_path(mesh_->icon_path());
+
+    // If the mesh is still null it means the mesh could not be loaded from file which most
+    // likely means the mesh has not been saved yet - the user created one and proceeded to
+    // edit before saving for example. This, in general, should be allowed if the user is willing
+    // to save the mesh.
+    if (msh == NULL)
+    {
+        QMessageBox mb(this);
+        mb.setText("Cannot edit unsaved resource - would you like to save to file?");
+        mb.setStandardButtons(QMessageBox::Yes | QMessageBox::Cancel);
+        int ret = mb.exec();
+        if (ret == QMessageBox::Yes)
+        {
+            bbtk.map_view()->make_current();
+            nsplugin * eplg = nse.plugin(plug_name);
+            eplg->save<nsmesh>(mesh_->name());
+            m_ui.m_preview->make_current();
+            msh = plg->load<nsmesh>(mesh_->subdir() + mesh_->name() + mesh_->extension());
+        }
+        else
+        {
+            rejected();
+            return;
+        }
+    }
+
+    m_editing_res = msh;
+    _set_mesh_widget_fields(msh, plg);
+}
+
+void resource_dialog_prev::_reset_fields()
+{
+    m_ui.m_name_le->clear();
+    m_ui.m_icon_path_le->clear();
+    m_ui.m_folder_le->clear();
+    m_ui.m_plugin_le->clear();
+    m_ui.m_icon_lbl->clear();
+    m_starting_plug.clear();
+    m_starting_res.clear();
+    m_starting_subdir.clear();
+    m_editing_res = NULL;
+}
+
+
+/* MAKE SURE PREVIEW CONTEXT IS SET PREVIEW CALLING THIS FUNCTION!*/
+void resource_dialog_prev::_set_mesh_widget_fields(nsmesh * msh, nsplugin * plg)
+{
     // Create the scene for viewing the preview and set it to current
     nsscene * scn = plg->create<nsscene>("preview_map");
     nse.set_current_scene(scn, true, false);
@@ -156,10 +189,6 @@ void resource_dialog_prev::set_mesh(nsmesh * mesh_)
 
     // Set the background color to light blue - this color will be used later to mask out the background
     scn->set_bg_color(fvec4(BG_R,BG_G,BG_B,1.0f));
-
-    // Now lets set up the mesh in the preview context
-    nsmesh * msh = plg->load<nsmesh>(mesh_->subdir() + mesh_->name() + mesh_->extension());
-    m_editing_res = msh;
 
     // Set up a basic material to use for previewing the mesh - by default wireframe enabled
     nsmaterial * mat = plg->create<nsmaterial>("preview_mat");
@@ -182,32 +211,49 @@ void resource_dialog_prev::set_mesh(nsmesh * mesh_)
     // Setup the center point of the mesh
 
     // Setup resource preview dialog to match the mesh
-    m_ui.m_plugin_le->setText(plug_name.c_str());
-    m_ui.m_name_le->setText(mesh_->name().c_str());
-    m_ui.m_folder_le->setText(mesh_->subdir().c_str());
-    m_ui.m_icon_path_le->setText(mesh_->icon_path().c_str());
+    m_ui.m_plugin_le->setText(plg->name().c_str());
+    m_ui.m_name_le->setText(msh->name().c_str());
+    m_ui.m_folder_le->setText(msh->subdir().c_str());
+    m_ui.m_icon_path_le->setText(msh->icon_path().c_str());
     if (!m_ui.m_icon_path_le->text().isEmpty())
         m_ui.m_icon_lbl->setPixmap(QPixmap(m_ui.m_icon_path_le->text()));
 
     // Indicate that an mesh from the main context is being edited
-    m_starting_res = mesh_->name();
-    m_starting_subdir = mesh_->subdir();
-    m_starting_plug = plug_name;
     _setup_preview_controls_mesh();
     nse.system<nsinput_system>()->push_context("cam_control");
+
+    m_mesh_widget->ui->lbl_total_verts->setText(QString::number(msh->vert_count()));
+    m_mesh_widget->ui->lbl_total_indices->setText(QString::number(msh->indice_count()));
+    m_mesh_widget->ui->lbl_submesh_count->setText(QString::number(msh->count()));
+    _update_submesh_info(msh, 0);
 }
 
-void resource_dialog_prev::_reset_fields()
+void resource_dialog_prev::_update_submesh_info(nsmesh * msh, uint32 sub_index)
 {
-    m_ui.m_name_le->clear();
-    m_ui.m_icon_path_le->clear();
-    m_ui.m_folder_le->clear();
-    m_ui.m_plugin_le->clear();
-    m_ui.m_icon_lbl->clear();
-    m_starting_plug.clear();
-    m_starting_res.clear();
-    m_starting_subdir.clear();
-    m_editing_res = NULL;
+    m_mesh_widget->ui->le_submesh_name->setText(msh->sub(sub_index)->m_name.c_str());
+    m_mesh_widget->ui->lbl_submesh_verts->setText(QString::number(msh->vert_count(sub_index)));
+    m_mesh_widget->ui->lbl_indices->setText(QString::number(msh->indice_count(sub_index)));
+
+    m_mesh_widget->ui->cb_uv_coords->blockSignals(true);
+    m_mesh_widget->ui->cb_uv_coords->setChecked(msh->sub(sub_index)->m_has_tex_coords);
+    m_mesh_widget->ui->cb_uv_coords->blockSignals(false);
+
+    if (msh->sub(sub_index)->m_node != NULL)
+        m_mesh_widget->ui->lbl_submesh_node->setText(msh->sub(sub_index)->m_node->m_name.c_str());
+    else
+        m_mesh_widget->ui->lbl_submesh_node->setText("None");
+
+    if (msh->sub(sub_index)->m_prim_type == GL_TRIANGLES)
+        m_mesh_widget->ui->lbl_prim_type->setText("Triangle");
+    else if (msh->sub(sub_index)->m_prim_type == GL_LINES)
+        m_mesh_widget->ui->lbl_prim_type->setText("Line");
+    else if (msh->sub(sub_index)->m_prim_type == GL_POINTS)
+        m_mesh_widget->ui->lbl_prim_type->setText("Point");
+    else
+        m_mesh_widget->ui->lbl_prim_type->setText("What the crap?");
+
+    m_mesh_widget->ui->lbl_joint_count->setText(QString::number(msh->joint_count()));
+    m_mesh_widget->ui->lbl_node_count->setText(QString::number(msh->node_count()));
 }
 
 void resource_dialog_prev::set_texture(nstexture * tex_)

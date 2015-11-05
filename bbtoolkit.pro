@@ -29,7 +29,9 @@ SOURCES += \
     src/tileview.cpp \
     src/toolkit.cpp \
     src/select_res_dialog.cpp \
-    src/mesh_widget.cpp
+    src/mesh_widget.cpp \
+    src/import_resources_dialog.cpp \
+    src/edit_submesh_data_widget.cpp
 
 HEADERS += \
     include/addnewbrushdialog.h \
@@ -63,7 +65,9 @@ HEADERS += \
     include/toolkit.h \
     include/toolkitdef.h \
     include/select_res_dialog.h \
-    include/mesh_widget.h
+    include/mesh_widget.h \
+    include/import_resources_dialog.h \
+    include/edit_submesh_data_widget.h
 
 FORMS += \
     ui/transformcompwidget.ui \
@@ -105,7 +109,9 @@ FORMS += \
     ui/brushmenuwidget.ui \
     ui/animcompwidget.ui \
     ui/addnewbrushdialog.ui \
-    ui/mesh_widget.ui
+    ui/mesh_widget.ui \
+    ui/import_resources_dialog.ui \
+    ui/edit_submesh_data_widget.ui
 
 CONFIG += qt debug_and_release c++14
 INCLUDEPATH += $$PWD/include

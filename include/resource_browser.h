@@ -9,6 +9,7 @@
 
 
 class Toolkit;
+class import_resources_dialog;
 
 class resource_browser : public QMainWindow
 {
@@ -45,6 +46,7 @@ class resource_browser : public QMainWindow
 	
 private:
     Ui::resource_browser m_ui;
+    import_resources_dialog * m_import_res_dialog;
     std::map<uint32, nsstring> m_default_icons;
 };
 
