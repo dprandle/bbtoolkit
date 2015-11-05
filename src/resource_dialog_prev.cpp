@@ -144,7 +144,6 @@ void resource_dialog_prev::set_mesh(nsmesh * mesh_)
 
     // Now lets set up the mesh in the preview context
     nsmesh * msh = plg->load<nsmesh>(mesh_->subdir() + mesh_->name() + mesh_->extension());
-    msh->set_icon_path(mesh_->icon_path());
 
     // If the mesh is still null it means the mesh could not be loaded from file which most
     // likely means the mesh has not been saved yet - the user created one and proceeded to
@@ -170,7 +169,7 @@ void resource_dialog_prev::set_mesh(nsmesh * mesh_)
             return;
         }
     }
-
+    msh->set_icon_path(mesh_->icon_path());
     m_editing_res = msh;
     _set_mesh_widget_fields(msh, plg);
 }
