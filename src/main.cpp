@@ -7,15 +7,13 @@
 
 #ifdef NSDEBUG
 #include <nsdebug.h>
-#endif
-
 #ifdef WIN32
 #include <Windows.h>
 #else
 #endif
-
 void qt_run(QApplication & a, int & ret_code);
-void app_exec(QApplication & app, int & ret_code);
+int filter_func(void *);
+#endif
 
 int main(int argc, char *argv[])
 {
@@ -24,30 +22,35 @@ int main(int argc, char *argv[])
     Toolkit tk;
     tk.init();
     tk.show();
+#ifdef NSDEBUG
     qt_run(a,ret_code);
     return ret_code;
+#else
+    return a.exec();
+#endif
 }
 
+#ifdef NSDEBUG
 #ifdef WIN32
 void qt_run(QApplication & a, int & ret_code)
 {
     __try
     {
-        app_exec(a,ret_code);
+        ret_code = a.exec();
     }
-    __except (1)
+    __except (filter_func(GetExceptionInformation()))
     {
-        //nsdebug_dump::save(nsfile_os::cwd()+"logs/crash_dump.dmp", GetExceptionInformation())
     }
 }
 #else
 int qt_run(QApplication & a, int & ret_code)
 {
-    ret_code = a.exec();
+
 }
 #endif
 
-void app_exec(QApplication & app, int & ret_code)
+int filter_func(void * param)
 {
-    ret_code = app.exec();
+    return nsdebug_dump::save(nsfile_os::cwd()+"logs/crash_dump.dmp", param, nsdebug_dump::info_level_small);
 }
+#endif
