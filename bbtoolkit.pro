@@ -145,7 +145,7 @@ DEFINES += NSDEBUG
 
 CONFIG(debug, debug|release){
 win32 {
-LIBS += -lOpenGL32
+LIBS += -lOpenGL32 -lDbgHelp
 }
 
 LIBS += -lnsengined -lIL -lassimpd
@@ -161,7 +161,7 @@ QMAKE_CXXFLAGS += -O0
 CONFIG(release, debug|release){
 
 win32 {
-LIBS += -lOpenGL32
+LIBS += -lOpenGL32 -lDbgHelp
 }
 
 LIBS += -lnsengined -lIL -lassimp
