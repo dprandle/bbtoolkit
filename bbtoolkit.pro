@@ -145,7 +145,7 @@ DEFINES += NSDEBUG
 
 CONFIG(debug, debug|release){
 win32 {
-LIBS += -lOpenGL32
+LIBS += -lOpenGL32 -lDbgHelp
 }
 
 LIBS += -lnsengined -lIL -lassimpd
