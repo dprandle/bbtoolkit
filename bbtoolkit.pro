@@ -164,7 +164,7 @@ win32 {
 LIBS += -lOpenGL32
 }
 
-LIBS += -lnsengine -lIL -lassimp
+LIBS += -lnsengined -lIL -lassimp
 DCONFIG = Release
 TARGET = bbtoolkit
 }
