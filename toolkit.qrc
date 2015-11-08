@@ -75,6 +75,7 @@
         <file>icons/toolbars/EarlyZ.png</file>
         <file>icons/toolbars/occupied_grid.png</file>
         <file>icons/toolbars/blank.png</file>
+        <file>icons/toolbars/Right_Arrow.png</file>
     </qresource>
     <qresource prefix="/ResourceIcons">
         <file>icons/default_hex.png</file>
@@ -86,5 +87,12 @@
         <file>icons/default_material.png</file>
         <file>icons/default_entity.png</file>
         <file>icons/default_anim.png</file>
+    </qresource>
+    <qresource prefix="/style_items">
+        <file>icons/style_items/tree_branch_open.png</file>
+        <file>icons/style_items/tree_branch_more.png</file>
+        <file>icons/style_items/tree_branch_end.png</file>
+        <file>icons/style_items/tree_branch_closed.png</file>
+        <file>icons/style_items/tree_vline.png</file>
     </qresource>
 </RCC>

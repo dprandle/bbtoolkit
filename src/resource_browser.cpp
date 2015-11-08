@@ -9,6 +9,7 @@
 #include <nsanim_set.h>
 #include <nsinput_map.h>
 #include <nsmesh.h>
+#include <nsrender_comp.h>
 
 #include <toolkit.h>
 #include <resource_browser.h>
@@ -217,8 +218,95 @@ void resource_browser::on_a_edit_resource_triggered()
     else if (res_type_id == type_to_hash(nsmesh))
     {
         nsmesh * res = nse.resource<nsmesh>(resid);
+        std::vector<fvec3_vector> vert_copy(res->count());
+        fmat4 node_copy;
+        if (res->tree()->m_root == NULL)
+        {
+            for (uint32 i = 0; i < res->count(); ++i)
+            {
+                nsmesh::submesh * sub = res->sub(i);
+                vert_copy[i].resize(sub->m_verts.size());
+                std::copy(sub->m_verts.begin(), sub->m_verts.end(),vert_copy[i].begin());
+            }
+        }
+        else
+            node_copy = res->tree()->m_root->m_world_tform;
+
         bbtk.res_dialog_prev()->set_mesh(res);
-        bbtk.res_dialog_prev()->exec();
+
+        if (bbtk.res_dialog_prev()->exec() == QDialog::Accepted)
+        {
+            bbtk.map_view()->make_current();
+            nsmesh * fin = nse.resource<nsmesh>(bbtk.res_dialog_prev()->get_editing_res());
+            if (fin == NULL)
+            {
+                QMessageBox mb2(this);
+                mb2.setIcon(QMessageBox::Critical);
+                mb2.setText("Okay was pressed, but nothing was returned - error code: ALEX_44_IS_44_DUMB_1112");
+                mb2.exec();
+                return;
+            }
+            // Check to see if the mesh verts changed..
+            bool change = false;
+            if (fin->tree()->m_root == NULL)
+            {
+                for (uint32 i = 0; i < fin->count(); ++i)
+                {
+                    nsmesh::submesh * subm = fin->sub(i);
+                    for (uint32 j = 0; j < subm->m_verts.size(); ++j)
+                        change = change || subm->m_verts[j] != vert_copy[i][j];
+                }
+            }
+            else
+                change = change || fin->tree()->m_root->m_world_tform != node_copy;
+
+            if (change)
+            {
+                auto iter = nse.plugins()->begin();
+                while (iter != nse.plugins()->end())
+                {
+                    nsplugin * plg = nse.plugin(iter->first);
+                    nsentity_manager * nsem = plg->manager<nsentity_manager>();
+                    auto iter2 = nsem->begin();
+                    while (iter2 != nsem->end())
+                    {
+                        nsentity * ent = plg->get<nsentity>(iter2->first);
+                        nsoccupy_comp * oc = ent->get<nsoccupy_comp>();
+                        nsrender_comp * rc = ent->get<nsrender_comp>();
+                        if (oc != NULL && rc != NULL)
+                        {
+                            if (fin->full_id() == rc->mesh_id())
+                            {
+                                QMessageBox mb2(this);
+                                mb2.setIcon(QMessageBox::Critical);
+                                mb2.setStandardButtons(QMessageBox::Yes | QMessageBox::Cancel);
+                                mb2.setText((nsstring("You have changed a mesh which is being referenced by an occupy component which is part of the entity \"") + ent->name() + nsstring(" \" - would you like to auto-recalculate the occupied spaces (you can do it manually in the entity editor)")).c_str());
+                                int res = mb2.exec();
+                                if (res == QMessageBox::Yes)
+                                {
+                                    nsscene * cur_scn = nse.current_scene();
+                                    if (cur_scn->entity(ent->full_id()) != NULL)
+                                    {
+                                        QMessageBox mb3(this);
+                                        mb3.setIcon(QMessageBox::Critical);
+                                        mb3.setStandardButtons(QMessageBox::Retry | QMessageBox::Abort);
+                                        mb3.setText((nsstring("The entity \"") + ent->name() + nsstring("\" is in the current map - in order to change the occupy component you need to remove it. Would you like to remove it and retry or abort the occupied space auto calc?")).c_str());
+                                        int res = mb3.exec();
+                                        if (res == QMessageBox::Retry)
+                                            cur_scn->remove(ent);
+                                        else
+                                            return;
+                                    }
+                                    oc->build(fin->aabb());
+                                }
+                            }
+                        }
+                        ++iter2;
+                    }
+                    ++iter;
+                }
+            }
+        }
     }
     else if (res_type_id == type_to_hash(nsmaterial))
     {

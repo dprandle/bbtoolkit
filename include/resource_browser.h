@@ -43,7 +43,7 @@ class resource_browser : public QMainWindow
     void on_a_create_resource_triggered();
     void on_a_del_resource_triggered();
     void change_resource_type();
-	
+
 private:
     Ui::resource_browser m_ui;
     import_resources_dialog * m_import_res_dialog;

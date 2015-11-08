@@ -45,6 +45,9 @@ void edit_submesh_data_widget::init(nsmesh * mesh, uint32 sub_index)
         std::stringstream ss;
         ss << sub->m_joints[i].m_joint_ids[0] << ":" << sub->m_joints[i].m_weights[0] << " " << sub->m_joints[i].m_joint_ids[1] << ":" << sub->m_joints[i].m_weights[1] << " " << sub->m_joints[i].m_joint_ids[2] << ":" << sub->m_joints[i].m_weights[2] << " " << sub->m_joints[i].m_joint_ids[3] << ":" << sub->m_joints[i].m_weights[3];
         joint_weight_item->setText(ss.str().c_str());
+
+        QTableWidgetItem * hi = new QTableWidgetItem(QString::number(i));
+        ui->tbl_data->setVerticalHeaderItem(i,hi);
     }
     ui->tbl_data->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
     on_cb_vertices_toggled(true);

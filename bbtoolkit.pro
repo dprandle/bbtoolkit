@@ -141,10 +141,9 @@ system(\"$$PWD/config.bat\" \"$$PWD\")
 LIBS += -L$$PWD/../nsengine/lib/$$ARCH
 LIBS += -L$$PWD/../nsengine/deps/assimp-3.1.1/lib/$$ARCH
 LIBS += -L$$PWD/../nsengine/deps/devil-1.7.8/lib/$$ARCH
-
-CONFIG(debug, debug|release){
 DEFINES += NSDEBUG
 
+CONFIG(debug, debug|release){
 win32 {
 LIBS += -lOpenGL32
 }

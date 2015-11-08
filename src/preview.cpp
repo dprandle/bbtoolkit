@@ -353,10 +353,12 @@ void Preview::resizeGL(int width, int height)
         rs->set_screen_fbo(defaultFramebufferObject());
         rs->resize_screen(ivec2(width,height));
     }
+    emit opengl_resized();
 }
 
 void Preview::paintGL()
 {
     nse.make_current(m_glew_id);
     nse.update();
+    emit opengl_updated();
 }

@@ -78,7 +78,6 @@ selection-background-color:  rgb(90, 90, 90);
 border: 1px solid rgb(100,100,100);
  }
 
-
 QGroupBox {
 border: 1px solid rgb(100,100,100);
 border-radius: 5px;
@@ -86,12 +85,10 @@ margin-top: 1ex;
 padding-top: 20px;
 }
 
-
 QGroupBox::title
 {
 subcontrol-origin: margin;
 }
-
 
 QLineEdit {
 background-color: rgb(30,30,30);
@@ -124,6 +121,29 @@ background-color: qlineargradient(spread:reflect, x1:0, y1:0.051, x2:0, y2:1, st
 border: 1px solid rgb(30,30,30);
 }
 
+QTreeView::branch:has-siblings:!adjoins-item {
+    border-image: url(:/style_items/icons/style_items/tree_vline.png) 0;
+}
+
+QTreeView::branch:has-siblings:adjoins-item {
+    border-image: url(:/style_items/icons/style_items/tree_branch_more.png);
+}
+
+QTreeView::branch:!has-children:!has-siblings:adjoins-item {
+    border-image: url(:/style_items/icons/style_items/tree_branch_end.png);
+}
+
+QTreeView::branch:has-children:!has-siblings:closed,
+QTreeView::branch:closed:has-children:has-siblings {
+        border-image: none;
+		image: url(:/style_items/icons/style_items/tree_branch_closed.png);
+}
+
+QTreeView::branch:open:has-children:!has-siblings,
+QTreeView::branch:open:has-children:has-siblings  {
+		border-image: none;
+		image: url(:/style_items/icons/style_items/tree_branch_open.png);
+}
 
 /* QSpinBox and QDoubleSpinBox Section*/
 QSpinBox,QDoubleSpinBox

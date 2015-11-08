@@ -15,8 +15,11 @@
 #include <nssel_comp.h>
 #include <nstex_manager.h>
 #include <nsselection_system.h>
+#include <nsselection_system.h>
 #include <nsfile_os.h>
 
+
+#include <qtreewidget.h>
 #include <QPixmap>
 #include <QBitmap>
 #include <resource_dialog_prev.h>
@@ -30,6 +33,7 @@
 #include <toolkit.h>
 #include <select_res_dialog.h>
 #include <QFileDialog>
+#include <QSpacerItem>
 
 resource_dialog_prev::resource_dialog_prev(QWidget * parent):
     QDialog(parent),
@@ -42,12 +46,32 @@ resource_dialog_prev::resource_dialog_prev(QWidget * parent):
     connect(m_tex_widget, SIGNAL(tex2d_triggered()), this, SLOT(tex_tex2d_triggered()));
     connect(m_mesh_widget->ui->cb_wireframe, SIGNAL(toggled(bool)), this, SLOT(mesh_wireframe_toggled(bool)));
     connect(m_mesh_widget->ui->btn_verts, SIGNAL(pressed()), this, SLOT(mesh_show_verts()));
+    connect(m_mesh_widget->ui->sb_submesh, SIGNAL(valueChanged(int)), SLOT(submesh_index_changed(int)));
+    connect(m_mesh_widget->ui->btn_joint, SIGNAL(pressed()), this, SLOT(mesh_view_joints()));
+    connect(m_mesh_widget->ui->btn_node_tree, SIGNAL(pressed()), this, SLOT(mesh_view_node_tree()));
+    connect(m_ui.m_preview, SIGNAL(opengl_updated()), this, SLOT(preview_updated()));
+    connect(m_mesh_widget->ui->dsb_offset_x, SIGNAL(valueChanged(double)), this, SLOT(mesh_translate()));
+    connect(m_mesh_widget->ui->dsb_offset_y, SIGNAL(valueChanged(double)), this, SLOT(mesh_translate()));
+    connect(m_mesh_widget->ui->dsb_offset_z, SIGNAL(valueChanged(double)), this, SLOT(mesh_translate()));
+    connect(m_mesh_widget->ui->dsb_scale_x, SIGNAL(valueChanged(double)), this, SLOT(mesh_scale(double)));
+    connect(m_mesh_widget->ui->dsb_scale_y, SIGNAL(valueChanged(double)), this, SLOT(mesh_scale(double)));
+    connect(m_mesh_widget->ui->dsb_scale_z, SIGNAL(valueChanged(double)), this, SLOT(mesh_scale(double)));
+    connect(m_mesh_widget->ui->dsb_rot_x, SIGNAL(valueChanged(int)), this, SLOT(mesh_rotate(int)));
+    connect(m_mesh_widget->ui->dsb_rot_y, SIGNAL(valueChanged(int)), this, SLOT(mesh_rotate(int)));
+    connect(m_mesh_widget->ui->dsb_rot_z, SIGNAL(valueChanged(int)), this, SLOT(mesh_rotate(int)));
+    connect(m_mesh_widget->ui->cb_tile_layer, SIGNAL(toggled(bool)), this, SLOT(mesh_toggle_show_tile_layer(bool)));
+    connect(m_mesh_widget->ui->cb_snap_point, SIGNAL(toggled(bool)), this, SLOT(mesh_toggle_show_center(bool)));
 }
 
 void resource_dialog_prev::init()
 {
     m_ui.m_preview->init();
     m_tex_widget->init();
+}
+
+uivec2 resource_dialog_prev::get_editing_res()
+{
+    return m_last_edit;
 }
 
 
@@ -65,6 +89,21 @@ void resource_dialog_prev::mesh_show_verts()
     edit_submesh_data_widget sw(this);
     sw.init(msg, m_mesh_widget->ui->sb_submesh->value()-1);
     sw.exec();
+}
+
+void resource_dialog_prev::submesh_index_changed(int index)
+{
+    m_ui.m_preview->make_current();
+    _update_submesh_info(nse.resource<nsmesh>(m_editing_res->full_id()), index-1);
+}
+
+void resource_dialog_prev::mesh_toggle_show_center(bool new_val)
+{
+    m_ui.m_preview->make_current();
+    nsentity * prev_center = nse.active()->get<nsentity>("preview_center");
+    if (prev_center == NULL)
+        return;
+    prev_center->get<nstform_comp>()->set_hidden_state(nstform_comp::hide_all, !new_val);
 }
 
 void resource_dialog_prev::set_mesh(const nsstring & model_fname)
@@ -102,6 +141,17 @@ void resource_dialog_prev::set_mesh(const nsstring & model_fname)
     }
     m_editing_res = msh;
     _set_mesh_widget_fields(msh, plg);
+}
+
+void resource_dialog_prev::mesh_toggle_uv_coords(bool new_val)
+{
+    m_ui.m_preview->make_current();
+    if (m_editing_res == NULL)
+        return;
+    nsmesh * msh = nse.resource<nsmesh>(m_editing_res->full_id());
+    if (msh == NULL)
+        return;
+    msh->sub(m_mesh_widget->ui->sb_submesh->value()-1)->m_has_tex_coords = new_val;
 }
 
 void resource_dialog_prev::mesh_wireframe_toggled(bool new_val)
@@ -192,6 +242,8 @@ void resource_dialog_prev::_reset_fields()
 /* MAKE SURE PREVIEW CONTEXT IS SET PREVIEW CALLING THIS FUNCTION!*/
 void resource_dialog_prev::_set_mesh_widget_fields(nsmesh * msh, nsplugin * plg)
 {
+    m_ui.m_preview->make_current();
+
     // Create the scene for viewing the preview and set it to current
     nsscene * scn = plg->create<nsscene>("preview_map");
     nse.set_current_scene(scn, true, false);
@@ -204,7 +256,7 @@ void resource_dialog_prev::_set_mesh_widget_fields(nsmesh * msh, nsplugin * plg)
     // Create our directional light and camera and add it to the scene
     nsentity * dir_light = plg->create_dir_light("preview_dir_light",0.1f,0.7f);
     nsentity * camera = plg->create_camera("preview_cam",60.0f, uivec2(m_ui.m_preview->width(), m_ui.m_preview->height()), fvec2(DEFAULT_Z_NEAR, DEFAULT_Z_FAR));
-    scn->add(dir_light,fvec3(-30,20,20));
+    scn->add(dir_light, fvec3(0,0,20), ::orientation(fvec4(1,0,0,-180.0f)));
     scn->set_camera(camera);
 
     // Set the background color to light blue - this color will be used later to mask out the background
@@ -227,8 +279,26 @@ void resource_dialog_prev::_set_mesh_widget_fields(nsmesh * msh, nsplugin * plg)
         rcomp->set_material(i, mat->full_id(), true);
     ent->create<nssel_comp>();
     scn->add(ent);
+    ent->get<nstform_comp>()->enable_snap(false);
+
+    // Make the base tile layer for seeing size comparison
+    nsentity * base_tile = plg->create_tile("preview_tile", "diffuseGrass.png", "normalGrass.png", fvec3(),4.0f, 0.1f, fvec3(),true );
+    scn->add_gridded(base_tile, ivec3(16,16,1), nstile_grid::world(ivec3(-8,-8,1)));
+    base_tile->get<nstform_comp>()->set_hidden_state(nstform_comp::hide_all, !m_mesh_widget->ui->cb_tile_layer->isChecked());
+
 
     // Setup the center point of the mesh
+    nsentity * center_point = plg->create<nsentity>("preview_center");
+    nsrender_comp * rc = center_point->create<nsrender_comp>();
+    rc->set_mesh_id(nse.core()->get<nsmesh>(MESH_SKYDOME)->full_id());
+    nsmaterial * center_mat = plg->create<nsmaterial>("preview_center");
+    center_mat->set_color_mode(true);
+    center_mat->set_color(fvec4(1.0f,0.2f,0.4f,1.0f));
+    center_mat->set_specular_intensity(0.8f);
+    center_mat->set_specular_power(16.0f);
+    rc->set_material(0, center_mat->full_id());
+    scn->add(center_point,fvec3(),fquat(),fvec3(0.04f,0.04f,0.04f));
+    center_point->get<nstform_comp>()->set_hidden_state(nstform_comp::hide_all, !m_mesh_widget->ui->cb_snap_point->isChecked());
 
     // Setup resource preview dialog to match the mesh
     m_ui.m_plugin_le->setText(plg->name().c_str());
@@ -245,7 +315,163 @@ void resource_dialog_prev::_set_mesh_widget_fields(nsmesh * msh, nsplugin * plg)
     m_mesh_widget->ui->lbl_total_verts->setText(QString::number(msh->vert_count()));
     m_mesh_widget->ui->lbl_total_indices->setText(QString::number(msh->indice_count()));
     m_mesh_widget->ui->lbl_submesh_count->setText(QString::number(msh->count()));
+    m_mesh_widget->ui->sb_submesh->setMinimum(1);
+    m_mesh_widget->ui->sb_submesh->setMaximum(msh->count());
+    m_mesh_widget->ui->btn_node_tree->setEnabled(msh->tree()->m_root != NULL);
+    m_mesh_widget->ui->btn_joint->setEnabled(msh->tree()->m_name_joint_map.size() > 0);
     _update_submesh_info(msh, 0);
+}
+
+void resource_dialog_prev::mesh_toggle_show_tile_layer(bool new_val)
+{
+    m_ui.m_preview->make_current();
+    nsentity * base_tile = nse.active()->get<nsentity>("preview_tile");
+    if (base_tile == NULL)
+        return;
+    base_tile->get<nstform_comp>()->set_hidden_state(nstform_comp::hide_all, !new_val);
+}
+
+void resource_dialog_prev::mesh_view_joints()
+{
+    if (m_editing_res == NULL)
+    {
+        QMessageBox mb(this);
+        mb.setText("This is one crazy sandwich... there is just no lunchmeat");
+        mb.exec();
+        return;
+    }
+
+    m_ui.m_preview->make_current();
+    nsmesh * msh = nse.resource<nsmesh>(m_editing_res->full_id());
+    if (msh == NULL)
+    {
+        QMessageBox mb(this);
+        mb.setText("Out of the fire... and in to the frying pan");
+        mb.exec();
+        return;
+    }
+
+    QHBoxLayout * layout = new QHBoxLayout;
+    QVBoxLayout * layoutv = new QVBoxLayout;
+    QDialog * dialog = new QDialog(this);
+    QTreeWidget * tree = new QTreeWidget;
+
+    tree->setColumnCount(3);
+    QStringList sl;
+    sl.append("joint");
+    sl.append("property");
+    sl.append("data");
+    tree->setHeaderLabels(sl);
+
+    auto iter = msh->tree()->m_name_joint_map.begin();
+    while (iter != msh->tree()->m_name_joint_map.end())
+    {
+        QTreeWidgetItem * item = new QTreeWidgetItem();
+        item->setText(0, iter->first.c_str());
+        QTreeWidgetItem * child = new QTreeWidgetItem();
+        QTreeWidgetItem * child2 = new QTreeWidgetItem();
+        child->setText(1, "ID");
+        child->setText(2, QString::number(iter->second.m_joint_id));
+        child2->setText(1, "Offset Transform");
+        child2->setText(2, iter->second.m_offset_tform.round_to_zero().to_string().c_str());
+        item->addChild(child);
+        item->addChild(child2);
+        tree->addTopLevelItem(item);
+        ++iter;
+    }
+    layoutv->addWidget(tree);
+    dialog->setLayout(layoutv);
+
+    QPushButton * done_button = new QPushButton("Done");
+
+    QSpacerItem * spacer = new QSpacerItem(1,1, QSizePolicy::Expanding, QSizePolicy::Fixed);
+    layout->addSpacerItem(spacer);
+    layout->addWidget(done_button);
+    layoutv->addLayout(layout);
+    connect(done_button, SIGNAL(pressed()), dialog, SLOT(accept()));
+    dialog->resize(500,500);
+    dialog->exec();
+    delete dialog;
+}
+
+void resource_dialog_prev::mesh_view_node_tree()
+{
+    if (m_editing_res == NULL)
+    {
+        QMessageBox mb(this);
+        mb.setText("This is one crazy sandwich... there is just no lunchmeat");
+        mb.exec();
+        return;
+    }
+    m_ui.m_preview->make_current();
+    nsmesh * msh = nse.resource<nsmesh>(m_editing_res->full_id());
+    if (msh == NULL)
+    {
+        QMessageBox mb(this);
+        mb.setText("Out of the fire... and in to the frying pan");
+        mb.exec();
+        return;
+    }
+
+    QHBoxLayout * layout = new QHBoxLayout;
+    QVBoxLayout * layoutv = new QVBoxLayout;
+    QDialog * dialog = new QDialog(this);
+    QTreeWidget * tree = new QTreeWidget;
+
+    tree->setColumnCount(3);
+    QStringList sl;
+    sl.append("node");
+    sl.append("property");
+    sl.append("data");
+    tree->setHeaderLabels(sl);
+
+    QTreeWidgetItem * item = new QTreeWidgetItem;
+    _add_node_to_tree(msh->tree()->m_root, item);
+    tree->addTopLevelItem(item);
+
+    layoutv->addWidget(tree);
+    dialog->setLayout(layoutv);
+    QPushButton * done_button = new QPushButton("Done");
+    QSpacerItem * spacer = new QSpacerItem(1,1, QSizePolicy::Expanding, QSizePolicy::Fixed);
+    layout->addSpacerItem(spacer);
+    layout->addWidget(done_button);
+    layoutv->addLayout(layout);
+    connect(done_button, SIGNAL(pressed()), dialog, SLOT(accept()));
+    dialog->resize(500,500);
+    dialog->exec();
+    delete dialog;
+}
+
+void resource_dialog_prev::_add_node_to_tree(void * node_, QTreeWidgetItem * item)
+{
+    nsmesh::node * node = static_cast<nsmesh::node*>(node_);
+
+    QTreeWidgetItem * node_id_item = new QTreeWidgetItem;
+    node_id_item->setText(1, "ID");
+    node_id_item->setText(2, QString::number(node->m_node_id));
+
+    QTreeWidgetItem * node_ntfrom_item = new QTreeWidgetItem;
+    node_ntfrom_item->setText(1, "Local Transform");
+    node_ntfrom_item->setText(2, node->m_node_tform.round_to_zero().to_string().c_str());
+
+    QTreeWidgetItem * node_wtform_item = new QTreeWidgetItem;
+    node_wtform_item->setText(1, "World Transform");
+    node_wtform_item->setText(2, node->m_world_tform.round_to_zero().to_string().c_str());
+
+    item->setText(0, node->m_name.c_str());
+    item->addChild(node_id_item);
+    item->addChild(node_ntfrom_item);
+    item->addChild(node_wtform_item);
+
+    QTreeWidgetItem * node_child_item;
+    auto iter = node->m_child_nodes.begin();
+    while (iter != node->m_child_nodes.end())
+    {
+        node_child_item = new QTreeWidgetItem;
+        _add_node_to_tree(*iter,node_child_item);
+        item->addChild(node_child_item);
+        ++iter;
+    }
 }
 
 void resource_dialog_prev::_update_submesh_info(nsmesh * msh, uint32 sub_index)
@@ -713,6 +939,44 @@ void resource_dialog_prev::on_m_okay_btn_pressed()
         if (plg->name() != new_plg_name)
             plg->rename(new_plg_name);
 
+        nsentity * ent = plg->get<nsentity>("preview_mesh_ent");
+        if (ent != NULL)
+        {
+            nsmesh * msh_v = plg->get<nsmesh>(m_editing_res->id());
+            if (msh_v == NULL)
+            {
+                QMessageBox mb(this);
+                mb.setText("A mesh entity exists but there is no mesh - probably a bug in deleting stuff!");
+                mb.setWindowTitle("Error");
+                mb.exec();
+            }
+            else
+            {
+                nstform_comp * tc = ent->get<nstform_comp>();
+                if (tc == NULL)
+                {
+                    QMessageBox mb(this);
+                    mb.setText("The preview entity has no friggin tform - this can't be good!");
+                    mb.setWindowTitle("Error");
+                    mb.exec();
+                }
+                else
+                {
+                    if (msh_v->tree()->m_root == NULL)
+                    {
+                        msh_v->bake_scaling(tc->scaling());
+                        msh_v->bake_rotation(tc->orientation());
+                        msh_v->bake_translation(tc->wpos());
+                    }
+                    else
+                    {
+                        msh_v->bake_node_scaling(tc->scaling());
+                        msh_v->bake_node_rotation(tc->orientation());
+                        msh_v->bake_node_translation(tc->wpos());
+                    }
+                }
+            }
+        }
         // Now save under this plugin name
         plg->save(m_editing_res);
 
@@ -754,9 +1018,11 @@ void resource_dialog_prev::on_m_okay_btn_pressed()
         // Make the preview's context current
         m_ui.m_preview->make_current();
     }
+    m_last_edit = m_editing_res->full_id();
 
     // Now destroy all resources in the plugin and reset the editing resource
     nse.set_active(nullptr);
+    nse.system<nsselection_system>()->clear();
     nse.destroy_plugin(plg);
     m_editing_res = nullptr;
     accept();
@@ -766,10 +1032,12 @@ void resource_dialog_prev::on_m_cancel_btn_pressed()
 {
     m_ui.m_preview->make_current();
     nsplugin * plg = nse.active();
+    nse.system<nsselection_system>()->clear();
     if (plg == nullptr)
         return;
     nse.set_active(nullptr);
     nse.destroy_plugin(plg);
+    m_last_edit = uivec2();
     m_editing_res = nullptr;
     reject();
 }
@@ -834,7 +1102,7 @@ void resource_dialog_prev::on_m_icon_create_btn_pressed()
         return;
     }
 
-    QPixmap pixMap = QPixmap::grabWidget(m_ui.m_preview).scaled(70,70);// = QPixmap::grabWidget(m_ui.m_preview).scaled(70,70);
+    QPixmap pixMap = QPixmap::grabWidget(m_ui.m_preview).scaled(96,96);// = QPixmap::grabWidget(m_ui.m_preview).scaled(70,70);
     pixMap.setMask(pixMap.createMaskFromColor(QColor(int(BG_R*255),int(BG_G*255),int(BG_B*255))));
 
     bbtk.map_view()->make_current();
@@ -855,4 +1123,99 @@ void resource_dialog_prev::on_m_icon_create_btn_pressed()
     m_ui.m_preview->make_current();
     m_ui.m_icon_lbl->setPixmap(pixMap);
     m_ui.m_icon_path_le->setText(icon_path.c_str());
+}
+
+void resource_dialog_prev::mesh_translate()
+{
+    if (m_editing_res == NULL)
+        return;
+    m_ui.m_preview->make_current();
+    nsmesh * msh = nse.resource<nsmesh>(m_editing_res->full_id());
+    if (msh == NULL)
+        return;
+    nsentity * ent = nse.active()->get<nsentity>("preview_mesh_ent");
+    if (ent == NULL)
+        return;
+    nstform_comp * tc = ent->get<nstform_comp>();
+    tc->set_pos(fvec3(m_mesh_widget->ui->dsb_offset_x->value(),
+                      m_mesh_widget->ui->dsb_offset_y->value(),
+                      m_mesh_widget->ui->dsb_offset_z->value()));
+}
+
+void resource_dialog_prev::mesh_scale(double new_val)
+{
+    if (m_editing_res == NULL)
+        return;
+    m_ui.m_preview->make_current();
+    nsmesh * msh = nse.resource<nsmesh>(m_editing_res->full_id());
+    if (msh == NULL)
+        return;
+    nsentity * ent = nse.active()->get<nsentity>("preview_mesh_ent");
+    if (ent == NULL)
+        return;
+    nstform_comp * tc = ent->get<nstform_comp>();
+
+    if (m_mesh_widget->ui->cb_constrain_dim->isChecked())
+    {
+        m_mesh_widget->ui->dsb_scale_x->blockSignals(true);
+        m_mesh_widget->ui->dsb_scale_x->setValue(new_val);
+        m_mesh_widget->ui->dsb_scale_x->blockSignals(false);
+
+        m_mesh_widget->ui->dsb_scale_y->blockSignals(true);
+        m_mesh_widget->ui->dsb_scale_y->setValue(new_val);
+        m_mesh_widget->ui->dsb_scale_y->blockSignals(false);
+
+        m_mesh_widget->ui->dsb_scale_z->blockSignals(true);
+        m_mesh_widget->ui->dsb_scale_z->setValue(new_val);
+        m_mesh_widget->ui->dsb_scale_z->blockSignals(false);
+    }
+    tc->set_scale(fvec3( m_mesh_widget->ui->dsb_scale_x->value(),
+                         m_mesh_widget->ui->dsb_scale_y->value(),
+                         m_mesh_widget->ui->dsb_scale_z->value()));
+}
+
+void resource_dialog_prev::mesh_rotate(int)
+{
+    if (m_editing_res == NULL)
+        return;
+    m_ui.m_preview->make_current();
+    nsmesh * msh = nse.resource<nsmesh>(m_editing_res->full_id());
+    if (msh == NULL)
+        return;
+    nsentity * ent = nse.active()->get<nsentity>("preview_mesh_ent");
+    if (ent == NULL)
+        return;
+    nstform_comp * tc = ent->get<nstform_comp>();
+    fvec3::EulerOrder eo = fvec3::EulerOrder(m_mesh_widget->ui->cmb_euler_order->currentIndex());
+
+    fmat4 rotmat = ::rotation_mat4(fvec3(m_mesh_widget->ui->dsb_rot_x->value(),m_mesh_widget->ui->dsb_rot_y->value(),m_mesh_widget->ui->dsb_rot_z->value()),eo,false);
+    tc->set_orientation(fquat().from(rotmat));
+}
+
+void resource_dialog_prev::preview_updated()
+{
+    if (m_editing_res == NULL)
+        return;
+    m_ui.m_preview->make_current();
+    nsmesh * msh = nse.resource<nsmesh>(m_editing_res->full_id());
+    if (msh == NULL)
+        return;
+    nsentity * ent = nse.active()->get<nsentity>("preview_mesh_ent");
+    if (ent == NULL)
+        return;
+
+    nstform_comp * tc = ent->get<nstform_comp>();
+
+    m_mesh_widget->ui->dsb_offset_x->blockSignals(true);
+    m_mesh_widget->ui->dsb_offset_x->setValue(tc->wpos().x);
+    m_mesh_widget->ui->dsb_offset_x->blockSignals(false);
+
+    m_mesh_widget->ui->dsb_offset_y->blockSignals(true);
+    m_mesh_widget->ui->dsb_offset_y->setValue(tc->wpos().y);
+    m_mesh_widget->ui->dsb_offset_y->blockSignals(false);
+
+    m_mesh_widget->ui->dsb_offset_z->blockSignals(true);
+    m_mesh_widget->ui->dsb_offset_z->setValue(tc->wpos().z);
+    m_mesh_widget->ui->dsb_offset_z->blockSignals(false);
+
 }

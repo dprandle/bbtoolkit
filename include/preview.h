@@ -28,6 +28,8 @@ class Preview : public QOpenGLWidget
 
   signals:
     void opengl_initialized();
+    void opengl_updated();
+    void opengl_resized();
 
   protected:
 	void initializeGL();
