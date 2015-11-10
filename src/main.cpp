@@ -6,13 +6,15 @@
 #include <nsstring.h>
 
 #ifdef NSDEBUG
+#include <nslog_file.h>
 #include <nsdebug.h>
 #ifdef WIN32
 #include <Windows.h>
+int filter_func(void *);
 #else
+#include <sys/resource.h>
 #endif
 void qt_run(QApplication & a, int & ret_code);
-int filter_func(void *);
 #endif
 
 int main(int argc, char *argv[])
@@ -42,15 +44,20 @@ void qt_run(QApplication & a, int & ret_code)
     {
     }
 }
-#else
-int qt_run(QApplication & a, int & ret_code)
-{
-
-}
-#endif
 
 int filter_func(void * param)
 {
     return nsdebug_dump::save(nsfile_os::cwd()+"logs/crash_dump.dmp", param, nsdebug_dump::info_level_small);
 }
+#else
+void qt_run(QApplication & a, int & ret_code)
+{
+    struct rlimit corelim;
+    corelim.rlim_cur = -1;
+    corelim.rlim_max = -1;
+    if (setrlimit (RLIMIT_CORE, &corelim) != 0)
+        nslog_file::write_to("Could not write core dump","core_d.log", nslog_file::wm_overwrite);
+    ret_code = a.exec();
+}
+#endif
 #endif

@@ -1,13 +1,13 @@
 #ifndef MESH_WIDGET_H
 #define MESH_WIDGET_H
 
-#include <QWidget>
+#include <component_widget.h>
 
 namespace Ui {
 class mesh_widget;
 }
 
-class mesh_widget : public QWidget
+class mesh_widget : public component_widget
 {
     Q_OBJECT
 

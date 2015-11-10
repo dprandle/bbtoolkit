@@ -134,7 +134,8 @@ void resource_browser::on_a_create_shader_triggered()
 
 void resource_browser::on_a_create_material_triggered()
 {
-    bbtk.res_dialog_prev_lighting()->exec();
+    bbtk.res_dialog_prev()->set_material(NULL);
+    bbtk.res_dialog_prev()->exec();
 }
 
 void resource_browser::on_a_create_texture_triggered()
@@ -159,6 +160,10 @@ void resource_browser::on_a_create_mesh_triggered()
         bool load_mats = m_import_res_dialog->ui->cb_materials->isChecked();
         bool load_anim = m_import_res_dialog->ui->cb_anim_set->isChecked();
         nsstring fname = m_import_res_dialog->ui->le_model_fname->text().toStdString();
+
+        if (!bbtk.res_dialog_prev()->set_mesh(fname))
+            return;
+
         if (load_mats)
         {
             bbtk.map_view()->make_current();
@@ -187,7 +192,6 @@ void resource_browser::on_a_create_mesh_triggered()
                     return;
             }
         }
-        bbtk.res_dialog_prev()->set_mesh(fname);
         bbtk.res_dialog_prev()->exec();
     }
 }
@@ -208,7 +212,8 @@ void resource_browser::on_a_edit_resource_triggered()
     if (res_type_id == type_to_hash(nsentity))
     {
         nsentity * res = nse.resource<nsentity>(resid);
-        bbtk.res_dialog_prev_lighting()->exec();
+        if (bbtk.res_dialog_prev()->set_entity(res))
+            bbtk.res_dialog_prev()->exec();
     }
     else if (res_type_id == type_to_hash(nsinput_map))
     {
@@ -232,7 +237,8 @@ void resource_browser::on_a_edit_resource_triggered()
         else
             node_copy = res->tree()->m_root->m_world_tform;
 
-        bbtk.res_dialog_prev()->set_mesh(res);
+        if (!bbtk.res_dialog_prev()->set_mesh(res))
+            return;
 
         if (bbtk.res_dialog_prev()->exec() == QDialog::Accepted)
         {
@@ -280,7 +286,7 @@ void resource_browser::on_a_edit_resource_triggered()
                                 QMessageBox mb2(this);
                                 mb2.setIcon(QMessageBox::Critical);
                                 mb2.setStandardButtons(QMessageBox::Yes | QMessageBox::Cancel);
-                                mb2.setText((nsstring("You have changed a mesh which is being referenced by an occupy component which is part of the entity \"") + ent->name() + nsstring(" \" - would you like to auto-recalculate the occupied spaces (you can do it manually in the entity editor)")).c_str());
+                                mb2.setText((nsstring("You have changed a mesh which is being referenced by the entity \"") + ent->name() + nsstring(" \" - would you like to auto-recalculate the occupied spaces")).c_str());
                                 int res = mb2.exec();
                                 if (res == QMessageBox::Yes)
                                 {
@@ -290,7 +296,7 @@ void resource_browser::on_a_edit_resource_triggered()
                                         QMessageBox mb3(this);
                                         mb3.setIcon(QMessageBox::Critical);
                                         mb3.setStandardButtons(QMessageBox::Retry | QMessageBox::Abort);
-                                        mb3.setText((nsstring("The entity \"") + ent->name() + nsstring("\" is in the current map - in order to change the occupy component you need to remove it. Would you like to remove it and retry or abort the occupied space auto calc?")).c_str());
+                                        mb3.setText((nsstring("The entity \"") + ent->name() + nsstring("\" is in the current map - it must be removed to continue. Would you like to remove it and retry or abort?")).c_str());
                                         int res = mb3.exec();
                                         if (res == QMessageBox::Retry)
                                             cur_scn->remove(ent);
@@ -311,7 +317,8 @@ void resource_browser::on_a_edit_resource_triggered()
     else if (res_type_id == type_to_hash(nsmaterial))
     {
         nsmaterial * res = nse.resource<nsmaterial>(resid);
-        bbtk.res_dialog_prev_lighting()->exec();
+        if (bbtk.res_dialog_prev()->set_material(res))
+            bbtk.res_dialog_prev()->exec();
     }
     else if (res_type_id == type_to_hash(nsanim_set))
     {
@@ -321,7 +328,8 @@ void resource_browser::on_a_edit_resource_triggered()
     else if (res_type_id == type_to_hash(nstexture))
     {
         nstexture * res = nse.resource<nstexture>(resid);
-        bbtk.res_dialog_prev()->set_texture(res);
+        if (!bbtk.res_dialog_prev()->set_texture(res))
+            return;
         bbtk.res_dialog_prev()->exec();
     }
     else if (res_type_id == type_to_hash(nsshader))

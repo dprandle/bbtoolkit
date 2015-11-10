@@ -17,31 +17,47 @@
 #include <nsselection_system.h>
 #include <nsselection_system.h>
 #include <nsfile_os.h>
+#include <nslight_comp.h>
+#include <nsplugin_manager.h>
 
-
-#include <qtreewidget.h>
-#include <QPixmap>
-#include <QBitmap>
-#include <resource_dialog_prev.h>
-#include <texture_widget.h>
-#include <mesh_widget.h>
-#include <ui_mesh_widget.h>
-#include <ui_texture_widget.h>
-#include <QMessageBox>
-#include <edit_submesh_data_widget.h>
-#include <ui_edit_submesh_data_widget.h>
 #include <toolkit.h>
 #include <select_res_dialog.h>
+#include <resource_dialog_prev.h>
+
+#include <mesh_widget.h>
+#include <ui_mesh_widget.h>
+
+#include <texture_widget.h>
+#include <ui_texture_widget.h>
+
+#include <edit_submesh_data_widget.h>
+#include <ui_edit_submesh_data_widget.h>
+
+#include <material_widget.h>
+#include <ui_material_widget.h>
+
+#include <entity_widget.h>
+#include <ui_entity_widget.h>
+
+#include <select_res_dialog.h>
+
+#include <QMessageBox>
+#include <QColorDialog>
 #include <QFileDialog>
+#include <QTreeWidget>
+#include <QPixmap>
+#include <QBitmap>
 #include <QSpacerItem>
 
 resource_dialog_prev::resource_dialog_prev(QWidget * parent):
     QDialog(parent),
     m_editing_res(NULL),
     m_tex_widget(new texture_widget()),
-    m_mesh_widget(new mesh_widget())
+    m_mesh_widget(new mesh_widget()),
+    m_mat_widget(new material_widget()),
+    m_ent_widget(new entity_widget())
 {
-    m_ui.setupUi(this);
+    m_ui.setupUi(this);    
     connect(m_tex_widget, SIGNAL(cubemap_triggered()), this, SLOT(tex_cubemap_triggered()));
     connect(m_tex_widget, SIGNAL(tex2d_triggered()), this, SLOT(tex_tex2d_triggered()));
     connect(m_mesh_widget->ui->cb_wireframe, SIGNAL(toggled(bool)), this, SLOT(mesh_wireframe_toggled(bool)));
@@ -61,6 +77,35 @@ resource_dialog_prev::resource_dialog_prev(QWidget * parent):
     connect(m_mesh_widget->ui->dsb_rot_z, SIGNAL(valueChanged(int)), this, SLOT(mesh_rotate(int)));
     connect(m_mesh_widget->ui->cb_tile_layer, SIGNAL(toggled(bool)), this, SLOT(mesh_toggle_show_tile_layer(bool)));
     connect(m_mesh_widget->ui->cb_snap_point, SIGNAL(toggled(bool)), this, SLOT(mesh_toggle_show_center(bool)));
+    connect(m_mesh_widget->ui->btn_flip_all_norms, SIGNAL(pressed()), this, SLOT(mesh_flip_all_norms()));
+    connect(m_mesh_widget->ui->btn_flip_all_uvs, SIGNAL(pressed()), this, SLOT(mesh_flip_all_uvs()));
+    connect(m_mesh_widget->ui->btn_flip_sub_norms, SIGNAL(pressed()), this, SLOT(mesh_flip_sub_norms()));
+    connect(m_mesh_widget->ui->btn_flip_sub_uvs, SIGNAL(pressed()), this, SLOT(mesh_flip_sub_uvs()));
+
+    // mat connections
+    connect(m_mat_widget->ui->cmb_preview_mesh, SIGNAL(currentIndexChanged(int)), this, SLOT(mat_preview_mesh_changed(int)));
+
+    connect(m_mat_widget->ui->btn_diffuse, SIGNAL(pressed()), this, SLOT(mat_btn_diffuse()));
+    connect(m_mat_widget->ui->btn_normal, SIGNAL(pressed()), this, SLOT(mat_btn_normal()));
+    connect(m_mat_widget->ui->btn_shader, SIGNAL(pressed()), this, SLOT(mat_btn_shader()));
+    connect(m_mat_widget->ui->btn_opacity, SIGNAL(pressed()), this, SLOT(mat_btn_opac()));
+
+    connect(m_mat_widget->ui->tb_material_color, SIGNAL(pressed()), this, SLOT(mat_color_tb()));
+    connect(m_mat_widget->ui->tb_spec_color, SIGNAL(pressed()), this, SLOT(mat_spec_color_tb()));
+
+    connect(m_mat_widget->ui->cb_color_mode, SIGNAL(toggled(bool)), this, SLOT(mat_from_ui()));
+    connect(m_mat_widget->ui->cb_cull_enable, SIGNAL(toggled(bool)), this, SLOT(mat_from_ui()));
+    connect(m_mat_widget->ui->cb_wireframe, SIGNAL(toggled(bool)), this, SLOT(mat_from_ui()));
+    connect(m_mat_widget->ui->cmb_cull_mode, SIGNAL(currentIndexChanged(int)), this, SLOT(mat_from_ui()));
+    connect(m_mat_widget->ui->sldr_mat_shininess, SIGNAL(valueChanged(int)), this, SLOT(mat_from_ui()));
+    connect(m_mat_widget->ui->sb_spec_power, SIGNAL(valueChanged(int)), this, SLOT(mat_from_ui()));
+
+    connect(m_mat_widget->ui->tb_norm_erase, SIGNAL(pressed()), this, SLOT(mat_norm_erase()));
+    connect(m_mat_widget->ui->tb_dif_erase, SIGNAL(pressed()), this, SLOT(mat_dif_erase()));
+    connect(m_mat_widget->ui->tb_opac_erase, SIGNAL(pressed()), this, SLOT(mat_opac_erase()));
+    connect(m_mat_widget->ui->tb_shader_erase, SIGNAL(pressed()), this, SLOT(mat_shader_erase()));
+
+    m_ent_widget->set_preview(m_ui.m_preview);
 }
 
 void resource_dialog_prev::init()
@@ -106,7 +151,7 @@ void resource_dialog_prev::mesh_toggle_show_center(bool new_val)
     prev_center->get<nstform_comp>()->set_hidden_state(nstform_comp::hide_all, !new_val);
 }
 
-void resource_dialog_prev::set_mesh(const nsstring & model_fname)
+bool resource_dialog_prev::set_mesh(const nsstring & model_fname)
 {
     m_ui.m_scroll_area->takeWidget();
     m_ui.m_scroll_area->setWidget(m_mesh_widget);
@@ -136,11 +181,12 @@ void resource_dialog_prev::set_mesh(const nsstring & model_fname)
         QMessageBox mb(this);
         mb.setText("Could not find mesh specified with path " + QString(model_fname.c_str()));
         mb.exec();
-        rejected();
-        return;
+        on_m_cancel_btn_pressed();
+        return false;
     }
     m_editing_res = msh;
     _set_mesh_widget_fields(msh, plg);
+    return true;
 }
 
 void resource_dialog_prev::mesh_toggle_uv_coords(bool new_val)
@@ -160,15 +206,14 @@ void resource_dialog_prev::mesh_wireframe_toggled(bool new_val)
     nse.active()->get<nsmaterial>("preview_mat")->enable_wireframe(new_val);
 }
 
-void resource_dialog_prev::set_mesh(nsmesh * mesh_)
+bool resource_dialog_prev::set_mesh(nsmesh * mesh_)
 {
     if (mesh_ == NULL)
     {
         QMessageBox mb(this);
         mb.setText("Internal error - must set valid mesh. You gotta wonder - who writes these messages anyways??");
         mb.exec();
-        rejected();
-        return;
+        return false;
     }
 
     m_ui.m_scroll_area->takeWidget();
@@ -180,17 +225,28 @@ void resource_dialog_prev::set_mesh(nsmesh * mesh_)
     nse.make_current(bbtk.map_view()->glewID());
     nsstring plug_name = nse.plugin(mesh_->plugin_id())->name();
 
-    // Now make the preview context current
-    m_ui.m_preview->make_current();
-
     // indicate that we are editing an already loaded mesh by filling in these fields
     m_starting_res = mesh_->name();
     m_starting_subdir = mesh_->subdir();
     m_starting_plug = plug_name;
 
+    // Now make the preview context current
+    m_ui.m_preview->make_current();
+
     // Create a plugin in this context with the same name and set it to active
     nsplugin * plg = nse.create_plugin(plug_name);
     nse.set_active(plg);
+
+    if (plg == NULL)
+    {
+        QMessageBox mb(this);
+        mb.setWindowTitle("Preview Error");
+        mb.setText("Could not load preview plugin - try again");
+        mb.setIcon(QMessageBox::Warning);
+        mb.exec();
+        on_m_cancel_btn_pressed();
+        return false;
+    }
 
     // Now lets set up the mesh in the preview context
     nsmesh * msh = plg->load<nsmesh>(mesh_->subdir() + mesh_->name() + mesh_->extension());
@@ -215,13 +271,14 @@ void resource_dialog_prev::set_mesh(nsmesh * mesh_)
         }
         else
         {
-            rejected();
-            return;
+            on_m_cancel_btn_pressed();
+            return false;
         }
     }
     msh->set_icon_path(mesh_->icon_path());
     m_editing_res = msh;
     _set_mesh_widget_fields(msh, plg);
+    return true;
 }
 
 void resource_dialog_prev::_reset_fields()
@@ -235,8 +292,52 @@ void resource_dialog_prev::_reset_fields()
     m_starting_res.clear();
     m_starting_subdir.clear();
     m_editing_res = NULL;
+    setResult(QDialog::Accepted);
 }
 
+void resource_dialog_prev::mesh_flip_all_uvs()
+{
+    m_ui.m_preview->make_current();
+    if (m_editing_res == NULL)
+        return;
+    nsmesh * msh = nse.resource<nsmesh>(m_editing_res->full_id());
+    if (msh == NULL)
+        return;
+    msh->flip_uv();
+}
+
+void resource_dialog_prev::mesh_flip_sub_uvs()
+{
+    m_ui.m_preview->make_current();
+    if (m_editing_res == NULL)
+        return;
+    nsmesh * msh = nse.resource<nsmesh>(m_editing_res->full_id());
+    if (msh == NULL)
+        return;
+    msh->flip_uv(m_mesh_widget->ui->sb_submesh->value()-1);
+}
+
+void resource_dialog_prev::mesh_flip_all_norms()
+{
+    m_ui.m_preview->make_current();
+    if (m_editing_res == NULL)
+        return;
+    nsmesh * msh = nse.resource<nsmesh>(m_editing_res->full_id());
+    if (msh == NULL)
+        return;
+    msh->flip_normals();
+}
+
+void resource_dialog_prev::mesh_flip_sub_norms()
+{
+    m_ui.m_preview->make_current();
+    if (m_editing_res == NULL)
+        return;
+    nsmesh * msh = nse.resource<nsmesh>(m_editing_res->full_id());
+    if (msh == NULL)
+        return;
+    msh->flip_normals(m_mesh_widget->ui->sb_submesh->value()-1);
+}
 
 /* MAKE SURE PREVIEW CONTEXT IS SET PREVIEW CALLING THIS FUNCTION!*/
 void resource_dialog_prev::_set_mesh_widget_fields(nsmesh * msh, nsplugin * plg)
@@ -249,17 +350,23 @@ void resource_dialog_prev::_set_mesh_widget_fields(nsmesh * msh, nsplugin * plg)
 
     // For the mesh we want focus mode
     nse.system<nscamera_system>()->set_mode(nscamera_system::mode_focus);
-    nse.system<nscamera_system>()->set_sensitivity(DEFAULT_CAM_SENSITIVITY*0.1,nscamera_system::sens_strafe);
-    nse.system<nscamera_system>()->set_zoom(DEFAULT_CAM_ZOOM_FACTOR*0.1f);
+    nse.system<nscamera_system>()->set_sensitivity(DEFAULT_CAM_SENSITIVITY*0.02,nscamera_system::sens_strafe);
+    nse.system<nscamera_system>()->set_zoom(DEFAULT_CAM_ZOOM_FACTOR*0.03f);
 
     // Create our directional light and camera and add it to the scene
-    nsentity * dir_light = plg->create_dir_light("preview_dir_light",0.1f,0.7f);
-    nsentity * camera = plg->create_camera("preview_cam",60.0f, uivec2(m_ui.m_preview->width(), m_ui.m_preview->height()), fvec2(DEFAULT_Z_NEAR, DEFAULT_Z_FAR));
-    scn->add(dir_light, fvec3(0,0,20), ::orientation(fvec4(1,0,0,-180.0f)));
+    nsentity * dir_light = plg->create_dir_light(PREV_LIGHT_NAME,0.8f,0.1f);
+    nsentity * camera = plg->create_camera(PREV_CAM_NAME,60.0f, uivec2(m_ui.m_preview->width(), m_ui.m_preview->height()), fvec2(DEFAULT_Z_NEAR, DEFAULT_Z_FAR));
+    scn->add(dir_light, fvec3(0,0,-20.0f));
+    scn->add(camera, fvec3(0.0f,-4.0f,-4.0f), ::orientation(fvec3(-70.0f,0.0f,0.0f),fvec3::XYZ));
     scn->set_camera(camera);
 
+    on_cb_shadows_toggled(false);
+
+    m_ui.sldr_ambient->setSliderPosition(100);
+    m_ui.sldr_diffuse->setSliderPosition(0);
+
     // Set the background color to light blue - this color will be used later to mask out the background
-    scn->set_bg_color(fvec4(BG_R,BG_G,BG_B,1.0f));
+    scn->set_bg_color(fvec4(BG_R,BG_G,BG_B,0.0f));
 
     // Set up a basic material to use for previewing the mesh - by default wireframe enabled
     nsmaterial * mat = plg->create<nsmaterial>("preview_mat");
@@ -319,6 +426,64 @@ void resource_dialog_prev::_set_mesh_widget_fields(nsmesh * msh, nsplugin * plg)
     m_mesh_widget->ui->btn_node_tree->setEnabled(msh->tree()->m_root != NULL);
     m_mesh_widget->ui->btn_joint->setEnabled(msh->tree()->m_name_joint_map.size() > 0);
     _update_submesh_info(msh, 0);
+}
+
+void resource_dialog_prev::on_sldr_diffuse_valueChanged()
+{
+    m_ui.m_preview->make_current();
+    nsentity * prev_lt = nse.active()->get<nsentity>(PREV_LIGHT_NAME);
+    if (prev_lt == NULL)
+        return;
+    nslight_comp * lc = prev_lt->get<nslight_comp>();
+    lc->set_intensity(float(m_ui.sldr_diffuse->value()) / 100.0f, float(m_ui.sldr_ambient->value()) / 100.0f);
+}
+
+void resource_dialog_prev::on_cb_shadows_toggled(bool enable)
+{
+    m_ui.m_preview->make_current();
+    nsentity * prev_lt = nse.active()->get<nsentity>(PREV_LIGHT_NAME);
+    if (prev_lt == NULL)
+        return;
+    nslight_comp * lc = prev_lt->get<nslight_comp>();
+    lc->set_cast_shadows(enable);
+}
+
+void resource_dialog_prev::on_sldr_ambient_valueChanged()
+{
+    m_ui.m_preview->make_current();
+    nsentity * prev_lt = nse.active()->get<nsentity>(PREV_LIGHT_NAME);
+    if (prev_lt == NULL)
+        return;
+    nslight_comp * lc = prev_lt->get<nslight_comp>();
+    lc->set_intensity(float(m_ui.sldr_diffuse->value()) / 100.0f, float(m_ui.sldr_ambient->value()) / 100.0f);
+}
+
+void resource_dialog_prev::on_sldr_horiz_plane_valueChanged()
+{
+    m_ui.m_preview->make_current();
+    nsentity * prev_lt = nse.active()->get<nsentity>(PREV_LIGHT_NAME);
+    if (prev_lt == NULL)
+        return;
+    nstform_comp * tc = prev_lt->get<nstform_comp>();
+    tc->enable_parent(true);
+    tc->set_parent(rotation_mat4(fvec3(60.0f - m_ui.slider_vert_plane->value() * 0.6f,
+                                       0.0f,
+                                       m_ui.sldr_horiz_plane->value()*3.6f - 180.0f),
+                                 fvec3::ZYX));
+}
+
+void resource_dialog_prev::on_slider_vert_plane_valueChanged()
+{
+    m_ui.m_preview->make_current();
+    nsentity * prev_lt = nse.active()->get<nsentity>(PREV_LIGHT_NAME);
+    if (prev_lt == NULL)
+        return;
+    nstform_comp * tc = prev_lt->get<nstform_comp>();
+    tc->enable_parent(true);
+    tc->set_parent(rotation_mat4(fvec3(60.0f - m_ui.slider_vert_plane->value() * 0.6f,
+                                       0.0f,
+                                       m_ui.sldr_horiz_plane->value()*3.6f - 180.0f),
+                                 fvec3::ZYX));
 }
 
 void resource_dialog_prev::mesh_toggle_show_tile_layer(bool new_val)
@@ -501,7 +666,604 @@ void resource_dialog_prev::_update_submesh_info(nsmesh * msh, uint32 sub_index)
     m_mesh_widget->ui->lbl_node_count->setText(QString::number(msh->node_count()));
 }
 
-void resource_dialog_prev::set_texture(nstexture * tex_)
+void resource_dialog_prev::reject()
+{
+    m_ui.m_preview->make_current();
+    nsplugin * plg = nse.active();
+    nse.system<nsselection_system>()->clear();
+    if (plg == nullptr)
+        return;
+    nse.set_active(nullptr);
+    while (nse.plugins()->begin() != nse.plugins()->end())
+        nse.destroy_plugin(nse.plugins()->begin()->first);
+    m_last_edit = uivec2();
+    m_editing_res = nullptr;
+    QDialog::reject();
+}
+
+bool resource_dialog_prev::set_material(nsmaterial * mat_)
+{
+    m_ui.m_scroll_area->takeWidget();
+    m_ui.m_scroll_area->setWidget(m_mat_widget);
+    //m_mat_widget->reset_fields();
+    _reset_fields();
+
+    nse.make_current(bbtk.map_view()->glewID());
+
+    nsstring plug_name = nse.active()->name();
+    if (mat_ != NULL)
+        plug_name = nse.plugin(mat_->plugin_id())->name();
+
+    m_ui.m_preview->make_current();
+
+    nsplugin * plg = nse.create_plugin(plug_name);
+    nse.set_active(plg);
+
+    if (plg == NULL)
+    {
+        QMessageBox mb(this);
+        mb.setWindowTitle("Preview Error");
+        mb.setText("Could not load preview plugin - try again");
+        mb.setIcon(QMessageBox::Warning);
+        mb.exec();
+        on_m_cancel_btn_pressed();
+        return false;
+    }
+
+    // Now lets set up the mesh in the preview context
+    nsmaterial * mat;
+    if (mat_ != NULL)
+    {
+        m_starting_res = mat_->name();
+        m_starting_subdir = mat_->subdir();
+        m_ui.m_name_le->setText(mat_->name().c_str());
+        m_ui.m_folder_le->setText(mat_->subdir().c_str());
+        m_ui.m_icon_path_le->setText(mat_->icon_path().c_str());
+
+        mat = plg->load<nsmaterial>(mat_->subdir() + mat_->name() + mat_->extension());
+        if (mat == NULL)
+        {
+            QMessageBox mb(this);
+            mb.setWindowTitle("Unsaved Resource");
+            mb.setIcon(QMessageBox::Question);
+            mb.setText("Cannot edit unsaved resource - would you like to save to file?");
+            mb.setStandardButtons(QMessageBox::Yes | QMessageBox::Cancel);
+            int ret = mb.exec();
+            if (ret == QMessageBox::Yes)
+            {
+                bbtk.map_view()->make_current();
+                nsplugin * eplg = nse.plugin(plug_name);
+                eplg->save<nsmaterial>(mat_->name());
+                m_ui.m_preview->make_current();
+                mat = plg->load<nsmaterial>(mat_->subdir() + mat_->name() + mat_->extension());
+            }
+            else
+            {
+                on_m_cancel_btn_pressed();
+                return false;
+            }
+        }
+        mat->set_icon_path(mat_->icon_path());
+    }
+    else
+        mat = plg->create<nsmaterial>("preview_mat");
+
+    nsscene * scn = plg->create<nsscene>("preview_map");
+    nse.set_current_scene(scn, true, false);
+
+    nse.system<nscamera_system>()->set_mode(nscamera_system::mode_free);
+
+    nsentity * dir_light = plg->create_dir_light(PREV_LIGHT_NAME,0.7f,0.3f);
+    nsentity * camera = plg->create_camera(PREV_CAM_NAME,60.0f, uivec2(m_ui.m_preview->width(), m_ui.m_preview->height()), fvec2(DEFAULT_Z_NEAR, DEFAULT_Z_FAR));
+
+    on_cb_shadows_toggled(false);
+
+    m_ui.sldr_diffuse->setSliderPosition(70);
+    m_ui.sldr_ambient->setSliderPosition(30);
+
+    scn->add(dir_light,fvec3(0,0,-10));
+    scn->add(camera, fvec3(0,0,-2.7));
+    scn->set_camera(camera);
+    scn->set_bg_color(fvec4(BG_R,BG_G,BG_B,0.0f));
+
+    nse.system<nscamera_system>()->set_mode(nscamera_system::mode_focus);
+    nse.system<nscamera_system>()->set_sensitivity(DEFAULT_CAM_SENSITIVITY*0.02,nscamera_system::sens_strafe);
+    nse.system<nscamera_system>()->set_zoom(DEFAULT_CAM_ZOOM_FACTOR*0.03f);
+
+    // Setup mesh plane
+    nsmesh_plane * plane = plg->create<nsmesh_plane>("preview_plane");
+    plane->set_dim(fvec2(2,2));
+
+    // Setup the 2d plane preview entity
+    nsentity * plane_ent = plg->create<nsentity>("preview_plane");
+    nsrender_comp * rc = plane_ent->create<nsrender_comp>();
+    rc->set_mesh_id(plane->full_id());
+    if (mat != NULL)
+        rc->set_material(0, mat->full_id());
+
+    // Setup the sphere preview entity
+    nsentity * sphere_ent = plg->create<nsentity>("preview_sphere");
+    rc = sphere_ent->create<nsrender_comp>();
+    rc->set_mesh_id(nse.core()->get<nsmesh>(MESH_SKYDOME)->full_id());
+    if (mat != NULL)
+        rc->set_material(0, mat->full_id());
+
+    // Setup the tile preview entity
+    nsentity * tile_ent = plg->create<nsentity>("preview_tile");
+    rc = tile_ent->create<nsrender_comp>();
+    rc->set_mesh_id(nse.core()->get<nsmesh>(MESH_FULL_TILE)->full_id());
+    if (mat != NULL)
+        rc->set_material(0, mat->full_id());
+
+    // Setup the half tile preview entity
+    nsentity * tile_half_ent = plg->create<nsentity>("preview_half_tile");
+    rc = tile_half_ent->create<nsrender_comp>();
+    rc->set_mesh_id(nse.core()->get<nsmesh>(MESH_HALF_TILE)->full_id());
+    if (mat != NULL)
+        rc->set_material(0, mat->full_id());
+
+
+    _setup_preview_controls_mesh();
+    nse.system<nsinput_system>()->push_context("cam_control");
+
+    m_ui.m_plugin_le->setText(plug_name.c_str());
+    m_starting_plug = plug_name;
+
+    if (mat != NULL)
+    {
+        if (!m_ui.m_icon_path_le->text().isEmpty())
+            m_ui.m_icon_lbl->setPixmap(QPixmap(m_ui.m_icon_path_le->text()));
+
+        bbtk.map_view()->make_current();
+        nstexture * tex_diff = nse.resource<nstexture>(mat->map_tex_id(nsmaterial::diffuse));
+        nstexture * tex_norm = nse.resource<nstexture>(mat->map_tex_id(nsmaterial::normal));
+        nstexture * tex_opac = nse.resource<nstexture>(mat->map_tex_id(nsmaterial::opacity));
+        nsshader * mat_shader = nse.resource<nsshader>(mat->shader_id());
+
+        nsstring diff_plug, norm_plug, shader_plug, opac_plug;
+        if (tex_diff != NULL)
+        {
+            m_mat_widget->ui->le_diffuse_name->setText(tex_diff->name().c_str());
+            nsplugin * tmp_plg = nse.plugin(tex_diff->plugin_id());
+            diff_plug = tmp_plg->name();
+            m_mat_widget->ui->le_diffuse_plugin->setText(tmp_plg->name().c_str());
+        }
+        if (tex_norm != NULL)
+        {
+            m_mat_widget->ui->le_normal_name->setText(tex_norm->name().c_str());
+            nsplugin * tmp_plg = nse.plugin(tex_norm->plugin_id());
+            norm_plug = tmp_plg->name();
+            m_mat_widget->ui->le_normal_plugin->setText(tmp_plg->name().c_str());
+        }
+        if (tex_opac != NULL)
+        {
+            m_mat_widget->ui->le_opacity_name->setText(tex_opac->name().c_str());
+            nsplugin * tmp_plg = nse.plugin(tex_opac->plugin_id());
+            opac_plug = tmp_plg->name();
+            m_mat_widget->ui->le_opacity_plugin->setText(tmp_plg->name().c_str());
+        }
+        if (mat_shader != NULL)
+        {
+            m_mat_widget->ui->le_shader_name->setText(mat_shader->name().c_str());
+            nsplugin * tmp_plg = nse.plugin(mat_shader->plugin_id());
+            shader_plug = tmp_plg->name();
+            m_mat_widget->ui->le_shader_plugin->setText(tmp_plg->name().c_str());
+        }
+        m_ui.m_preview->make_current();
+        if (tex_diff != NULL)
+        {
+            nsplugin * plgd = nse.plugin(diff_plug);
+            if (plgd == NULL)
+                plgd = nse.create_plugin(diff_plug,false);
+
+            if (plgd->get<nstexture>(tex_diff->name()) == NULL)
+                plgd->load(tex_diff->type(), tex_diff->subdir() + tex_diff->name() + tex_diff->extension());
+        }
+        if (tex_norm != NULL)
+        {
+            nsplugin * plgn = nse.plugin(norm_plug);
+            if (plgn == NULL)
+                plgn = nse.create_plugin(norm_plug,false);
+
+            if (plgn->get<nstexture>(tex_norm->name()) == NULL)
+                plgn->load(tex_norm->type(), tex_norm->subdir() + tex_norm->name() + tex_norm->extension());
+        }
+        if (tex_opac != NULL)
+        {
+            nsplugin * plgo = nse.plugin(opac_plug);
+            if (plgo == NULL)
+                plgo = nse.create_plugin(opac_plug,false);
+
+            if (plgo->get<nstexture>(tex_opac->name()) == NULL)
+                plgo->load(tex_opac->type(), tex_opac->subdir() + tex_opac->name() + tex_opac->extension());
+        }
+        if (mat_shader != NULL)
+        {
+            nsplugin * plgs = nse.plugin(shader_plug);
+            if (plgs == NULL)
+                plgs = nse.create_plugin(shader_plug,false);
+
+            nsmaterial_shader * m_shd = plgs->get<nsmaterial_shader>(mat_shader->name());
+            if (m_shd == NULL)
+            {
+                m_shd = static_cast<nsmaterial_shader*>(plgs->load(mat_shader->type(), mat_shader->subdir() + mat_shader->name() + mat_shader->extension()));
+                m_shd->compile();
+                m_shd->link();
+                m_shd->init_uniforms();
+            }
+        }
+
+        m_mat_widget->ui->cb_color_mode->setChecked(mat->color_mode());
+        m_mat_widget->ui->cb_cull_enable->setChecked(mat->culling());
+        m_mat_widget->ui->sldr_mat_shininess->setValue(mat->specular_intensity()*100.0f);
+        m_mat_widget->ui->sb_spec_power->setValue(int(mat->specular_power()));
+
+        QColor color(mat->color().r*255,mat->color().g*255,mat->color().b*255,mat->color().a*255);
+        QPixmap px(20, 20);
+        px.fill(color);
+        m_mat_widget->ui->tb_material_color->setIcon(px);
+
+        QColor scolor(mat->specular_color().r*255,mat->specular_color().g*255,mat->specular_color().b*255,255);
+        QPixmap spx(20, 20);
+        spx.fill(scolor);
+        m_mat_widget->ui->tb_spec_color->setIcon(spx);
+
+        if (mat->cull_mode() == GL_BACK)
+            m_mat_widget->ui->cmb_cull_mode->setCurrentIndex(0);
+        else if (mat->cull_mode() == GL_FRONT)
+            m_mat_widget->ui->cmb_cull_mode->setCurrentIndex(1);
+        else
+            m_mat_widget->ui->cmb_cull_mode->setCurrentIndex(2);
+
+        m_editing_res = mat;
+
+        mat_preview_mesh_changed(m_mat_widget->ui->cmb_preview_mesh->currentIndex());
+    }
+    else
+    {
+        QMessageBox mb(this);
+        mb.setWindowTitle("Preview Error");
+        mb.setIcon(QMessageBox::Question);
+        mb.setText("Could not load material at all - please report bug");
+        mb.setStandardButtons(QMessageBox::Ok);
+        mb.exec();
+        on_m_cancel_btn_pressed();
+        return false;
+    }
+    return true;
+    // main camera controls
+}
+
+void resource_dialog_prev::mat_from_ui()
+{
+    m_ui.m_preview->make_current();
+    if (m_editing_res == NULL)
+        return;
+    nsmaterial * cur_mat = nse.resource<nsmaterial>(m_editing_res->full_id());
+    if (cur_mat == NULL)
+        return;
+    cur_mat->set_specular_power(float(m_mat_widget->ui->sb_spec_power->value()));
+    cur_mat->set_specular_intensity(float(m_mat_widget->ui->sldr_mat_shininess->value()) / 100.0f);
+    cur_mat->set_color_mode(m_mat_widget->ui->cb_color_mode->isChecked());
+    cur_mat->enable_culling(m_mat_widget->ui->cb_cull_enable->isChecked());
+    cur_mat->enable_wireframe(m_mat_widget->ui->cb_wireframe->isChecked());
+    switch (m_mat_widget->ui->cmb_cull_mode->currentIndex())
+    {
+    case(0):
+        cur_mat->set_cull_mode(GL_BACK);
+        break;
+    case(1):
+        cur_mat->set_cull_mode(GL_FRONT);
+        break;
+    default:
+        cur_mat->set_cull_mode(GL_FRONT_AND_BACK);
+        break;
+    }
+}
+
+void resource_dialog_prev::mat_color_tb()
+{
+    m_ui.m_preview->make_current();
+    if (m_editing_res == NULL)
+        return;
+    nsmaterial * cur_mat = nse.resource<nsmaterial>(m_editing_res->full_id());
+    if (cur_mat == NULL)
+        return;
+
+    QColor c(cur_mat->color().r*255,cur_mat->color().g*255,cur_mat->color().b*255,cur_mat->color().a*255);
+    QColorDialog cd(c,this);
+    cd.setWindowTitle("Choose Material Color");
+    cd.setOptions(QColorDialog::DontUseNativeDialog);
+    if (cd.exec() == QDialog::Accepted)
+        c = cd.currentColor();
+
+    QPixmap px(20, 20);
+    px.fill(c);
+    m_mat_widget->ui->tb_material_color->setIcon(px);
+    m_mat_widget->ui->tb_material_color->setDown(false);
+    cur_mat->set_color(fvec4(c.redF(),c.greenF(),c.blueF(),c.alphaF()));
+}
+
+void resource_dialog_prev::mat_spec_color_tb()
+{
+    m_ui.m_preview->make_current();
+    if (m_editing_res == NULL)
+        return;
+    nsmaterial * cur_mat = nse.resource<nsmaterial>(m_editing_res->full_id());
+    if (cur_mat == NULL)
+        return;
+
+    QColor c(cur_mat->specular_color().r*255,cur_mat->specular_color().g*255,cur_mat->specular_color().b*255,255);
+    QColorDialog cd(c,this);
+    cd.setWindowTitle("Choose Specular Color");
+    cd.setOptions(QColorDialog::DontUseNativeDialog);
+    if (cd.exec() == QDialog::Accepted)
+        c = cd.currentColor();
+
+    QPixmap px(20, 20);
+    px.fill(c);
+    m_mat_widget->ui->tb_spec_color->setIcon(px);
+    m_mat_widget->ui->tb_spec_color->setDown(false);
+    cur_mat->set_specular_color(fvec3(c.redF(),c.greenF(),c.blueF()));
+}
+
+void resource_dialog_prev::mat_btn_shader()
+{
+    m_ui.m_preview->make_current();
+    if (m_editing_res == NULL)
+        return;
+    nsmaterial * cur_mat = nse.resource<nsmaterial>(m_editing_res->full_id());
+    if (cur_mat == NULL)
+        return;
+
+    bbtk.map_view()->make_current();
+
+    nsmaterial_shader * mat_shader = NULL;
+    select_res_dialog rd(this);
+    nsstring plug,name;
+    rd.show_type<nsmaterial_shader>();
+    if (rd.exec() == QDialog::Accepted)
+    {
+        mat_shader = rd.selected_resource<nsmaterial_shader>();
+        plug = nse.plugin(mat_shader->plugin_id())->name();
+        name = mat_shader->name();
+        m_mat_widget->ui->le_shader_plugin->setText(plug.c_str());
+        m_mat_widget->ui->le_shader_name->setText(name.c_str());
+    }
+    else
+        return;
+
+    m_ui.m_preview->make_current();
+    if (mat_shader != NULL)
+    {
+        nsplugin * plg = nse.plugin(plug);
+        if (plg == NULL)
+            plg = nse.create_plugin(plug,false);
+        nsmaterial_shader * m_shd = plg->get<nsmaterial_shader>(name);
+        if (m_shd == NULL)
+        {
+            m_shd = static_cast<nsmaterial_shader*>(plg->load(mat_shader->type(), mat_shader->subdir() + mat_shader->name() + mat_shader->extension()));
+            m_shd->compile();
+            m_shd->link();
+            m_shd->init_uniforms();
+        }
+
+        cur_mat->set_shader_id(m_shd->full_id());
+    }
+}
+
+void resource_dialog_prev::mat_btn_diffuse()
+{
+    m_ui.m_preview->make_current();
+    if (m_editing_res == NULL)
+        return;
+    nsmaterial * cur_mat = nse.resource<nsmaterial>(m_editing_res->full_id());
+    if (cur_mat == NULL)
+        return;
+
+    bbtk.map_view()->make_current();
+
+    nstexture * tex_diff = NULL;
+    select_res_dialog rd(this);
+    nsstring plug,name;
+    rd.show_type<nstexture>();
+    if (rd.exec() == QDialog::Accepted)
+    {
+        bbtk.map_view()->make_current();
+        tex_diff = rd.selected_resource<nstexture>();
+        plug = nse.plugin(tex_diff->plugin_id())->name();
+        name = tex_diff->name();
+        m_mat_widget->ui->le_diffuse_plugin->setText(plug.c_str());
+        m_mat_widget->ui->le_diffuse_name->setText(name.c_str());
+    }
+    else
+        return;
+
+    m_ui.m_preview->make_current();
+    if (tex_diff != NULL)
+    {
+        nsplugin * plg = nse.plugin(plug);
+        if (plg == NULL)
+            plg = nse.create_plugin(plug,false);
+
+        nsresource * tex = plg->get<nstexture>(name);
+        if (tex == NULL)
+            tex = plg->load(tex_diff->type(), tex_diff->subdir() + tex_diff->name() + tex_diff->extension());
+        cur_mat->set_map_tex_id(nsmaterial::diffuse, tex->full_id(), true);
+    }
+}
+
+void resource_dialog_prev::mat_btn_normal()
+{
+    m_ui.m_preview->make_current();
+    if (m_editing_res == NULL)
+        return;
+    nsmaterial * cur_mat = nse.resource<nsmaterial>(m_editing_res->full_id());
+    if (cur_mat == NULL)
+        return;
+
+    bbtk.map_view()->make_current();
+
+    nstexture * tex_norm = NULL;
+    select_res_dialog rd(this);
+    nsstring plug,name;
+    rd.show_type<nstexture>();
+    if (rd.exec() == QDialog::Accepted)
+    {
+        bbtk.map_view()->make_current();
+        tex_norm = rd.selected_resource<nstexture>();
+        plug = nse.plugin(tex_norm->plugin_id())->name();
+        name = tex_norm->name();
+        m_mat_widget->ui->le_normal_plugin->setText(plug.c_str());
+        m_mat_widget->ui->le_normal_name->setText(name.c_str());
+    }
+    else
+        return;
+
+    m_ui.m_preview->make_current();
+    if (tex_norm != NULL)
+    {
+        nsplugin * plg = nse.plugin(plug);
+        if (plg == NULL)
+            plg = nse.create_plugin(plug,false);
+
+        nsresource * tex = plg->get<nstexture>(name);
+        if (tex == NULL)
+            tex = plg->load(tex_norm->type(), tex_norm->subdir() + tex_norm->name() + tex_norm->extension());
+        cur_mat->set_map_tex_id(nsmaterial::normal, tex->full_id(), true);
+    }
+}
+
+void resource_dialog_prev::mat_dif_erase()
+{
+    m_ui.m_preview->make_current();
+    if (m_editing_res == NULL)
+        return;
+    nsmaterial * cur_mat = nse.resource<nsmaterial>(m_editing_res->full_id());
+    if (cur_mat == NULL)
+        return;
+
+    cur_mat->set_map_tex_id(nsmaterial::diffuse,uivec2(),true);
+    m_mat_widget->ui->le_diffuse_name->clear();
+    m_mat_widget->ui->le_diffuse_plugin->clear();
+    m_mat_widget->ui->tb_dif_erase->setDown(false);
+}
+
+void resource_dialog_prev::mat_norm_erase()
+{
+    m_ui.m_preview->make_current();
+    if (m_editing_res == NULL)
+        return;
+    nsmaterial * cur_mat = nse.resource<nsmaterial>(m_editing_res->full_id());
+    if (cur_mat == NULL)
+        return;
+
+    cur_mat->set_map_tex_id(nsmaterial::normal,uivec2(),true);
+    m_mat_widget->ui->le_normal_name->clear();
+    m_mat_widget->ui->le_normal_plugin->clear();
+    m_mat_widget->ui->tb_norm_erase->setDown(false);
+}
+
+void resource_dialog_prev::mat_opac_erase()
+{
+    m_ui.m_preview->make_current();
+    if (m_editing_res == NULL)
+        return;
+    nsmaterial * cur_mat = nse.resource<nsmaterial>(m_editing_res->full_id());
+    if (cur_mat == NULL)
+        return;
+
+    cur_mat->set_map_tex_id(nsmaterial::opacity,uivec2(),true);
+    m_mat_widget->ui->le_opacity_name->clear();
+    m_mat_widget->ui->le_opacity_plugin->clear();
+    m_mat_widget->ui->tb_opac_erase->setDown(false);
+}
+
+void resource_dialog_prev::mat_shader_erase()
+{
+    m_ui.m_preview->make_current();
+    if (m_editing_res == NULL)
+        return;
+    nsmaterial * cur_mat = nse.resource<nsmaterial>(m_editing_res->full_id());
+    if (cur_mat == NULL)
+        return;
+
+    cur_mat->set_shader_id(uivec2());
+    m_mat_widget->ui->le_shader_name->clear();
+    m_mat_widget->ui->le_shader_plugin->clear();
+    m_mat_widget->ui->tb_shader_erase->setDown(false);
+}
+
+void resource_dialog_prev::mat_btn_opac()
+{
+    m_ui.m_preview->make_current();
+    if (m_editing_res == NULL)
+        return;
+    nsmaterial * cur_mat = nse.resource<nsmaterial>(m_editing_res->full_id());
+    if (cur_mat == NULL)
+        return;
+
+    bbtk.map_view()->make_current();
+
+    nstexture * tex_opac = NULL;
+    select_res_dialog rd(this);
+    nsstring plug,name;
+    rd.show_type<nstexture>();
+    if (rd.exec() == QDialog::Accepted)
+    {
+        bbtk.map_view()->make_current();
+        tex_opac = rd.selected_resource<nstexture>();
+        plug = nse.plugin(tex_opac->plugin_id())->name();
+        name = tex_opac->name();
+        m_mat_widget->ui->le_opacity_plugin->setText(plug.c_str());
+        m_mat_widget->ui->le_opacity_name->setText(name.c_str());
+    }
+    else
+        return;
+
+    m_ui.m_preview->make_current();
+    if (tex_opac != NULL)
+    {
+        nsplugin * plg = nse.plugin(plug);
+        if (plg == NULL)
+            plg = nse.create_plugin(plug,false);
+
+        nsresource * tex = plg->get<nstexture>(name);
+        if (tex == NULL)
+            tex = plg->load(tex_opac->type(), tex_opac->subdir() + tex_opac->name() + tex_opac->extension());
+        cur_mat->set_map_tex_id(nsmaterial::opacity, tex->full_id(), true);
+    }
+}
+
+void resource_dialog_prev::mat_preview_mesh_changed(int new_index)
+{
+    m_ui.m_preview->make_current();
+    nsscene *scn = nse.current_scene();
+    scn->remove(nse.active(),"preview_plane");
+    scn->remove(nse.active(),"preview_sphere");
+    scn->remove(nse.active(),"preview_tile");
+    scn->remove(nse.active(),"preview_half_tile");
+    switch (new_index)
+    {
+    case(0):
+        scn->add(nse.active(),"preview_plane");
+        break;
+    case(1):
+        scn->add(nse.active(),"preview_tile");
+        break;
+    case(2):
+        scn->add(nse.active(),"preview_half_tile");
+        break;
+    case(3):
+        scn->add(nse.active(),"preview_sphere", fvec3(), fquat(), fvec3(0.25,0.25,0.25));
+        break;
+    case(4):
+        scn->add(nse.active(),"preview_sphere", fvec3(), fquat(), fvec3(0.25,0.25,0.25));
+        break;
+    }
+}
+
+bool resource_dialog_prev::set_texture(nstexture * tex_)
 {
     m_ui.m_scroll_area->takeWidget();
     m_ui.m_scroll_area->setWidget(m_tex_widget);
@@ -524,12 +1286,15 @@ void resource_dialog_prev::set_texture(nstexture * tex_)
 
     nse.system<nscamera_system>()->set_mode(nscamera_system::mode_free);
 
-    nsentity * dir_light = plg->create_dir_light("preview_dir_light",0.0f,1.0f);
-    nsentity * camera = plg->create_camera("preview_cam",60.0f, uivec2(m_ui.m_preview->width(), m_ui.m_preview->height()), fvec2(DEFAULT_Z_NEAR, DEFAULT_Z_FAR));
+    nsentity * dir_light = plg->create_dir_light(PREV_LIGHT_NAME,0.0f,1.0f);
+    nsentity * camera = plg->create_camera(PREV_CAM_NAME,60.0f, uivec2(m_ui.m_preview->width(), m_ui.m_preview->height()), fvec2(DEFAULT_Z_NEAR, DEFAULT_Z_FAR));
+
+    m_ui.sldr_ambient->setSliderPosition(100);
+    m_ui.sldr_diffuse->setSliderPosition(0);
 
     scn->add(dir_light,fvec3(-30,20,20));
     scn->set_camera(camera);
-    scn->set_bg_color(fvec4(BG_R,BG_G,BG_B,1.0f));
+    scn->set_bg_color(fvec4(BG_R,BG_G,BG_B,0.0f));
 
     // Setup mesh plane
     nsmesh_plane * plane = plg->create<nsmesh_plane>("2dplane");
@@ -591,6 +1356,9 @@ void resource_dialog_prev::set_texture(nstexture * tex_)
                 m_tex_widget->ui->m_tex_type_cmb->setCurrentIndex(1);
             else
                 tex_cubemap_triggered();
+
+            if (result() == Rejected)
+                return false;
         }
         else
         {
@@ -602,6 +1370,9 @@ void resource_dialog_prev::set_texture(nstexture * tex_)
                 m_tex_widget->ui->m_tex_type_cmb->setCurrentIndex(0);
             else
                 tex_tex2d_triggered();
+
+            if (result() == Rejected)
+                return false;
         }
 
     }
@@ -610,8 +1381,10 @@ void resource_dialog_prev::set_texture(nstexture * tex_)
         m_tex_widget->ui->m_type_lbl->setEnabled(true);
         m_tex_widget->ui->m_tex_type_cmb->setEnabled(true);
         tex_tex2d_triggered();
+        if (result() == Rejected)
+            return false;
     }
-
+    return true;
     // main camera controls
 }
 
@@ -621,8 +1394,8 @@ void resource_dialog_prev::tex_cubemap_triggered()
 
     nsplugin * plg = nse.active();
     nsscene * scn = plg->current_scene();
-    nsentity * dir_light = plg->get<nsentity>("preview_dir_light");
-    nsentity * camera = plg->get<nsentity>("preview_cam");
+    nsentity * dir_light = plg->get<nsentity>(PREV_LIGHT_NAME);
+    nsentity * camera = plg->get<nsentity>(PREV_CAM_NAME);
     nsentity * skydome_ent = plg->get<nsentity>("skydome");
 
     scn->clear();
@@ -677,12 +1450,7 @@ void resource_dialog_prev::tex_cubemap_triggered()
         {
             pix.load(svec[i].c_str());
             if (basesz != pix.size())
-            {
-                QMessageBox mb(this);
-                mb.setText("All images in the cubemap must be the same size");
-                mb.exec();
                 return;
-            }
         }
     }
     nstex_manager * mgr = plg->manager<nstex_manager>();
@@ -695,7 +1463,7 @@ void resource_dialog_prev::tex_cubemap_triggered()
     if (tex != NULL)
     {
         nsmaterial * mat = plg->get<nsmaterial>("skydome");
-        mat->set_map_tex_id(nsmaterial::diffuse, tex->full_id());
+        mat->set_map_tex_id(nsmaterial::diffuse, tex->full_id(), true);
         m_editing_res = tex;
     }
     else
@@ -712,8 +1480,8 @@ void resource_dialog_prev::tex_tex2d_triggered()
 
     nsplugin * plg = nse.active();
     nsscene * scn = plg->current_scene();
-    nsentity * dir_light = plg->get<nsentity>("preview_dir_light");
-    nsentity * camera = plg->get<nsentity>("preview_cam");
+    nsentity * dir_light = plg->get<nsentity>(PREV_LIGHT_NAME);
+    nsentity * camera = plg->get<nsentity>(PREV_CAM_NAME);
     nsentity * plane_ent = plg->get<nsentity>("2dplane");
 
     scn->clear();
@@ -746,8 +1514,34 @@ void resource_dialog_prev::tex_tex2d_triggered()
     else
     {
         QMessageBox mb(this);
-        mb.setText("Could not find image file specified!");
-        mb.exec();
+        mb.setText("The image you selected has not yet been saved to the plugin folder - it has to be saved in order to edit - would you like to save and edit?");
+        mb.setIcon(QMessageBox::Warning);
+        mb.setStandardButtons(QMessageBox::Yes | QMessageBox::Cancel);
+        mb.setWindowTitle("Editing Texture");
+        int ret = mb.exec();
+        if (ret == QMessageBox::Yes)
+        {
+            bbtk.map_view()->make_current();
+            nsplugin * eplg = nse.plugin(m_starting_plug);
+            eplg->save<nstex2d>(m_starting_res);
+            m_ui.m_preview->make_current();
+            tex = plg->load<nstex2d>(fname);
+            if (tex == NULL)
+            {
+                mb.setText("Still could not save texture - please submit an issue report");
+                mb.setStandardButtons(QMessageBox::Ok);
+                mb.exec();
+                on_m_cancel_btn_pressed();
+            }
+            tex->rename("preview_tex");
+            nsmaterial * mat = plg->get<nsmaterial>("2dplane");
+            mat->set_map_tex_id(nsmaterial::diffuse, tex->full_id(),true);
+            m_editing_res = tex;
+        }
+        else
+        {
+            on_m_cancel_btn_pressed();
+        }
     }
 }
 
@@ -911,6 +1705,45 @@ void resource_dialog_prev::on_m_okay_btn_pressed()
         if (!subdir.isEmpty() && subdir[subdir.size()-1] != '/')
             subdir.append('/');
 
+        // validate our resource stuff
+        if (m_starting_res.empty())
+        {
+            nsstring name = m_ui.m_name_le->text().toStdString();
+            nsstring plugin = m_ui.m_plugin_le->text().toStdString();
+
+            if (name.empty())
+            {
+                QMessageBox mb(this);
+                mb.setText("Please choose a name for your resource");
+                mb.setWindowTitle("Name Error");
+                mb.setIcon(QMessageBox::Warning);
+                mb.exec();
+                return;
+            }
+
+            if (plugin.empty())
+            {
+                QMessageBox mb(this);
+                mb.setText("Please choose a valid plugin");
+                mb.setWindowTitle("Name Error");
+                mb.setIcon(QMessageBox::Warning);
+                mb.exec();
+                return;
+            }
+
+            bbtk.map_view()->make_current();
+            if (nse.resource(m_editing_res->type(), nse.plugin(plugin),name) != NULL)
+            {
+                QMessageBox mb(this);
+                mb.setText(("The " + nse.guid(m_editing_res->type()).substr(2) + " \"" + name + "\" already exists in plugin " + plugin + " - please choose a different name").c_str());
+                mb.setWindowTitle("Name Conflict");
+                mb.setIcon(QMessageBox::Warning);
+                mb.exec();
+                return;
+            }
+            m_ui.m_preview->make_current();
+        }
+
         m_editing_res->set_subdir(subdir.toStdString());
         m_editing_res->rename(new_name);
         nsstring fname = m_editing_res->subdir() + m_editing_res->name() + m_editing_res->extension();
@@ -1023,21 +1856,17 @@ void resource_dialog_prev::on_m_okay_btn_pressed()
     nse.set_active(nullptr);
     nse.system<nsselection_system>()->clear();
     nse.destroy_plugin(plg);
+
+    while (nse.plugins()->begin() != nse.plugins()->end())
+        nse.destroy_plugin(nse.plugins()->begin()->first);
+
     m_editing_res = nullptr;
+    bbtk.map_view()->update();
     accept();
 }
 
 void resource_dialog_prev::on_m_cancel_btn_pressed()
 {
-    m_ui.m_preview->make_current();
-    nsplugin * plg = nse.active();
-    nse.system<nsselection_system>()->clear();
-    if (plg == nullptr)
-        return;
-    nse.set_active(nullptr);
-    nse.destroy_plugin(plg);
-    m_last_edit = uivec2();
-    m_editing_res = nullptr;
     reject();
 }
 
@@ -1060,7 +1889,9 @@ void resource_dialog_prev::on_m_folder_tb_pressed()
                                                  "Resource Subdirectory",
                                                  "./resources/" + m_ui.m_plugin_le->text(),
                                                  QFileDialog::DontUseNativeDialog | QFileDialog::ShowDirsOnly);
-    nsstring to_set = nsres_manager::name_from_filename(fname.toStdString()) + '/';
+    nsstring to_set = nsres_manager::name_from_filename(fname.toStdString());
+    if (!to_set.empty())
+        to_set += '/';
     m_ui.m_folder_le->setText(to_set.c_str());
 }
 
@@ -1102,7 +1933,7 @@ void resource_dialog_prev::on_m_icon_create_btn_pressed()
     }
 
     QPixmap pixMap = QPixmap::grabWidget(m_ui.m_preview).scaled(96,96);// = QPixmap::grabWidget(m_ui.m_preview).scaled(70,70);
-    pixMap.setMask(pixMap.createMaskFromColor(QColor(int(BG_R*255),int(BG_G*255),int(BG_B*255))));
+    pixMap.setMask(pixMap.createMaskFromColor(QColor(int(BG_R*255),int(BG_G*255),int(BG_B*255),0)));
 
     bbtk.map_view()->make_current();
     nsplugin * plg = nse.plugin(m_ui.m_plugin_le->text().toStdString());
@@ -1217,4 +2048,162 @@ void resource_dialog_prev::preview_updated()
     m_mesh_widget->ui->dsb_offset_z->setValue(tc->wpos().z);
     m_mesh_widget->ui->dsb_offset_z->blockSignals(false);
 
+}
+
+bool resource_dialog_prev::set_entity(nsentity * ent_)
+{
+    if (ent_ == NULL)
+    {
+        QMessageBox mb(this);
+        mb.setText("Internal error - must set valid ent. You gotta wonder - who writes these messages anyways??");
+        mb.exec();
+        return false;
+    }
+
+    m_ui.m_scroll_area->takeWidget();
+    m_ui.m_scroll_area->setWidget(m_ent_widget);
+ //   m_mesh_widget->clear_fields();
+    _reset_fields();
+
+    // make main window context current and get the passed in meshes owning plugin name
+    nse.make_current(bbtk.map_view()->glewID());
+    nsstring plug_name = nse.plugin(ent_->plugin_id())->name();
+
+    // indicate that we are editing an already loaded mesh by filling in these fields
+    m_starting_res = ent_->name();
+    m_starting_subdir = ent_->subdir();
+    m_starting_plug = plug_name;
+
+    // Now make the preview context current
+    m_ui.m_preview->make_current();
+
+    // Create a plugin in this context with the same name and set it to active
+    nsplugin * plg = nse.create_plugin(plug_name);
+    nse.set_active(plg);
+    if (plg == NULL)
+    {
+        QMessageBox mb(this);
+        mb.setWindowTitle("Preview Error");
+        mb.setText("Could not load preview plugin - try again");
+        mb.setIcon(QMessageBox::Warning);
+        mb.exec();
+        on_m_cancel_btn_pressed();
+        return false;
+    }
+
+    // Now lets set up the mesh in the preview context
+    nsentity * ent = plg->load<nsentity>(ent_->subdir() + ent_->name() + ent_->extension());
+
+    // If the mesh is still null it means the mesh could not be loaded from file which most
+    // likely means the mesh has not been saved yet - the user created one and proceeded to
+    // edit before saving for example. This, in general, should be allowed if the user is willing
+    // to save the mesh.
+    if (ent == NULL)
+    {
+        QMessageBox mb(this);
+        mb.setText("Cannot edit unsaved resource - would you like to save to file?");
+        mb.setStandardButtons(QMessageBox::Yes | QMessageBox::Cancel);
+        int ret = mb.exec();
+        if (ret == QMessageBox::Yes)
+        {
+            bbtk.map_view()->make_current();
+            nsplugin * eplg = nse.plugin(plug_name);
+            eplg->save<nsentity>(ent_->name());
+            m_ui.m_preview->make_current();
+            ent = plg->load<nsentity>(ent->subdir() + ent->name() + ent->extension());
+        }
+        else
+        {
+            on_m_cancel_btn_pressed();
+            return false;
+        }
+    }
+    ent->set_icon_path(ent_->icon_path());
+    m_editing_res = ent;
+    _set_ent_widget_fields(ent, plg);
+    return true;
+}
+
+bool resource_dialog_prev::set_entity(const nsstring & model_fname)
+{
+    m_ui.m_scroll_area->takeWidget();
+    m_ui.m_scroll_area->setWidget(m_ent_widget);
+ //   m_mesh_widget->clear_fields();
+    _reset_fields();
+
+    // make main window context current and get the passed in meshes owning plugin name
+    nse.make_current(bbtk.map_view()->glewID());
+    nsstring plug_name = nse.active()->name();
+
+    // Now make the preview context current
+    m_ui.m_preview->make_current();
+
+    // This is a mesh that has not been loaded in to the engine yet
+    m_starting_res = "";
+    m_starting_subdir = "";
+    m_starting_plug = plug_name;
+
+    // Create a plugin in this context with the same name and set it to active
+    nsplugin * plg = nse.create_plugin(plug_name);
+    nse.set_active(plg);
+
+    // Now lets set up the mesh in the preview context
+    nsentity * ent = plg->load_model("new_ent", model_fname, false);
+    if (ent == NULL)
+    {
+        QMessageBox mb(this);
+        mb.setText("Could not find mesh specified with path " + QString(model_fname.c_str()));
+        mb.exec();
+        on_m_cancel_btn_pressed();
+        return false;
+    }
+    m_editing_res = ent;
+    _set_ent_widget_fields(ent, plg);
+    return true;
+}
+
+void resource_dialog_prev::_set_ent_widget_fields(nsentity * ent, nsplugin * plg)
+{
+    m_ui.m_preview->make_current();
+
+    // Create the scene for viewing the preview and set it to current
+    nsscene * scn = plg->create<nsscene>("preview_map");
+    nse.set_current_scene(scn, true, false);
+
+    nse.system<nscamera_system>()->set_mode(nscamera_system::mode_focus);
+    nse.system<nscamera_system>()->set_sensitivity(DEFAULT_CAM_SENSITIVITY*0.02,nscamera_system::sens_strafe);
+    nse.system<nscamera_system>()->set_zoom(DEFAULT_CAM_ZOOM_FACTOR*0.03f);
+
+    // Create our directional light and camera and add it to the scene
+    nsentity * dir_light = plg->create_dir_light(PREV_LIGHT_NAME,0.8f,0.1f);
+    nsentity * camera = plg->create_camera(PREV_CAM_NAME,60.0f, uivec2(m_ui.m_preview->width(), m_ui.m_preview->height()), fvec2(DEFAULT_Z_NEAR, DEFAULT_Z_FAR));
+    scn->add(dir_light, fvec3(0,0,-20.0f));
+    scn->add(camera, fvec3(0.0f,-4.0f,-4.0f), ::orientation(fvec3(-70.0f,0.0f,0.0f),fvec3::XYZ));
+    scn->set_camera(camera);
+
+    on_cb_shadows_toggled(false);
+
+    m_ui.sldr_diffuse->setSliderPosition(80);
+    m_ui.sldr_ambient->setSliderPosition(10);
+
+    // Set the background color to light blue - this color will be used later to mask out the background
+    scn->set_bg_color(fvec4(BG_R,BG_G,BG_B,0.0f));
+    scn->add(ent);
+
+    nsentity * base_tile = plg->create_tile("preview_tile", "diffuseGrass.png", "normalGrass.png", fvec3(),4.0f, 0.1f, fvec3(),true );
+    scn->add_gridded(base_tile, ivec3(16,16,1), nstile_grid::world(ivec3(-8,-8,1)));
+    base_tile->get<nstform_comp>()->set_hidden_state(nstform_comp::hide_all, !m_mesh_widget->ui->cb_tile_layer->isChecked());
+
+
+    m_ui.m_plugin_le->setText(plg->name().c_str());
+    m_ui.m_name_le->setText(ent->name().c_str());
+    m_ui.m_folder_le->setText(ent->subdir().c_str());
+    m_ui.m_icon_path_le->setText(ent->icon_path().c_str());
+    if (!m_ui.m_icon_path_le->text().isEmpty())
+        m_ui.m_icon_lbl->setPixmap(QPixmap(m_ui.m_icon_path_le->text()));
+
+    _setup_preview_controls_mesh();
+    nse.system<nsinput_system>()->push_context("cam_control");
+    m_ent_widget->set_editing_ent(ent);
+    m_ent_widget->set_comp_widget(hash_id("nsrender_comp"));
 }

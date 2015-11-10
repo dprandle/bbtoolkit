@@ -37,7 +37,6 @@ class BrushMenuWidget;
 class CameraSettingsDialog;
 class TileView;
 class ObjectView;
-class EntityEditorDialog;
 class resource_browser;
 class QComboBox;
 

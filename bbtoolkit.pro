@@ -31,7 +31,21 @@ SOURCES += \
     src/select_res_dialog.cpp \
     src/mesh_widget.cpp \
     src/import_resources_dialog.cpp \
-    src/edit_submesh_data_widget.cpp
+    src/edit_submesh_data_widget.cpp \
+    src/material_widget.cpp \
+    src/entity_widget.cpp \
+    src/render_comp_widget.cpp \
+    src/light_comp_widget.cpp \
+    src/occupy_comp_widget.cpp \
+    src/tform_comp_widget.cpp \
+    src/cam_comp_widget.cpp \
+    src/sel_comp_widget.cpp \
+    src/tile_comp_widget.cpp \
+    src/tile_brush_comp_widget.cpp \
+    src/particle_comp_widget.cpp \
+    src/terrain_comp_widget.cpp \
+    src/anim_comp_widget.cpp \
+    src/component_widget.cpp
 
 HEADERS += \
     include/addnewbrushdialog.h \
@@ -67,7 +81,21 @@ HEADERS += \
     include/select_res_dialog.h \
     include/mesh_widget.h \
     include/import_resources_dialog.h \
-    include/edit_submesh_data_widget.h
+    include/edit_submesh_data_widget.h \
+    include/material_widget.h \
+    include/entity_widget.h \
+    include/render_comp_widget.h \
+    include/light_comp_widget.h \
+    include/occupy_comp_widget.h \
+    include/tform_comp_widget.h \
+    include/cam_comp_widget.h \
+    include/sel_comp_widget.h \
+    include/tile_comp_widget.h \
+    include/tile_brush_comp_widget.h \
+    include/particle_comp_widget.h \
+    include/terrain_comp_widget.h \
+    include/anim_comp_widget.h \
+    include/component_widget.h
 
 FORMS += \
     ui/transformcompwidget.ui \
@@ -111,7 +139,20 @@ FORMS += \
     ui/addnewbrushdialog.ui \
     ui/mesh_widget.ui \
     ui/import_resources_dialog.ui \
-    ui/edit_submesh_data_widget.ui
+    ui/edit_submesh_data_widget.ui \
+    ui/material_widget.ui \
+    ui/entity_widget.ui \
+    ui/render_comp_widget.ui \
+    ui/light_comp_widget.ui \
+    ui/occupy_comp_widget.ui \
+    ui/tform_comp_widget.ui \
+    ui/cam_comp_widget.ui \
+    ui/sel_comp_widget.ui \
+    ui/tile_comp_widget.ui \
+    ui/tile_brush_comp_widget.ui \
+    ui/particle_comp_widget.ui \
+    ui/terrain_comp_widget.ui \
+    ui/anim_comp_widget.ui
 
 CONFIG += qt debug_and_release c++14
 INCLUDEPATH += $$PWD/include
@@ -126,6 +167,7 @@ DEFINES += GLEW_STATIC GLEW_MX
 
 unix {
 QMAKE_CXXFLAGS += -pipe
+QMAKE_LFLAGS += -Wl,-rpath $$PWD/bin/x64
 system($$PWD/config.sh $$PWD)
 }
 
@@ -164,7 +206,7 @@ win32 {
 LIBS += -lOpenGL32 -lDbgHelp
 }
 
-LIBS += -lnsengined -lIL -lassimp
+LIBS += -lnsengine -lIL -lassimp
 DCONFIG = Release
 TARGET = bbtoolkit
 }

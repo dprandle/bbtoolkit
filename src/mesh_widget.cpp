@@ -2,7 +2,7 @@
 #include "ui_mesh_widget.h"
 
 mesh_widget::mesh_widget(QWidget *parent) :
-    QWidget(parent),
+    component_widget(parent),
     ui(new Ui::mesh_widget)
 {
     ui->setupUi(this);

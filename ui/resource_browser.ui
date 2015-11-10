@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>646</width>
-    <height>536</height>
+    <width>1103</width>
+    <height>745</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -142,8 +142,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>646</width>
-     <height>20</height>
+     <width>1103</width>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="m_create_menu">
@@ -168,7 +168,7 @@
     <enum>Qt::RightToLeft</enum>
    </property>
    <attribute name="toolBarArea">
-    <enum>BottomToolBarArea</enum>
+    <enum>RightToolBarArea</enum>
    </attribute>
    <attribute name="toolBarBreak">
     <bool>false</bool>
