@@ -15,6 +15,8 @@ public:
     explicit particle_comp_widget(QWidget *parent = 0);
     ~particle_comp_widget();
 
+    uint32 type();
+
 private:
     Ui::particle_comp_widget *ui;
 };

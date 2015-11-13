@@ -15,6 +15,8 @@ public:
     explicit terrain_comp_widget(QWidget *parent = 0);
     ~terrain_comp_widget();
 
+    uint32 type();
+
 private:
     Ui::terrain_comp_widget *ui;
 };

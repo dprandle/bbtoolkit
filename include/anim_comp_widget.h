@@ -17,6 +17,8 @@ public:
     explicit anim_comp_widget(QWidget *parent = 0);
     ~anim_comp_widget();
 
+    uint32 type();
+
 private:
     Ui::anim_comp_widget *ui;
 };

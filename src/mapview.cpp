@@ -34,21 +34,21 @@ This file contains all of the neccessary definitions for the MapView class.
 #include <resource_dialog_prev.h>
 #include <resource_dialog_prev_lighting.h>
 
-MapView::MapView(QWidget * parent) :
+map_view::map_view(QWidget * parent) :
 	QOpenGLWidget(parent)
 {
 }
 
-MapView::~MapView()
+map_view::~map_view()
 {
 }
 
-uint32 MapView::glewID()
+uint32 map_view::glew_id()
 {
     return m_glew_id;
 }
 
-void MapView::init()
+void map_view::init()
 {
 	setMouseTracking(true);
 	setFocusPolicy(Qt::StrongFocus);
@@ -58,21 +58,21 @@ void MapView::init()
 }
 
 
-void MapView::_connect()
+void map_view::_connect()
 {
     QTimer * t = new QTimer();
-    connect(t, SIGNAL(timeout()), this, SLOT(onIdle()));
+    connect(t, SIGNAL(timeout()), this, SLOT(on_idle()));
     t->start(0);
 }
 
-void MapView::enterEvent(QEvent *)
+void map_view::enterEvent(QEvent *)
 {
     nse.make_current(m_glew_id);
     nse.system<nsinput_system>()->set_cursor_pos(platform_normalized_mpos());
     nse.system<nsbuild_system>()->to_cursor();
 }
 
-void MapView::keyReleaseEvent(QKeyEvent * kEvent)
+void map_view::keyReleaseEvent(QKeyEvent * kEvent)
 {
     nse.make_current(m_glew_id);
     if (kEvent->isAutoRepeat())
@@ -85,7 +85,7 @@ void MapView::keyReleaseEvent(QKeyEvent * kEvent)
         QOpenGLWidget::keyPressEvent(kEvent);
 }
 
-void MapView::keyPressEvent(QKeyEvent * kEvent)
+void map_view::keyPressEvent(QKeyEvent * kEvent)
 {
     nse.make_current(m_glew_id);
     if (kEvent->isAutoRepeat())
@@ -98,7 +98,7 @@ void MapView::keyPressEvent(QKeyEvent * kEvent)
         QOpenGLWidget::keyPressEvent(kEvent);
 }
 
-bool MapView::_on_key(bool pressed, int key)
+bool map_view::_on_key(bool pressed, int key)
 {
     switch (key)
     {
@@ -264,28 +264,28 @@ bool MapView::_on_key(bool pressed, int key)
     return true;
 }
 
-void MapView::mouseMoveEvent(QMouseEvent * mevent)
+void map_view::mouseMoveEvent(QMouseEvent * mevent)
 {
     nse.make_current(m_glew_id);
     nse.event_dispatch()->push<nsmouse_move_event>(platform_normalized_mpos());
     QOpenGLWidget::mouseMoveEvent(mevent);
 }
 
-void MapView::mouseReleaseEvent(QMouseEvent * mevent)
+void map_view::mouseReleaseEvent(QMouseEvent * mevent)
 {
     nse.make_current(m_glew_id);
     if (!_on_mouse(false, mevent->button(), platform_normalized_mpos()))
         QOpenGLWidget::mousePressEvent(mevent);
 }
 
-void MapView::mousePressEvent(QMouseEvent * mevent)
+void map_view::mousePressEvent(QMouseEvent * mevent)
 {
     nse.make_current(m_glew_id);
     if (!_on_mouse(true, mevent->button(), platform_normalized_mpos()))
         QOpenGLWidget::mousePressEvent(mevent);
 }
 
-bool MapView::_on_mouse(bool pressed, int mbutton, const fvec2 & norm_mpos)
+bool map_view::_on_mouse(bool pressed, int mbutton, const fvec2 & norm_mpos)
 {
     switch (mbutton)
     {
@@ -311,7 +311,7 @@ bool MapView::_on_mouse(bool pressed, int mbutton, const fvec2 & norm_mpos)
 
 }
 
-void MapView::mouseDoubleClickEvent(QMouseEvent *)
+void map_view::mouseDoubleClickEvent(QMouseEvent *)
 {
     QMessageBox mb;
     mb.setText("Double clicked");
@@ -319,7 +319,7 @@ void MapView::mouseDoubleClickEvent(QMouseEvent *)
 }
 
 
-void MapView::wheelEvent(QWheelEvent * wevent)
+void map_view::wheelEvent(QWheelEvent * wevent)
 {
     nse.make_current(m_glew_id);
     nse.event_dispatch()->push<nsmouse_scroll_event>(wevent->delta(), platform_normalized_mpos());
@@ -336,13 +336,13 @@ fvec2 platform_normalized_mpos()
     return pos;
 }
 
-void MapView::onIdle()
+void map_view::on_idle()
 {
     if (hasFocus())
         update();
 }
 
-void MapView::initializeGL()
+void map_view::initializeGL()
 {
     bbtk.output_view()->writeToScreen("Initializing mapview opengL");
 
@@ -408,13 +408,13 @@ void MapView::initializeGL()
     bbtk.res_dialog_prev_lighting()->init();
 }
 
-void MapView::make_current()
+void map_view::make_current()
 {
     makeCurrent();
     nse.make_current(m_glew_id);
 }
 
-void MapView::resizeGL(int width, int height)
+void map_view::resizeGL(int width, int height)
 {
     nse.make_current(m_glew_id);
     nsrender_system * rs = nse.system<nsrender_system>();
@@ -425,7 +425,7 @@ void MapView::resizeGL(int width, int height)
     }
 }
 
-void MapView::paintGL()
+void map_view::paintGL()
 {
     nse.make_current(m_glew_id);
     nse.update();

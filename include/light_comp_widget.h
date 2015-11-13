@@ -15,6 +15,8 @@ public:
     explicit light_comp_widget(QWidget *parent = 0);
     ~light_comp_widget();
 
+    uint32 type();
+
 private:
     Ui::light_comp_widget *ui;
 };

@@ -7,12 +7,16 @@
 #define BG_G 0.3f
 #define BG_B 0.4f
 
+#define DEF_LT_AMB 1.0f
+#define DEF_LT_DIFF 0.0f
+
 #define PREV_LIGHT_NAME "preview_dir_light"
 #define PREV_CAM_NAME "preview_cam"
 
 class texture_widget;
 class nstexture;
 class material_widget;
+class component_selection_widget;
 class nsentity;
 class nsmaterial;
 class nsmesh;
@@ -37,7 +41,7 @@ public:
 
     void init();
 
-    bool set_entity(nsentity * mesh_);
+    bool set_entity(nsentity * ent_);
 
     bool set_entity(const nsstring & model_fname);
 
@@ -55,31 +59,11 @@ public:
 
 public slots:
 
-    void tex_cubemap_triggered();
+    void edit_res_changed(nsresource * res);
 
-    void tex_tex2d_triggered();
+    void entity_edit_component(uint32 comp_type);
 
-    void mesh_show_verts();
-
-    void submesh_index_changed(int index);
-
-    void mesh_toggle_uv_coords(bool new_val);
-
-    void mesh_toggle_show_tile_layer(bool new_val);
-
-    void mesh_toggle_show_center(bool new_val);
-
-    void mesh_wireframe_toggled(bool new_val);
-
-    void mesh_view_joints();
-
-    void mesh_view_node_tree();
-
-    void mesh_scale(double new_val);
-
-    void mesh_translate();
-
-    void mesh_rotate(int);
+    void comp_sel_widget();
 
     void on_m_okay_btn_pressed();
 
@@ -101,56 +85,17 @@ public slots:
 
     void on_slider_vert_plane_valueChanged();
 
-    void mesh_flip_all_uvs();
-
-    void mesh_flip_sub_uvs();
-
-    void mesh_flip_all_norms();
-
-    void mesh_flip_sub_norms();
-
-    void mat_preview_mesh_changed(int new_index);
-
-    void mat_from_ui();
-
-    void mat_color_tb();
-
-    void mat_spec_color_tb();
-
-    void mat_btn_shader();
-
-    void mat_btn_diffuse();
-
-    void mat_btn_normal();
-
-    void mat_btn_opac();
-
-    void preview_updated();
-
     void on_cb_shadows_toggled(bool);
 
-    void mat_dif_erase();
-
-    void mat_norm_erase();
-
-    void mat_opac_erase();
-
-    void mat_shader_erase();
-
 private:
-    void _set_mesh_widget_fields(nsmesh * msh, nsplugin * plg);
 
-    void _set_ent_widget_fields(nsentity * ent, nsplugin * plg);
-
-    void _update_submesh_info(nsmesh * msh, uint32 sub_index);
+    bool _setup_resource_ui(nsresource * incoming);
 
     void _reset_fields();
 
-    void _setup_preview_controls_tex();
+    void _setup_preview_controls_limited();
 
-    void _setup_preview_controls_mesh();
-
-    void _add_node_to_tree(void * node_, QTreeWidgetItem * item);
+    void _setup_preview_controls_full();
 
     Ui::resource_dialog_prev m_ui;
 
@@ -160,13 +105,13 @@ private:
     mesh_widget * m_mesh_widget;
     material_widget * m_mat_widget;
     entity_widget * m_ent_widget;
+    component_selection_widget * m_comp_sel;
 
     nsstring m_starting_res;
     nsstring m_starting_plug;
     nsstring m_starting_subdir;
 
     uivec2 m_last_edit;
-
 };
 
 #endif // RESOURCE_DIALOG_PREV_H

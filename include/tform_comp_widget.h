@@ -15,6 +15,8 @@ public:
     explicit tform_comp_widget(QWidget *parent = 0);
     ~tform_comp_widget();
 
+    uint32 type();
+
 private:
     Ui::tform_comp_widget *ui;
 };

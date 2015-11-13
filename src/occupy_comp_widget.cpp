@@ -1,3 +1,4 @@
+#include <nsengine.h>
 #include <occupy_comp_widget.h>
 #include <ui_occupy_comp_widget.h>
 
@@ -11,4 +12,9 @@ occupy_comp_widget::occupy_comp_widget(QWidget *parent) :
 occupy_comp_widget::~occupy_comp_widget()
 {
     delete ui;
+}
+
+uint32 occupy_comp_widget::type()
+{
+    return hash_id("nsoccupy_comp");
 }

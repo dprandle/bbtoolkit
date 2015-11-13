@@ -21,7 +21,7 @@ This file contains all of the neccessary definitions for the Toolkit class.
 #include <nsplugin.h>
 
 #include <qdockwidget.h>
-#include <qmessagebox.h>
+#include <QMessageBox>
 #include <qlabel.h>
 #include <qcombobox.h>
 #include <qspinbox.h>
@@ -72,7 +72,17 @@ Toolkit::Toolkit(QWidget *parent) :
     m_ptr = this;
 }
 
-MapView * Toolkit::map_view()
+int message_box(QWidget * parent, const nsstring & title, const nsstring & msg, int buttons, int icon)
+{
+    QMessageBox mb(parent);
+    mb.setIcon(QMessageBox::Icon(icon));
+    mb.setWindowTitle(title.c_str());
+    mb.setText(msg.c_str());
+    mb.setStandardButtons(QMessageBox::StandardButton(buttons));
+    return mb.exec();
+}
+
+map_view * Toolkit::map()
 {
     return m_ui.mMapView;
 }
@@ -296,7 +306,7 @@ void Toolkit::on_actionSelect_triggered(bool pVal)
     m_ui.mMapView->setFocus();
 }
 
-void Toolkit::on_actionSelectArea_triggered(bool pVal)
+void Toolkit::on_actionSelectArea_triggered(bool)
 {
     output_view()->writeToScreen("This behaviour has not yet been implemented");
 }
@@ -522,7 +532,7 @@ void Toolkit::refresh_views()
 
 void Toolkit::on_debug_view(bool pNewVal)
 {
-    map_view()->make_current();
+    map()->make_current();
     nse.system<nsrender_system>()->enable_debug_draw(pNewVal);
 }
 
@@ -546,7 +556,7 @@ void Toolkit::on_actionNewBrush_triggered()
     m_ui.mMapView->setFocus();
 }
 
-void Toolkit::on_set_current_brush(nsentity * pBrush)
+void Toolkit::on_set_current_brush(nsentity *)
 {
 //	if (pBrush == NULL)
 //		return;
@@ -570,7 +580,7 @@ void Toolkit::on_set_current_brush(nsentity * pBrush)
 //    m_ui.mMapView->setFocus();
 }
 
-void Toolkit::on_brush_change(QListWidgetItem* pCurrent)
+void Toolkit::on_brush_change(QListWidgetItem*)
 {
 //	if (pCurrent == NULL)
 //	{
@@ -729,7 +739,7 @@ void Toolkit::on_actionUndo_triggered()
 //    m_ui.mMapView->setFocus();
 }
 
-Toolkit * Toolkit::m_ptr = NULL;
+Toolkit * Toolkit::m_ptr = nullptr;
 
 Toolkit & Toolkit::inst()
 {

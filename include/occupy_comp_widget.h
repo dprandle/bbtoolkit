@@ -15,6 +15,8 @@ public:
     explicit occupy_comp_widget(QWidget *parent = 0);
     ~occupy_comp_widget();
 
+    uint32 type();
+
 private:
     Ui::occupy_comp_widget *ui;
 };

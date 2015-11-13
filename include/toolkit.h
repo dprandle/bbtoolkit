@@ -23,8 +23,17 @@ This file contains all of the neccessary declarations for the Toolkit class.
 #define LAYER_ALL_TEXT "All Except"
 #define LAYER_ONLY_TEXT "Only"
 
+#define mbox(title,msg) message_box(this, title, msg, QMessageBox::Ok, QMessageBox::Warning)
+#define mboxb(title,msg,b) message_box(this, title, msg, b, QMessageBox::Warning)
+
+#define mboxq(title,msg) message_box(this, title, msg, QMessageBox::Ok, QMessageBox::Question)
+#define mboxqb(title,msg,b) message_box(this, title, msg, b, QMessageBox::Question)
+
+#define mboxc(title,msg) message_box(this, title, msg, QMessageBox::Ok, QMessageBox::Critical)
+#define mboxcb(title,msg,b) message_box(this, title, msg, b, QMessageBox::Critical)
+
 class QMessageBox;
-class MapView;
+class map_view;
 class nsengine;
 class OutputView;
 class QSpinBox;
@@ -44,6 +53,8 @@ class resource_dialog;
 class resource_dialog_prev;
 class resource_dialog_prev_lighting;
 
+int message_box(QWidget * parent, const nsstring & title, const nsstring & msg, int buttons, int icon);
+
 class Toolkit : public QMainWindow
 {
 	Q_OBJECT
@@ -54,7 +65,7 @@ public:
 
 	void closeEvent(QCloseEvent *pEvent);
 
-    MapView * map_view();
+    map_view * map();
 
     OutputView * output_view();
 

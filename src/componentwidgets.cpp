@@ -83,7 +83,7 @@ void CamCompWidget::onChangeSpeed(double pNewSpeed)
 		return;
 
     camComp->set_speed(pNewSpeed);
-    bbtk.map_view()->update();
+    bbtk.map()->update();
 }
 
 InputCompWidget::InputCompWidget(QWidget * pParent) :
@@ -172,7 +172,7 @@ void LightCompWidget::onAmbientChange(int pVal)
 
     lightComp->set_intensity(lightComp->intensity().x, float(pVal)/100.0f, nslight_comp::adjustment_t(mUI.mFalloffCB->currentIndex()));
 	setEntity(mEnt);
-    bbtk.map_view()->update();
+    bbtk.map()->update();
 }
 
 void LightCompWidget::onColorChange()
@@ -195,7 +195,7 @@ void LightCompWidget::onColorChange()
 		prevC = c;
 	}
 	_setColorStyle(prevC);
-    bbtk.map_view()->update();
+    bbtk.map()->update();
 }
 
 void LightCompWidget::onCutoffChange(int pVal)
@@ -209,7 +209,7 @@ void LightCompWidget::onCutoffChange(int pVal)
 
     lightComp->set_cutoff(float(pVal));
 	setEntity(mEnt);
-    bbtk.map_view()->update();
+    bbtk.map()->update();
 }
 
 void LightCompWidget::onDiffuseChange(int pVal)
@@ -223,7 +223,7 @@ void LightCompWidget::onDiffuseChange(int pVal)
 
     lightComp->set_intensity(float(pVal)/100.0f, lightComp->intensity().y, nslight_comp::adjustment_t(mUI.mFalloffCB->currentIndex()));
 	setEntity(mEnt);
-    bbtk.map_view()->update();
+    bbtk.map()->update();
 }
 
 void LightCompWidget::onDistanceChange(int pVal)
@@ -240,7 +240,7 @@ void LightCompWidget::onDistanceChange(int pVal)
 	mUI.mDistanceSB->setValue(double(pVal));
 	mUI.mDistanceSB->blockSignals(false);
 	setEntity(mEnt);
-    bbtk.map_view()->update();
+    bbtk.map()->update();
 }
 
 void LightCompWidget::onDistanceChangeSB(double pVal)
@@ -257,7 +257,7 @@ void LightCompWidget::onDistanceChangeSB(double pVal)
 	mUI.mDistanceSldr->setValue(int(pVal));
 	mUI.mDistanceSldr->blockSignals(false);
 	setEntity(mEnt);
-    bbtk.map_view()->update();
+    bbtk.map()->update();
 }
 
 void LightCompWidget::onFalloffChange(QString pVal)
@@ -270,7 +270,7 @@ void LightCompWidget::onFalloffChange(QString pVal)
 		return;
 
 	setEntity(mEnt);
-    bbtk.map_view()->update();
+    bbtk.map()->update();
 }
 
 void LightCompWidget::onLightTypeChange(QString pVal)
@@ -301,7 +301,7 @@ void LightCompWidget::onLightTypeChange(QString pVal)
     lightComp->set_type(lType);
     lightComp->set_mesh_id(ID);
 	setEntity(mEnt);
-    bbtk.map_view()->update();
+    bbtk.map()->update();
 }
 
 void LightCompWidget::onRadiusChange(double pVal)
@@ -315,7 +315,7 @@ void LightCompWidget::onRadiusChange(double pVal)
 
     lightComp->set_radius(pVal);
 	setEntity(mEnt);
-    bbtk.map_view()->update();
+    bbtk.map()->update();
 }
 
 void LightCompWidget::onCastShadowChange(bool pVal)
@@ -328,7 +328,7 @@ void LightCompWidget::onCastShadowChange(bool pVal)
 		return;
 
     lightComp->set_cast_shadows(pVal);
-    bbtk.map_view()->update();
+    bbtk.map()->update();
 }
 
 void LightCompWidget::onShadowDarknessChange(int pVal)
@@ -341,7 +341,7 @@ void LightCompWidget::onShadowDarknessChange(int pVal)
 		return;
 
     lightComp->set_shadow_darkness(float(pVal)/100.0f);
-    bbtk.map_view()->update();
+    bbtk.map()->update();
 }
 
 void LightCompWidget::onShadowSamplesChange(int pVal)
@@ -354,7 +354,7 @@ void LightCompWidget::onShadowSamplesChange(int pVal)
 		return;
 
     lightComp->set_shadow_samples(pVal);
-    bbtk.map_view()->update();
+    bbtk.map()->update();
 }
 
 void LightCompWidget::_setColorStyle(const QColor & pCol)
@@ -1162,7 +1162,7 @@ void RenderCompWidget::onCastShadowsChange(bool)
 		return;
 
     renComp->set_cast_shadow(mUI.mCastsShadowsCB->isChecked());
-    bbtk.map_view()->update();
+    bbtk.map()->update();
 }
 
 void RenderCompWidget::onChooseMat()
@@ -1219,7 +1219,7 @@ void RenderCompWidget::onChooseMat()
 
         renComp->set_material(twItem->data(0, 0).toInt(), mat->full_id(), true);
 		setEntity(mEnt);
-        bbtk.map_view()->update();
+        bbtk.map()->update();
 	}
 }
 
@@ -1273,7 +1273,7 @@ void RenderCompWidget::onChooseMesh()
         renComp->set_mesh_id(mesh->full_id());
         renComp->clear_mats();
 		setEntity(mEnt);
-        bbtk.map_view()->update();
+        bbtk.map()->update();
 	}
 }
 
@@ -1294,7 +1294,7 @@ void RenderCompWidget::onClearMat()
 
     renComp->remove_material(twItem->data(0, 0).toInt());
 	setEntity(mEnt);
-    bbtk.map_view()->update();
+    bbtk.map()->update();
 
 }
 
@@ -1353,7 +1353,7 @@ void SelCompWidget::onAlphaChange(double pVal)
 		return;
 
     selComp->set_mask_alpha(pVal);
-    bbtk.map_view()->update();
+    bbtk.map()->update();
 }
 
 void SelCompWidget::onChangeColor()
@@ -1376,7 +1376,7 @@ void SelCompWidget::onChangeColor()
 		prevC = c;
 	}
 	_setColorStyle(prevC);
-    bbtk.map_view()->update();
+    bbtk.map()->update();
 }
 
 void SelCompWidget::_setColorStyle(const QColor & pCol)

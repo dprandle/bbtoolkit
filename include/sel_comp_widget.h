@@ -15,6 +15,8 @@ public:
     explicit sel_comp_widget(QWidget *parent = 0);
     ~sel_comp_widget();
 
+    uint32 type();
+
 private:
     Ui::sel_comp_widget *ui;
 };

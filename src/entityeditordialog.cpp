@@ -85,7 +85,7 @@ void EntityEditorDialog::init()
 
 void EntityEditorDialog::onIdle()
 {
-    bbtk.map_view()->update();
+    bbtk.map()->update();
 }
 
 void EntityEditorDialog::onChooseIcon()
@@ -123,10 +123,10 @@ void EntityEditorDialog::onRemoveComp()
 	if (items.isEmpty())
 		return;
 	auto item = items.first();
-    bbtk.map_view()->makeCurrent();
+    bbtk.map()->makeCurrent();
 	mEnt->del(item->text().toStdString());
 	setEntity(mEnt);
-    bbtk.map_view()->update();
+    bbtk.map()->update();
 }
 
 void EntityEditorDialog::onPrevDefault()

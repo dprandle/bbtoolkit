@@ -15,6 +15,8 @@ public:
     explicit cam_comp_widget(QWidget *parent = 0);
     ~cam_comp_widget();
 
+    uint32 type();
+
 private:
     Ui::cam_comp_widget *ui;
 };

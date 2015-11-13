@@ -16,5 +16,5 @@ void ListWidgetCust::mousePressEvent(QMouseEvent * pEvent)
 	if (!indexAt(pEvent->pos()).isValid())
 		clearSelection();
 	QListWidget::mousePressEvent(pEvent);
-    bbtk.map_view()->setFocus();
+    bbtk.map()->setFocus();
 }

@@ -32,7 +32,7 @@ select_res_dialog::~select_res_dialog()
 
 void select_res_dialog::show_type(uint32 guid_)
 {
-    bbtk.map_view()->make_current();
+    bbtk.map()->make_current();
     m_ui.m_lw->clear();
 
     nsstring restype = hash_to_guid(guid_).substr(2);

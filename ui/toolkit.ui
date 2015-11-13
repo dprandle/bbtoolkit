@@ -420,7 +420,7 @@ QTabBar::tab:!selected
   <property name="unifiedTitleAndToolBarOnMac">
    <bool>false</bool>
   </property>
-  <widget class="MapView" name="mMapView"/>
+  <widget class="map_view" name="mMapView"/>
   <widget class="QMenuBar" name="mMenubar">
    <property name="geometry">
     <rect>
@@ -1084,7 +1084,7 @@ border: 0px;
  </widget>
  <customwidgets>
   <customwidget>
-   <class>MapView</class>
+   <class>map_view</class>
    <extends>QWidget</extends>
    <header>mapview.h</header>
    <container>1</container>
@@ -1092,19 +1092,19 @@ border: 0px;
   <customwidget>
    <class>OutputView</class>
    <extends>QWidget</extends>
-   <header>outputview.h</header>
+   <header location="global">outputview.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>TileView</class>
    <extends>QWidget</extends>
-   <header>tileview.h</header>
+   <header location="global">tileview.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>ObjectView</class>
    <extends>QWidget</extends>
-   <header>objectview.h</header>
+   <header location="global">objectview.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

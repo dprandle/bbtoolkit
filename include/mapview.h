@@ -25,19 +25,19 @@ class nsentity;
 class nstex_manager;
 class nsshader_manager;
 
-class MapView : public QOpenGLWidget
+class map_view : public QOpenGLWidget
 {
 	Q_OBJECT
 public:
-	MapView(QWidget * parent=NULL);
-	~MapView();
+    map_view(QWidget * parent=NULL);
+    ~map_view();
 
-    uint32 glewID();
+    uint32 glew_id();
     void init();
     void make_current();
 
 public slots:
-	void onIdle();
+    void on_idle();
 
 protected:
 	void initializeGL();

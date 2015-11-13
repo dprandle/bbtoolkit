@@ -45,7 +45,9 @@ SOURCES += \
     src/particle_comp_widget.cpp \
     src/terrain_comp_widget.cpp \
     src/anim_comp_widget.cpp \
-    src/component_widget.cpp
+    src/component_widget.cpp \
+    src/add_comp_dialog.cpp \
+    src/component_selection_widget.cpp
 
 HEADERS += \
     include/addnewbrushdialog.h \
@@ -95,7 +97,9 @@ HEADERS += \
     include/particle_comp_widget.h \
     include/terrain_comp_widget.h \
     include/anim_comp_widget.h \
-    include/component_widget.h
+    include/component_widget.h \
+    include/add_comp_dialog.h \
+    include/component_selection_widget.h
 
 FORMS += \
     ui/transformcompwidget.ui \
@@ -152,7 +156,9 @@ FORMS += \
     ui/tile_brush_comp_widget.ui \
     ui/particle_comp_widget.ui \
     ui/terrain_comp_widget.ui \
-    ui/anim_comp_widget.ui
+    ui/anim_comp_widget.ui \
+    ui/add_comp_dialog.ui \
+    ui/component_selection_widget.ui
 
 CONFIG += qt debug_and_release c++14
 INCLUDEPATH += $$PWD/include

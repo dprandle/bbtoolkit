@@ -79,7 +79,7 @@ void resource_browser::change_resource_type()
 
 void resource_browser::show_type(uint32 guid_)
 {
-    bbtk.map_view()->make_current();
+    bbtk.map()->make_current();
     m_ui.m_res_lw->clear();
 
     auto plg_iter = nse.plugins()->begin();
@@ -166,7 +166,7 @@ void resource_browser::on_a_create_mesh_triggered()
 
         if (load_mats)
         {
-            bbtk.map_view()->make_current();
+            bbtk.map()->make_current();
             if (!nse.active()->load_model_mats(fname, false))
             {
                 QMessageBox mb(this);
@@ -180,7 +180,7 @@ void resource_browser::on_a_create_mesh_triggered()
         }
         if (load_anim)
         {
-            bbtk.map_view()->make_current();
+            bbtk.map()->make_current();
             if (!nse.active()->load_model_anim(fname, false))
             {
                 QMessageBox mb(this);
@@ -198,7 +198,7 @@ void resource_browser::on_a_create_mesh_triggered()
 
 void resource_browser::on_a_edit_resource_triggered()
 {
-    bbtk.map_view()->make_current();
+    bbtk.map()->make_current();
     auto current_res_type = m_ui.m_res_type_lw->selectedItems().last();
     uint res_type_id = current_res_type->data(Qt::UserRole).toUInt();
 
@@ -242,7 +242,7 @@ void resource_browser::on_a_edit_resource_triggered()
 
         if (bbtk.res_dialog_prev()->exec() == QDialog::Accepted)
         {
-            bbtk.map_view()->make_current();
+            bbtk.map()->make_current();
             nsmesh * fin = nse.resource<nsmesh>(bbtk.res_dialog_prev()->get_editing_res());
             if (fin == NULL)
             {
@@ -388,7 +388,7 @@ void resource_browser::on_a_del_resource_triggered()
     int ret = mb.exec();
     if (ret == QMessageBox::Ok)
     {
-        bbtk.map_view()->make_current();
+        bbtk.map()->make_current();
         auto current_res_type = m_ui.m_res_type_lw->selectedItems().last();
         uint res_type_id = current_res_type->data(Qt::UserRole).toUInt();
 

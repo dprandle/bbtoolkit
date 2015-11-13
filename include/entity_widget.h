@@ -31,19 +31,36 @@ public:
 
     void set_comp_widget(uint32 comp_type);
 
-    void set_editing_ent(nsentity * ent_);
+    void set_entity(nsentity * ent_);
 
-    void set_preview(Preview * prev_);
+    void init(Preview * prev_);
+
+    void done();
 
     nsentity * editing_ent();
 
-    Ui::entity_widget *ui;
+public slots:
+
+    void on_tb_prev_pressed();
+
+    void on_tb_next_pressed();
+
+    void on_tb_back_pressed();
+
+signals:
+
+    void set_comp_sel();
 
 private:
 
+    void _ui_comp_title(uint32 cid);
+
     std::map<uint32,component_widget*> m_type_map;
 
+    Ui::entity_widget * m_ui;
+
     nsentity * m_editing_ent;
+
     Preview * m_prev;
 };
 

@@ -15,6 +15,8 @@ public:
     explicit tile_comp_widget(QWidget *parent = 0);
     ~tile_comp_widget();
 
+    uint32 type();
+
 private:
     Ui::tile_comp_widget *ui;
 };

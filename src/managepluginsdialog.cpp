@@ -268,7 +268,7 @@ void ManagePluginsDialog::onOkay()
 			}
 			if (cur->camera() == NULL)
 			{
-                nsentity * cam = activePlug->create_camera(cur->name() + "cam", 60.0f, uivec2(bbtk.map_view()->width(), bbtk.map_view()->height()), fvec2(DEFAULT_Z_NEAR, DEFAULT_Z_FAR));
+                nsentity * cam = activePlug->create_camera(cur->name() + "cam", 60.0f, uivec2(bbtk.map()->width(), bbtk.map()->height()), fvec2(DEFAULT_Z_NEAR, DEFAULT_Z_FAR));
                 cur->set_camera(cam, true);
 			}
 		}

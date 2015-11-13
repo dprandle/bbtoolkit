@@ -365,7 +365,7 @@ void NewMapDialog::onCreate()
 		}
 	}
 	else
-        scenecam = nse.active()->create_camera(mapName + "_cam", 60.0f, uivec2(bbtk.map_view()->width(), bbtk.map_view()->height()), fvec2(DEFAULT_Z_NEAR, DEFAULT_Z_FAR));
+        scenecam = nse.active()->create_camera(mapName + "_cam", 60.0f, uivec2(bbtk.map()->width(), bbtk.map()->height()), fvec2(DEFAULT_Z_NEAR, DEFAULT_Z_FAR));
 
 	nsscene * scene = scenes->create(mapName);
 	if (scene == NULL)
