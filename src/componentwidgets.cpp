@@ -20,7 +20,7 @@
 #include <nsengine.h>
 #include <nsmesh_manager.h>
 #include <ui_select_res_dialog.h>
-#include <nsrender_system.h>
+#include <nstform_system.h>
 
 CompWidget::CompWidget(QWidget * pParent) :
 mEnt(NULL),
@@ -275,33 +275,33 @@ void LightCompWidget::onFalloffChange(QString pVal)
 
 void LightCompWidget::onLightTypeChange(QString pVal)
 {
-	if (mEnt == NULL)
-		return;
+//	if (mEnt == NULL)
+//		return;
 
-	nslight_comp * lightComp = mEnt->get<nslight_comp>();
-	if (lightComp == NULL)
-		return;
+//	nslight_comp * lightComp = mEnt->get<nslight_comp>();
+//	if (lightComp == NULL)
+//		return;
 
-    nslight_comp::light_t lType = nslight_comp::light_t(mUI.mLightTypeCB->findText(pVal));
-	uivec2 ID;
+//    nslight_comp::light_t lType = nslight_comp::light_t(mUI.mLightTypeCB->findText(pVal));
+//	uivec2 ID;
 
-	switch (lType)
-	{
-    case(nslight_comp::l_dir) :
-        ID = nse.resource<nsmesh>(ENGINE_PLUG,MESH_DIRLIGHT_BOUNDS)->full_id();
-		break;
-    case(nslight_comp::l_point) :
-        ID = nse.resource<nsmesh>(ENGINE_PLUG, MESH_POINTLIGHT_BOUNDS)->full_id();
-		break;
-    case(nslight_comp::l_spot) :
-        ID = nse.resource<nsmesh>(ENGINE_PLUG, MESH_SPOTLIGHT_BOUNDS)->full_id();
-		break;
-	}
+//	switch (lType)
+//	{
+//    case(nslight_comp::l_dir) :
+//        ID = nse.resource<nsmesh>(ENGINE_PLUG,MESH_DIRLIGHT_BOUNDS)->full_id();
+//		break;
+//    case(nslight_comp::l_point) :
+//        ID = nse.resource<nsmesh>(ENGINE_PLUG, MESH_POINTLIGHT_BOUNDS)->full_id();
+//		break;
+//    case(nslight_comp::l_spot) :
+//        ID = nse.resource<nsmesh>(ENGINE_PLUG, MESH_SPOTLIGHT_BOUNDS)->full_id();
+//		break;
+//	}
 
-    lightComp->set_type(lType);
-    lightComp->set_mesh_id(ID);
-	setEntity(mEnt);
-    bbtk.map()->update();
+//    lightComp->set_type(lType);
+//    lightComp->set_mesh_id(ID);
+//	setEntity(mEnt);
+//    bbtk.map()->update();
 }
 
 void LightCompWidget::onRadiusChange(double pVal)
@@ -392,241 +392,241 @@ ParticleCompWidget::~ParticleCompWidget()
 
 void ParticleCompWidget::setEntity(nsentity * pEnt)
 {
-	CompWidget::setEntity(pEnt);
-	if (mEnt == NULL)
-		return;
+//	CompWidget::setEntity(pEnt);
+//	if (mEnt == NULL)
+//		return;
 
 
-	nsparticle_comp * partComp = mEnt->get<nsparticle_comp>();
-	if (partComp == NULL)
-		return;
+//	nsparticle_comp * partComp = mEnt->get<nsparticle_comp>();
+//	if (partComp == NULL)
+//		return;
 
-	mUI.mKeyframeTblW->clearContents();
-	mUI.mForceTblW->clearContents();
-	mUI.mForceTblW->setMinimumHeight(40);
-	mUI.mKeyframeTblW->setMinimumHeight(40);
+//	mUI.mKeyframeTblW->clearContents();
+//	mUI.mForceTblW->clearContents();
+//	mUI.mForceTblW->setMinimumHeight(40);
+//	mUI.mKeyframeTblW->setMinimumHeight(40);
 
-    nsmaterial * mat = nse.resource<nsmaterial>(partComp->material_id());
-    nsshader * shader = nse.resource<nsshader>(partComp->shader_id());
-    nstexture * tex = nse.resource<nstexture>(partComp->rand_tex_id());
+//    nsmaterial * mat = nse.resource<nsmaterial>(partComp->material_id());
+//    nsshader * shader = nse.resource<nsshader>(partComp->shader_id());
+//    nstexture * tex = nse.resource<nstexture>(partComp->rand_tex_id());
 
-	if (mat != NULL)
-		mUI.mMaterialLE->setText(mat->name().c_str());
-	else
-		mUI.mMaterialLE->setText("None");
+//	if (mat != NULL)
+//		mUI.mMaterialLE->setText(mat->name().c_str());
+//	else
+//		mUI.mMaterialLE->setText("None");
 
-	if (shader != NULL)
-		mUI.mShaderLE->setText(shader->name().c_str());
-	else
-		mUI.mShaderLE->setText("None");
+//	if (shader != NULL)
+//		mUI.mShaderLE->setText(shader->name().c_str());
+//	else
+//		mUI.mShaderLE->setText("None");
 	
-	if (tex != NULL)
-		mUI.mRandTexLE->setText(tex->name().c_str());
-	else
-		mUI.mRandTexLE->setText("None");
+//	if (tex != NULL)
+//		mUI.mRandTexLE->setText(tex->name().c_str());
+//	else
+//		mUI.mRandTexLE->setText("None");
 
-	mUI.mLoopCB->setChecked(partComp->looping());
-	mUI.mSimCB->setChecked(partComp->simulating());
+//	mUI.mLoopCB->setChecked(partComp->looping());
+//	mUI.mSimCB->setChecked(partComp->simulating());
 
-	mUI.mMaxParticlesSB->blockSignals(true);
-    mUI.mMaxParticlesSB->setValue(partComp->max_particles());
-	mUI.mMaxParticlesSB->blockSignals(false);
+//	mUI.mMaxParticlesSB->blockSignals(true);
+//    mUI.mMaxParticlesSB->setValue(partComp->max_particles());
+//	mUI.mMaxParticlesSB->blockSignals(false);
 
-	mUI.mEmissionSB->blockSignals(true);
-    mUI.mEmissionSB->setValue(partComp->emission_rate());
-	mUI.mEmissionSB->blockSignals(false);
+//	mUI.mEmissionSB->blockSignals(true);
+//    mUI.mEmissionSB->setValue(partComp->emission_rate());
+//	mUI.mEmissionSB->blockSignals(false);
 
-	mUI.mAngVelSB->blockSignals(true);
-    mUI.mAngVelSB->setValue(partComp->angular_vel());
-	mUI.mAngVelSB->blockSignals(false);
+//	mUI.mAngVelSB->blockSignals(true);
+//    mUI.mAngVelSB->setValue(partComp->angular_vel());
+//	mUI.mAngVelSB->blockSignals(false);
 
-	mUI.mLifetimeDSB->blockSignals(true);
-	mUI.mLifetimeDSB->setValue(float(partComp->lifetime())/1000.0f);
-	mUI.mLifetimeDSB->blockSignals(false);
+//	mUI.mLifetimeDSB->blockSignals(true);
+//	mUI.mLifetimeDSB->setValue(float(partComp->lifetime())/1000.0f);
+//	mUI.mLifetimeDSB->blockSignals(false);
 
-	mUI.mStartWidthDSB->blockSignals(true);
-    mUI.mStartWidthDSB->setValue(partComp->starting_size().u);
-	mUI.mStartWidthDSB->blockSignals(false);
+//	mUI.mStartWidthDSB->blockSignals(true);
+//    mUI.mStartWidthDSB->setValue(partComp->starting_size().u);
+//	mUI.mStartWidthDSB->blockSignals(false);
 
-	mUI.mStartHeightDSB->blockSignals(true);
-    mUI.mStartHeightDSB->setValue(partComp->starting_size().v);
-	mUI.mStartHeightDSB->blockSignals(false);
+//	mUI.mStartHeightDSB->blockSignals(true);
+//    mUI.mStartHeightDSB->setValue(partComp->starting_size().v);
+//	mUI.mStartHeightDSB->blockSignals(false);
 
-	mUI.mEmitComb->blockSignals(true);
-    mUI.mEmitComb->setCurrentIndex(partComp->emitter_shape());
-	mUI.mEmitComb->blockSignals(false);
+//	mUI.mEmitComb->blockSignals(true);
+//    mUI.mEmitComb->setCurrentIndex(partComp->emitter_shape());
+//	mUI.mEmitComb->blockSignals(false);
 
-    fvec3 ss = partComp->emitter_size();
-	mUI.mEmitXDSB->blockSignals(true);
-	mUI.mEmitXDSB->setValue(ss.x);
-	mUI.mEmitXDSB->blockSignals(false);
+//    fvec3 ss = partComp->emitter_size();
+//	mUI.mEmitXDSB->blockSignals(true);
+//	mUI.mEmitXDSB->setValue(ss.x);
+//	mUI.mEmitXDSB->blockSignals(false);
 
-	mUI.mEmitYDSB->blockSignals(true);
-	mUI.mEmitYDSB->setValue(ss.y);
-	mUI.mEmitYDSB->blockSignals(false);
+//	mUI.mEmitYDSB->blockSignals(true);
+//	mUI.mEmitYDSB->setValue(ss.y);
+//	mUI.mEmitYDSB->blockSignals(false);
 
-	mUI.mEmitZDSB->blockSignals(true);
-	mUI.mEmitZDSB->setValue(ss.z);
-	mUI.mEmitZDSB->blockSignals(false);
+//	mUI.mEmitZDSB->blockSignals(true);
+//	mUI.mEmitZDSB->setValue(ss.z);
+//	mUI.mEmitZDSB->blockSignals(false);
 
-	mUI.mMotionComb->blockSignals(true);
-    mUI.mMotionComb->setCurrentIndex(partComp->motion_key_type());
-	mUI.mMotionComb->blockSignals(false);
+//	mUI.mMotionComb->blockSignals(true);
+//    mUI.mMotionComb->setCurrentIndex(partComp->motion_key_type());
+//	mUI.mMotionComb->blockSignals(false);
 
-	mUI.mInterpMotionCB->blockSignals(true);
-    mUI.mInterpMotionCB->setChecked(partComp->motion_key_interpolation());
-	mUI.mInterpMotionCB->blockSignals(false);
+//	mUI.mInterpMotionCB->blockSignals(true);
+//    mUI.mInterpMotionCB->setChecked(partComp->motion_key_interpolation());
+//	mUI.mInterpMotionCB->blockSignals(false);
 
-	mUI.mGlobalTimeCB->blockSignals(true);
-    mUI.mGlobalTimeCB->setChecked(partComp->motion_global_time());
-	mUI.mGlobalTimeCB->blockSignals(false);
+//	mUI.mGlobalTimeCB->blockSignals(true);
+//    mUI.mGlobalTimeCB->setChecked(partComp->motion_global_time());
+//	mUI.mGlobalTimeCB->blockSignals(false);
 
-	mUI.mGlobalTimeVisualCB->blockSignals(true);
-    mUI.mGlobalTimeVisualCB->setChecked(partComp->visual_global_time());
-	mUI.mGlobalTimeVisualCB->blockSignals(false);
+//	mUI.mGlobalTimeVisualCB->blockSignals(true);
+//    mUI.mGlobalTimeVisualCB->setChecked(partComp->visual_global_time());
+//	mUI.mGlobalTimeVisualCB->blockSignals(false);
 
-	mUI.mInterpolateVisualCB->blockSignals(true);
-    mUI.mInterpolateVisualCB->setChecked(partComp->visual_key_interpolation());
-	mUI.mInterpolateVisualCB->blockSignals(false);
+//	mUI.mInterpolateVisualCB->blockSignals(true);
+//    mUI.mInterpolateVisualCB->setChecked(partComp->visual_key_interpolation());
+//	mUI.mInterpolateVisualCB->blockSignals(false);
 
-    fvec3 iv = partComp->init_vel_mult();
-	mUI.mInitVelXDSB->blockSignals(true);
-	mUI.mInitVelXDSB->setValue(iv.x);
-	mUI.mInitVelXDSB->blockSignals(false);
+//    fvec3 iv = partComp->init_vel_mult();
+//	mUI.mInitVelXDSB->blockSignals(true);
+//	mUI.mInitVelXDSB->setValue(iv.x);
+//	mUI.mInitVelXDSB->blockSignals(false);
 
-	mUI.mInitVelYDSB->blockSignals(true);
-	mUI.mInitVelYDSB->setValue(iv.y);
-	mUI.mInitVelYDSB->blockSignals(false);
+//	mUI.mInitVelYDSB->blockSignals(true);
+//	mUI.mInitVelYDSB->setValue(iv.y);
+//	mUI.mInitVelYDSB->blockSignals(false);
 
-	mUI.mInitVelZDSB->blockSignals(true);
-	mUI.mInitVelZDSB->setValue(iv.z);
-	mUI.mInitVelZDSB->blockSignals(false);
+//	mUI.mInitVelZDSB->blockSignals(true);
+//	mUI.mInitVelZDSB->setValue(iv.z);
+//	mUI.mInitVelZDSB->blockSignals(false);
 
-	mUI.mBlendComb->blockSignals(true);
-    mUI.mBlendComb->setCurrentIndex(partComp->blend_mode());
-	mUI.mBlendComb->blockSignals(false);
+//	mUI.mBlendComb->blockSignals(true);
+//    mUI.mBlendComb->setCurrentIndex(partComp->blend_mode());
+//	mUI.mBlendComb->blockSignals(false);
 
 
 
-    mUI.mForceTblW->setRowCount(partComp->motion_key_count());
-    mUI.mKeyframeTblW->setRowCount(partComp->visual_key_count());
+//    mUI.mForceTblW->setRowCount(partComp->motion_key_count());
+//    mUI.mKeyframeTblW->setRowCount(partComp->visual_key_count());
 
-	mUI.mForceTblW->blockSignals(true);
-    auto iterF = partComp->begin_motion_key();
-	int index = 0;
-    while (iterF != partComp->end_motion_key())
-	{
-		QTableWidgetItem * item = new QTableWidgetItem();
-		QTableWidgetItem * item2 = new QTableWidgetItem();
-		QTableWidgetItem * item3 = new QTableWidgetItem();
-		QTableWidgetItem * item4 = new QTableWidgetItem();
+//	mUI.mForceTblW->blockSignals(true);
+//    auto iterF = partComp->begin_motion_key();
+//	int index = 0;
+//    while (iterF != partComp->end_motion_key())
+//	{
+//		QTableWidgetItem * item = new QTableWidgetItem();
+//		QTableWidgetItem * item2 = new QTableWidgetItem();
+//		QTableWidgetItem * item3 = new QTableWidgetItem();
+//		QTableWidgetItem * item4 = new QTableWidgetItem();
 		
-        float normTime = float(iterF->first) / float(partComp->max_motion_keys());
-		item->setData(0, normTime);
-		item->setData(Qt::UserRole, normTime);
+//        float normTime = float(iterF->first) / float(partComp->max_motion_keys());
+//		item->setData(0, normTime);
+//		item->setData(Qt::UserRole, normTime);
 
-		item2->setData(0, iterF->second.x);
-		item2->setData(Qt::UserRole, iterF->second.x);
+//		item2->setData(0, iterF->second.x);
+//		item2->setData(Qt::UserRole, iterF->second.x);
 
-		item3->setData(0, iterF->second.y);
-		item3->setData(Qt::UserRole, iterF->second.y);
+//		item3->setData(0, iterF->second.y);
+//		item3->setData(Qt::UserRole, iterF->second.y);
 
-		item4->setData(0, iterF->second.z);
-		item4->setData(Qt::UserRole, iterF->second.z);
+//		item4->setData(0, iterF->second.z);
+//		item4->setData(Qt::UserRole, iterF->second.z);
 
-		mUI.mForceTblW->setItem(index, 0, item);
-		mUI.mForceTblW->setItem(index, 1, item2);
-		mUI.mForceTblW->setItem(index, 2, item3);
-		mUI.mForceTblW->setItem(index, 3, item4);
-		mUI.mForceTblW->setMinimumHeight(mUI.mForceTblW->minimumHeight()+20);
-		++index;
-		++iterF;
-	}
-	mUI.mForceTblW->blockSignals(false);
+//		mUI.mForceTblW->setItem(index, 0, item);
+//		mUI.mForceTblW->setItem(index, 1, item2);
+//		mUI.mForceTblW->setItem(index, 2, item3);
+//		mUI.mForceTblW->setItem(index, 3, item4);
+//		mUI.mForceTblW->setMinimumHeight(mUI.mForceTblW->minimumHeight()+20);
+//		++index;
+//		++iterF;
+//	}
+//	mUI.mForceTblW->blockSignals(false);
 
-	mUI.mKeyframeTblW->blockSignals(true);
-	index = 0;
-    auto iterR = partComp->begin_visual_key();
-    while (iterR != partComp->end_visual_key())
-	{
-		QTableWidgetItem * item = new QTableWidgetItem();
-		QTableWidgetItem * item2 = new QTableWidgetItem();
-		QTableWidgetItem * item3 = new QTableWidgetItem();
-		QTableWidgetItem * item4 = new QTableWidgetItem();
+//	mUI.mKeyframeTblW->blockSignals(true);
+//	index = 0;
+//    auto iterR = partComp->begin_visual_key();
+//    while (iterR != partComp->end_visual_key())
+//	{
+//		QTableWidgetItem * item = new QTableWidgetItem();
+//		QTableWidgetItem * item2 = new QTableWidgetItem();
+//		QTableWidgetItem * item3 = new QTableWidgetItem();
+//		QTableWidgetItem * item4 = new QTableWidgetItem();
 
-        float normTime = float(iterR->first) / float(partComp->max_visual_keys());
-		item->setData(0, normTime);
-		item->setData(Qt::UserRole, normTime);
+//        float normTime = float(iterR->first) / float(partComp->max_visual_keys());
+//		item->setData(0, normTime);
+//		item->setData(Qt::UserRole, normTime);
 
-		item2->setData(0, iterR->second.x);
-		item2->setData(Qt::UserRole, iterR->second.x);
+//		item2->setData(0, iterR->second.x);
+//		item2->setData(Qt::UserRole, iterR->second.x);
 
-		item3->setData(0, iterR->second.y);
-		item3->setData(Qt::UserRole, iterR->second.y);
+//		item3->setData(0, iterR->second.y);
+//		item3->setData(Qt::UserRole, iterR->second.y);
 
-		item4->setData(0, iterR->second.z);
-		item4->setData(Qt::UserRole, iterR->second.z);
+//		item4->setData(0, iterR->second.z);
+//		item4->setData(Qt::UserRole, iterR->second.z);
 
-		mUI.mKeyframeTblW->setItem(index, 0, item);
-		mUI.mKeyframeTblW->setItem(index, 1, item2);
-		mUI.mKeyframeTblW->setItem(index, 2, item3);
-		mUI.mKeyframeTblW->setItem(index, 3, item4);
-		mUI.mKeyframeTblW->setMinimumHeight(mUI.mKeyframeTblW->minimumHeight() + 20);
-		++index;
-		++iterR;
-	}
-	mUI.mKeyframeTblW->blockSignals(false);
+//		mUI.mKeyframeTblW->setItem(index, 0, item);
+//		mUI.mKeyframeTblW->setItem(index, 1, item2);
+//		mUI.mKeyframeTblW->setItem(index, 2, item3);
+//		mUI.mKeyframeTblW->setItem(index, 3, item4);
+//		mUI.mKeyframeTblW->setMinimumHeight(mUI.mKeyframeTblW->minimumHeight() + 20);
+//		++index;
+//		++iterR;
+//	}
+//	mUI.mKeyframeTblW->blockSignals(false);
 }
 
 void ParticleCompWidget::onChooseMat()
 {
-	if (mEnt == NULL)
-		return;
+//	if (mEnt == NULL)
+//		return;
 
-	nsparticle_comp * partComp = mEnt->get<nsparticle_comp>();
-	if (partComp == NULL)
-		return;
+//	nsparticle_comp * partComp = mEnt->get<nsparticle_comp>();
+//	if (partComp == NULL)
+//		return;
 
-	QDialog selMatD(this);
-    Ui::select_res_dialog ui;
-	ui.setupUi(&selMatD);
-	selMatD.setWindowTitle("Select Material");
+//	QDialog selMatD(this);
+//    Ui::select_res_dialog ui;
+//	ui.setupUi(&selMatD);
+//	selMatD.setWindowTitle("Select Material");
 
-	auto plugiter = nse.plugins()->begin();
-	while (plugiter != nse.plugins()->end())
-	{
-		nsplugin * plg = nse.plugin(plugiter->first);
+//	auto plugiter = nse.plugins()->begin();
+//	while (plugiter != nse.plugins()->end())
+//	{
+//		nsplugin * plg = nse.plugin(plugiter->first);
 
-		nsmat_manager * mats = plg->manager<nsmat_manager>();
-		auto miter = mats->begin();
-		while (miter != mats->end())
-		{
-			QListWidgetItem * toAdd = new QListWidgetItem(miter->second->name().c_str());
-            toAdd->setData(VIEW_WIDGET_ITEM_PLUG, miter->second->plugin_id());
-			toAdd->setData(VIEW_WIDGET_ITEM_ENT, miter->second->id());
-            ui.m_lw->addItem(toAdd);
-			++miter;
-		}
+//		nsmat_manager * mats = plg->manager<nsmat_manager>();
+//		auto miter = mats->begin();
+//		while (miter != mats->end())
+//		{
+//			QListWidgetItem * toAdd = new QListWidgetItem(miter->second->name().c_str());
+//            toAdd->setData(VIEW_WIDGET_ITEM_PLUG, miter->second->plugin_id());
+//			toAdd->setData(VIEW_WIDGET_ITEM_ENT, miter->second->id());
+//            ui.m_lw->addItem(toAdd);
+//			++miter;
+//		}
 
-		++plugiter;
-	}
+//		++plugiter;
+//	}
 
-	if (selMatD.exec() == QDialog::Accepted)
-	{
-        auto lwitems = ui.m_lw->selectedItems();
-		if (lwitems.isEmpty())
-			return;
-		auto lwitem = lwitems.first();
+//	if (selMatD.exec() == QDialog::Accepted)
+//	{
+//        auto lwitems = ui.m_lw->selectedItems();
+//		if (lwitems.isEmpty())
+//			return;
+//		auto lwitem = lwitems.first();
 
-		uivec2 id(lwitem->data(VIEW_WIDGET_ITEM_PLUG).toUInt(), lwitem->data(VIEW_WIDGET_ITEM_ENT).toUInt());
+//		uivec2 id(lwitem->data(VIEW_WIDGET_ITEM_PLUG).toUInt(), lwitem->data(VIEW_WIDGET_ITEM_ENT).toUInt());
 
-		nsmaterial * mat = nse.resource<nsmaterial>(id);
-		if (mat == NULL)
-			return;
+//		nsmaterial * mat = nse.resource<nsmaterial>(id);
+//		if (mat == NULL)
+//			return;
 
-        partComp->set_material_id(mat->full_id());
-		setEntity(mEnt);
-	}
+//        partComp->set_material_id(mat->full_id());
+//		setEntity(mEnt);
+//	}
 }
 
 void ParticleCompWidget::onChangeBlendMode(int pVal)
@@ -644,98 +644,98 @@ void ParticleCompWidget::onChangeBlendMode(int pVal)
 
 void ParticleCompWidget::onChooseShader()
 {
-	if (mEnt == NULL)
-		return;
+//	if (mEnt == NULL)
+//		return;
 
-	nsparticle_comp * partComp = mEnt->get<nsparticle_comp>();
-	if (partComp == NULL)
-		return;
+//	nsparticle_comp * partComp = mEnt->get<nsparticle_comp>();
+//	if (partComp == NULL)
+//		return;
 
-	QDialog selShaderD(this);
-    Ui::select_res_dialog ui;
-	ui.setupUi(&selShaderD);
-	selShaderD.setWindowTitle("Select Shader");
+//	QDialog selShaderD(this);
+//    Ui::select_res_dialog ui;
+//	ui.setupUi(&selShaderD);
+//	selShaderD.setWindowTitle("Select Shader");
 
-	auto plugiter = nse.plugins()->begin();
-	while (plugiter != nse.plugins()->end())
-	{
-		nsplugin *plg = nse.plugin(plugiter->first);
-		nsshader_manager * shaders = plg->manager<nsshader_manager>();
-		auto siter = shaders->begin();
-		while (siter != shaders->end())
-		{
-			QListWidgetItem * lwitem = new QListWidgetItem(siter->second->name().c_str());
-            lwitem->setData(VIEW_WIDGET_ITEM_PLUG, siter->second->plugin_id());
-			lwitem->setData(VIEW_WIDGET_ITEM_ENT, siter->second->id());
-            ui.m_lw->addItem(lwitem);
-			++siter;
-		}
-		++plugiter;
-	}
+//	auto plugiter = nse.plugins()->begin();
+//	while (plugiter != nse.plugins()->end())
+//	{
+//		nsplugin *plg = nse.plugin(plugiter->first);
+//		nsshader_manager * shaders = plg->manager<nsshader_manager>();
+//		auto siter = shaders->begin();
+//		while (siter != shaders->end())
+//		{
+//			QListWidgetItem * lwitem = new QListWidgetItem(siter->second->name().c_str());
+//            lwitem->setData(VIEW_WIDGET_ITEM_PLUG, siter->second->plugin_id());
+//			lwitem->setData(VIEW_WIDGET_ITEM_ENT, siter->second->id());
+//            ui.m_lw->addItem(lwitem);
+//			++siter;
+//		}
+//		++plugiter;
+//	}
 
-	if (selShaderD.exec() == QDialog::Accepted)
-	{
-        auto lwitems = ui.m_lw->selectedItems();
-		if (lwitems.isEmpty())
-			return;
-		auto lwitem = lwitems.first();
+//	if (selShaderD.exec() == QDialog::Accepted)
+//	{
+//        auto lwitems = ui.m_lw->selectedItems();
+//		if (lwitems.isEmpty())
+//			return;
+//		auto lwitem = lwitems.first();
 
-		uivec2 id(lwitem->data(VIEW_WIDGET_ITEM_PLUG).toUInt(), lwitem->data(VIEW_WIDGET_ITEM_ENT).toUInt());
-		nsshader * shader = nse.resource<nsshader>(id);
-		if (shader == NULL)
-			return;
+//		uivec2 id(lwitem->data(VIEW_WIDGET_ITEM_PLUG).toUInt(), lwitem->data(VIEW_WIDGET_ITEM_ENT).toUInt());
+//		nsshader * shader = nse.resource<nsshader>(id);
+//		if (shader == NULL)
+//			return;
 
-        partComp->set_shader_id(shader->full_id());
-		setEntity(mEnt);
-	}
+//        partComp->set_shader_id(shader->full_id());
+//		setEntity(mEnt);
+//	}
 }
 
 void ParticleCompWidget::onChooseRandTex()
 {
-	if (mEnt == NULL)
-		return;
+//	if (mEnt == NULL)
+//		return;
 
-	nsparticle_comp * partComp = mEnt->get<nsparticle_comp>();
-	if (partComp == NULL)
-		return;
+//	nsparticle_comp * partComp = mEnt->get<nsparticle_comp>();
+//	if (partComp == NULL)
+//		return;
 
-	QDialog selTextureD(this);
-    Ui::select_res_dialog ui;
-	ui.setupUi(&selTextureD);
-	selTextureD.setWindowTitle("Select Texture");
+//	QDialog selTextureD(this);
+//    Ui::select_res_dialog ui;
+//	ui.setupUi(&selTextureD);
+//	selTextureD.setWindowTitle("Select Texture");
 
 
-	auto plugiter = nse.plugins()->begin();
-	while (plugiter != nse.plugins()->end())
-	{
-		nsplugin *plg = nse.plugin(plugiter->first);
-		nstex_manager * textures = plg->manager<nstex_manager>();
-		auto txiter = textures->begin();
-		while (txiter != textures->end())
-		{
-			nstexture * tex = textures->get(txiter->first);
-			QListWidgetItem * lwitem = new QListWidgetItem(txiter->second->name().c_str());
-            lwitem->setData(VIEW_WIDGET_ITEM_PLUG, tex->plugin_id());
-			lwitem->setData(VIEW_WIDGET_ITEM_ENT, tex->id());
-            ui.m_lw->addItem(lwitem);
-			++txiter;
-		}
-		++plugiter;
-	}
-	if (selTextureD.exec() == QDialog::Accepted)
-	{
-        auto lwitems = ui.m_lw->selectedItems();
-		if (lwitems.isEmpty())
-			return;
-		auto lwitem = lwitems.first();
-		uivec2 id(lwitem->data(VIEW_WIDGET_ITEM_PLUG).toUInt(), lwitem->data(VIEW_WIDGET_ITEM_ENT).toUInt());
-		nstexture * tex = nse.resource<nstexture>(id);
-		if (tex == NULL)
-			return;
+//	auto plugiter = nse.plugins()->begin();
+//	while (plugiter != nse.plugins()->end())
+//	{
+//		nsplugin *plg = nse.plugin(plugiter->first);
+//		nstex_manager * textures = plg->manager<nstex_manager>();
+//		auto txiter = textures->begin();
+//		while (txiter != textures->end())
+//		{
+//			nstexture * tex = textures->get(txiter->first);
+//			QListWidgetItem * lwitem = new QListWidgetItem(txiter->second->name().c_str());
+//            lwitem->setData(VIEW_WIDGET_ITEM_PLUG, tex->plugin_id());
+//			lwitem->setData(VIEW_WIDGET_ITEM_ENT, tex->id());
+//            ui.m_lw->addItem(lwitem);
+//			++txiter;
+//		}
+//		++plugiter;
+//	}
+//	if (selTextureD.exec() == QDialog::Accepted)
+//	{
+//        auto lwitems = ui.m_lw->selectedItems();
+//		if (lwitems.isEmpty())
+//			return;
+//		auto lwitem = lwitems.first();
+//		uivec2 id(lwitem->data(VIEW_WIDGET_ITEM_PLUG).toUInt(), lwitem->data(VIEW_WIDGET_ITEM_ENT).toUInt());
+//		nstexture * tex = nse.resource<nstexture>(id);
+//		if (tex == NULL)
+//			return;
 
-        partComp->set_rand_tex_id(tex->full_id());
-		setEntity(mEnt);
-	}
+//        partComp->set_rand_tex_id(tex->full_id());
+//		setEntity(mEnt);
+//	}
 }
 
 void ParticleCompWidget::onChangeMaxParticle()
@@ -1120,35 +1120,35 @@ RenderCompWidget::~RenderCompWidget()
 
 void RenderCompWidget::setEntity(nsentity * pEnt)
 {
-	CompWidget::setEntity(pEnt);
-	if (mEnt == NULL)
-		return;
+//	CompWidget::setEntity(pEnt);
+//	if (mEnt == NULL)
+//		return;
 
-	nsrender_comp * renComp = mEnt->get<nsrender_comp>();
-	if (renComp == NULL)
-		return;
+//	nsrender_comp * renComp = mEnt->get<nsrender_comp>();
+//	if (renComp == NULL)
+//		return;
 
-	mUI.mMaterialsTW->clear();
+//	mUI.mMaterialsTW->clear();
 
-	mUI.mCastsShadowsCB->blockSignals(true);
-    mUI.mCastsShadowsCB->setChecked(renComp->cast_shadow());
-	mUI.mCastsShadowsCB->blockSignals(false);
+//	mUI.mCastsShadowsCB->blockSignals(true);
+//    mUI.mCastsShadowsCB->setChecked(renComp->cast_shadow());
+//	mUI.mCastsShadowsCB->blockSignals(false);
 
-    nsmesh * mesh = nse.resource<nsmesh>(renComp->mesh_id());
+//    nsmesh * mesh = nse.resource<nsmesh>(renComp->mesh_id());
 
-	mUI.mMeshNameLE->setText(mesh->name().c_str());
+//	mUI.mMeshNameLE->setText(mesh->name().c_str());
 	
 	
-	for (uint32 i = 0; i < mesh->count(); ++i)
-	{
-        nsmaterial * mat = nse.resource<nsmaterial>(renComp->material_id(i));
-		QTreeWidgetItem * item = new QTreeWidgetItem();
-		item->setText(0, QString::number(i)); item->setData(0, 0, i);
-		item->setText(1, "None");
-		if (mat != NULL)
-			item->setText(1,mat->name().c_str());
-		mUI.mMaterialsTW->addTopLevelItem(item);
-	}
+//	for (uint32 i = 0; i < mesh->count(); ++i)
+//	{
+//        nsmaterial * mat = nse.resource<nsmaterial>(renComp->material_id(i));
+//		QTreeWidgetItem * item = new QTreeWidgetItem();
+//		item->setText(0, QString::number(i)); item->setData(0, 0, i);
+//		item->setText(1, "None");
+//		if (mat != NULL)
+//			item->setText(1,mat->name().c_str());
+//		mUI.mMaterialsTW->addTopLevelItem(item);
+//	}
 }
 
 
@@ -1167,114 +1167,114 @@ void RenderCompWidget::onCastShadowsChange(bool)
 
 void RenderCompWidget::onChooseMat()
 {
-	if (mEnt == NULL)
-		return;
+//	if (mEnt == NULL)
+//		return;
 
-	nsrender_comp * renComp = mEnt->get<nsrender_comp>();
-	if (renComp == NULL)
-		return;
+//	nsrender_comp * renComp = mEnt->get<nsrender_comp>();
+//	if (renComp == NULL)
+//		return;
 
-	auto items = mUI.mMaterialsTW->selectedItems();
-	if (items.isEmpty())
-		return;
+//	auto items = mUI.mMaterialsTW->selectedItems();
+//	if (items.isEmpty())
+//		return;
 
-	QTreeWidgetItem * twItem = items.first();
+//	QTreeWidgetItem * twItem = items.first();
 
-	QDialog selMatD(this);
-    Ui::select_res_dialog ui;
-	ui.setupUi(&selMatD);
-	selMatD.setWindowTitle("Select Material");
+//	QDialog selMatD(this);
+//    Ui::select_res_dialog ui;
+//	ui.setupUi(&selMatD);
+//	selMatD.setWindowTitle("Select Material");
 
-	auto plugiter = nse.plugins()->begin();
-	while (plugiter != nse.plugins()->end())
-	{
-		nsplugin * plg = nse.plugin(plugiter->first);
+//	auto plugiter = nse.plugins()->begin();
+//	while (plugiter != nse.plugins()->end())
+//	{
+//		nsplugin * plg = nse.plugin(plugiter->first);
 
-		nsmat_manager * mats = plg->manager<nsmat_manager>();
-		auto miter = mats->begin();
-		while (miter != mats->end())
-		{
-			QListWidgetItem * toAdd = new QListWidgetItem(miter->second->name().c_str());
-            toAdd->setData(VIEW_WIDGET_ITEM_PLUG, miter->second->plugin_id());
-			toAdd->setData(VIEW_WIDGET_ITEM_ENT, miter->second->id());
-            ui.m_lw->addItem(toAdd);
-			++miter;
-		}
+//		nsmat_manager * mats = plg->manager<nsmat_manager>();
+//		auto miter = mats->begin();
+//		while (miter != mats->end())
+//		{
+//			QListWidgetItem * toAdd = new QListWidgetItem(miter->second->name().c_str());
+//            toAdd->setData(VIEW_WIDGET_ITEM_PLUG, miter->second->plugin_id());
+//			toAdd->setData(VIEW_WIDGET_ITEM_ENT, miter->second->id());
+//            ui.m_lw->addItem(toAdd);
+//			++miter;
+//		}
 
-		++plugiter;
-	}
+//		++plugiter;
+//	}
 
-	if (selMatD.exec() == QDialog::Accepted)
-	{
-        auto lwitems = ui.m_lw->selectedItems();
-		if (lwitems.isEmpty())
-			return;
-		auto lwitem = lwitems.first();
+//	if (selMatD.exec() == QDialog::Accepted)
+//	{
+//        auto lwitems = ui.m_lw->selectedItems();
+//		if (lwitems.isEmpty())
+//			return;
+//		auto lwitem = lwitems.first();
 
-		uivec2 id(lwitem->data(VIEW_WIDGET_ITEM_PLUG).toUInt(), lwitem->data(VIEW_WIDGET_ITEM_ENT).toUInt());
+//		uivec2 id(lwitem->data(VIEW_WIDGET_ITEM_PLUG).toUInt(), lwitem->data(VIEW_WIDGET_ITEM_ENT).toUInt());
 
-		nsmaterial * mat = nse.resource<nsmaterial>(id);
-		if (mat == NULL)
-			return;
+//		nsmaterial * mat = nse.resource<nsmaterial>(id);
+//		if (mat == NULL)
+//			return;
 
-        renComp->set_material(twItem->data(0, 0).toInt(), mat->full_id(), true);
-		setEntity(mEnt);
-        bbtk.map()->update();
-	}
+//        renComp->set_material(twItem->data(0, 0).toInt(), mat->full_id(), true);
+//		setEntity(mEnt);
+//        bbtk.map()->update();
+//	}
 }
 
 void RenderCompWidget::onChooseMesh()
 {
-	if (mEnt == NULL)
-		return;
+//	if (mEnt == NULL)
+//		return;
 
-	nsrender_comp * renComp = mEnt->get<nsrender_comp>();
-	if (renComp == NULL)
-		return;
+//	nsrender_comp * renComp = mEnt->get<nsrender_comp>();
+//	if (renComp == NULL)
+//		return;
 
-	QDialog selMeshD(this);
-    Ui::select_res_dialog ui;
-	ui.setupUi(&selMeshD);
+//	QDialog selMeshD(this);
+//    Ui::select_res_dialog ui;
+//	ui.setupUi(&selMeshD);
 
-	selMeshD.setWindowTitle("Select Mesh");
+//	selMeshD.setWindowTitle("Select Mesh");
 
-	auto plugiter = nse.plugins()->begin();
-	while (plugiter != nse.plugins()->end())
-	{
-		nsplugin * plg = nse.plugin(plugiter->first);
+//	auto plugiter = nse.plugins()->begin();
+//	while (plugiter != nse.plugins()->end())
+//	{
+//		nsplugin * plg = nse.plugin(plugiter->first);
 
-		nsmesh_manager * meshes = plg->manager<nsmesh_manager>();
-		auto miter = meshes->begin();
-		while (miter != meshes->end())
-		{
-			QListWidgetItem * toAdd = new QListWidgetItem(miter->second->name().c_str());
-            toAdd->setData(VIEW_WIDGET_ITEM_PLUG, miter->second->plugin_id());
-			toAdd->setData(VIEW_WIDGET_ITEM_ENT, miter->second->id());
-            ui.m_lw->addItem(toAdd);
-			++miter;
-		}
+//		nsmesh_manager * meshes = plg->manager<nsmesh_manager>();
+//		auto miter = meshes->begin();
+//		while (miter != meshes->end())
+//		{
+//			QListWidgetItem * toAdd = new QListWidgetItem(miter->second->name().c_str());
+//            toAdd->setData(VIEW_WIDGET_ITEM_PLUG, miter->second->plugin_id());
+//			toAdd->setData(VIEW_WIDGET_ITEM_ENT, miter->second->id());
+//            ui.m_lw->addItem(toAdd);
+//			++miter;
+//		}
 
-		++plugiter;
-	}
+//		++plugiter;
+//	}
 
-	if (selMeshD.exec() == QDialog::Accepted)
-	{
-        auto lwitems = ui.m_lw->selectedItems();
-		if (lwitems.isEmpty())
-			return;
-		auto lwitem = lwitems.first();
+//	if (selMeshD.exec() == QDialog::Accepted)
+//	{
+//        auto lwitems = ui.m_lw->selectedItems();
+//		if (lwitems.isEmpty())
+//			return;
+//		auto lwitem = lwitems.first();
 
-		uivec2 id(lwitem->data(VIEW_WIDGET_ITEM_PLUG).toUInt(), lwitem->data(VIEW_WIDGET_ITEM_ENT).toUInt());
+//		uivec2 id(lwitem->data(VIEW_WIDGET_ITEM_PLUG).toUInt(), lwitem->data(VIEW_WIDGET_ITEM_ENT).toUInt());
 
-		nsmesh * mesh = nse.resource<nsmesh>(id);
-		if (mesh == NULL)
-			return;
+//		nsmesh * mesh = nse.resource<nsmesh>(id);
+//		if (mesh == NULL)
+//			return;
 
-        renComp->set_mesh_id(mesh->full_id());
-        renComp->clear_mats();
-		setEntity(mEnt);
-        bbtk.map()->update();
-	}
+//        renComp->set_mesh_id(mesh->full_id());
+//        renComp->clear_mats();
+//		setEntity(mEnt);
+//        bbtk.map()->update();
+//	}
 }
 
 void RenderCompWidget::onClearMat()

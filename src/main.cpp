@@ -1,8 +1,8 @@
-#include <myGL/glew.h>
+
 #include <toolkit.h>
 #include <QApplication>
 #include <qsurfaceformat.h>
-#include <nsfile_os.h>
+#include <nsplatform.h>
 #include <nsstring.h>
 
 #ifdef NSDEBUG

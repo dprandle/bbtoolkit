@@ -12,7 +12,7 @@ This file contains all of the neccessary definitions for the Toolkit class.
 
 #include <nsengine.h>
 #include <nsbuild_system.h>
-#include <nsrender_system.h>
+#include <nstform_system.h>
 #include <nsselection_system.h>
 #include <nscamera_system.h>
 #include <nstile_brush_comp.h>
@@ -94,16 +94,16 @@ OutputView * Toolkit::output_view()
 
 void Toolkit::load_plugin_files(const QDir & startingDir)
 {
-    if (startingDir.exists())
-    {
-        foreach(QFileInfo info, startingDir.entryInfoList(QDir::NoDotAndDotDot | QDir::Files | QDir::AllDirs))
-        {
-            if (info.isFile())
-                nse.load_plugin(info.absoluteFilePath().toStdString());
-            if (info.isDir())
-                load_plugin_files(info.dir());
-        }
-    }
+//    if (startingDir.exists())
+//    {
+//        foreach(QFileInfo info, startingDir.entryInfoList(QDir::NoDotAndDotDot | QDir::Files | QDir::AllDirs))
+//        {
+//            if (info.isFile())
+//                nse.load_plugin(info.absoluteFilePath().toStdString());
+//            if (info.isDir())
+//                load_plugin_files(info.dir());
+//        }
+//    }
 }
 
 
@@ -197,22 +197,22 @@ CameraSettingsDialog * Toolkit::camera_settings()
 
 void Toolkit::closeEvent(QCloseEvent *pEvent)
 {
-    nsplugin * activePlug = nse.active();
+//    nsplugin * activePlug = nse.active();
 
-    if (activePlug != NULL)
-    {
-        QMessageBox mb(QMessageBox::Warning, "Unsaved Changed", "There are unsaved changes. Would you like to save before exiting?", QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel, this);
-        int ret = mb.exec();
-        if (ret == QMessageBox::Cancel)
-        {
-            pEvent->ignore();
-            return;
-        }
-        bool saveChanges = (ret == QMessageBox::Yes);
-        if (saveChanges)
-            on_actionSave_triggered();
-        pEvent->accept();
-    }
+//    if (activePlug != NULL)
+//    {
+//        QMessageBox mb(QMessageBox::Warning, "Unsaved Changed", "There are unsaved changes. Would you like to save before exiting?", QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel, this);
+//        int ret = mb.exec();
+//        if (ret == QMessageBox::Cancel)
+//        {
+//            pEvent->ignore();
+//            return;
+//        }
+//        bool saveChanges = (ret == QMessageBox::Yes);
+//        if (saveChanges)
+//            on_actionSave_triggered();
+//        pEvent->accept();
+//    }
 }
 
 resource_dialog * Toolkit::res_dialog()
@@ -237,53 +237,53 @@ is very sensative and things like posting to the status bar here will significan
 */
 void Toolkit::update_ui()
 {
-    bool chk = m_ui.actionEraserBrush->isChecked() || m_ui.actionObjectBrush->isChecked() || m_ui.actionTileBrush->isChecked();
-    m_ui.actionNewBrush->setEnabled(nse.system<nsselection_system>()->valid_brush() && !chk);
-    m_ui.actionSwapTiles->setEnabled(nse.system<nsselection_system>()->valid_tile_swap() && !chk && !m_ui.mTileView->ui()->mListWidget->selectedItems().isEmpty());
-    m_ui.actionDeleteSelection->setEnabled(!nse.system<nsselection_system>()->empty() && !chk);
+//    bool chk = m_ui.actionEraserBrush->isChecked() || m_ui.actionObjectBrush->isChecked() || m_ui.actionTileBrush->isChecked();
+//    m_ui.actionNewBrush->setEnabled(nse.system<nsselection_system>()->valid_brush() && !chk);
+//    m_ui.actionSwapTiles->setEnabled(nse.system<nsselection_system>()->valid_tile_swap() && !chk && !m_ui.mTileView->ui()->mListWidget->selectedItems().isEmpty());
+//    m_ui.actionDeleteSelection->setEnabled(!nse.system<nsselection_system>()->empty() && !chk);
 
-    m_current_layer->setEnabled(m_ui.actionLayerMode->isChecked() || m_ui.actionEraserBrush->isChecked() || m_ui.actionObjectBrush->isChecked() || m_ui.actionTileBrush->isChecked());
+//    m_current_layer->setEnabled(m_ui.actionLayerMode->isChecked() || m_ui.actionEraserBrush->isChecked() || m_ui.actionObjectBrush->isChecked() || m_ui.actionTileBrush->isChecked());
 
-    nsscene * curScene = nse.current_scene();
-    nsplugin * activePlug = nse.active();
-    QString winTitle = "Build and Battle Toolkit [Active Plugin: ";
+//    nsscene * curScene = nse.current_scene();
+//    nsplugin * activePlug = nse.active();
+//    QString winTitle = "Build and Battle Toolkit [Active Plugin: ";
 
-    if (activePlug != NULL)
-    {
-        winTitle += QString(activePlug->name().c_str());
-    }
+//    if (activePlug != NULL)
+//    {
+//        winTitle += QString(activePlug->name().c_str());
+//    }
 	
-    winTitle += "] [Scene: ";
+//    winTitle += "] [Scene: ";
 
-    m_ui.mCamToolbar->setEnabled(curScene != NULL);
-    if (curScene != NULL)
-    {
-        winTitle += QString(curScene->name().c_str()) + ".map";
+//    m_ui.mCamToolbar->setEnabled(curScene != NULL);
+//    if (curScene != NULL)
+//    {
+//        winTitle += QString(curScene->name().c_str()) + ".map";
 
-        uivec3 selObj = nse.system<nsselection_system>()->center();
-        nsentity * ent = curScene->entity(selObj.xy());
+//        uivec3 selObj = nse.system<nsselection_system>()->center();
+//        nsentity * ent = curScene->entity(selObj.xy());
 
-        if (ent != NULL && (!m_ui.actionLayerMode->isChecked()||nse.system<nsbuild_system>()->enabled()))
-        {
-            nstform_comp * tComp = ent->get<nstform_comp>();
-            if (tComp != NULL)
-            {
-                int32 layer = nstile_grid::grid(tComp->wpos(selObj.z)).z;
-                int32 tmpVal = m_spinbox_val;
-                m_current_layer->blockSignals(true);
-                m_current_layer->setValue(layer*-1);
-                m_current_layer->blockSignals(false);
-                m_spinbox_val = layer*-1;
-                if (m_ui.actionLayerMode->isChecked() && tmpVal != m_spinbox_val)
-                    on_actionLayerMode_toggled(true);
-            }
-        }
-      nse.system<nsbuild_system>()->set_layer(m_spinbox_val*-1);
-    }
+//        if (ent != NULL && (!m_ui.actionLayerMode->isChecked()||nse.system<nsbuild_system>()->enabled()))
+//        {
+//            nstform_comp * tComp = ent->get<nstform_comp>();
+//            if (tComp != NULL)
+//            {
+//                int32 layer = nstile_grid::grid(tComp->wpos(selObj.z)).z;
+//                int32 tmpVal = m_spinbox_val;
+//                m_current_layer->blockSignals(true);
+//                m_current_layer->setValue(layer*-1);
+//                m_current_layer->blockSignals(false);
+//                m_spinbox_val = layer*-1;
+//                if (m_ui.actionLayerMode->isChecked() && tmpVal != m_spinbox_val)
+//                    on_actionLayerMode_toggled(true);
+//            }
+//        }
+//      nse.system<nsbuild_system>()->set_layer(m_spinbox_val*-1);
+//    }
 
-    winTitle += "]";
-    if (winTitle != windowTitle())
-        setWindowTitle(winTitle);
+//    winTitle += "]";
+//    if (winTitle != windowTitle())
+//        setWindowTitle(winTitle);
 }
 
 void Toolkit::_disable_side_tb_actions()
@@ -313,7 +313,7 @@ void Toolkit::on_actionSelectArea_triggered(bool)
 
 void Toolkit::on_actionToggleLighting_toggled(bool pChange)
 {
-    nse.system<nsrender_system>()->enable_lighting(pChange);
+    //nse.system<nsrender_system>()->enable_lighting(pChange);
 }
 
 void Toolkit::on_actionTileBrush_triggered(bool pVal)
@@ -390,10 +390,10 @@ void Toolkit::on_actionMirrorMode_toggled(bool pEnable)
 
 void Toolkit::on_mirror_center_change()
 {
-    ivec3 grid(m_grid_x->value(), m_grid_y->value());
-    fvec3 pos = nstile_grid::world(grid);
-    nse.system<nsbuild_system>()->set_center(pos);
-    m_ui.mMapView->setFocus();
+//    ivec3 grid(m_grid_x->value(), m_grid_y->value());
+//    fvec3 pos = nstile_grid::world(grid);
+//    nse.system<nsbuild_system>()->set_center(pos);
+//    m_ui.mMapView->setFocus();
 }
 
 void Toolkit::on_actionNew_triggered()
@@ -431,18 +431,18 @@ void Toolkit::on_brush_height_change(int pHeight)
 
 void Toolkit::on_actionShowAllHidden_toggled(bool pState)
 {
-    nsscene * scene = nse.current_scene();
-    if (scene == NULL)
-        return;
+//    nsscene * scene = nse.current_scene();
+//    if (scene == NULL)
+//        return;
 
-    auto ents = scene->entities();
-    auto iter = ents.begin();
-    while (iter != ents.end())
-    {
-        nstform_comp * tComp = (*iter)->get<nstform_comp>();
-        tComp->set_hidden_state(nstform_comp::hide_none, pState);
-        ++iter;
-    }
+//    auto ents = scene->entities();
+//    auto iter = ents.begin();
+//    while (iter != ents.end())
+//    {
+//        nstform_comp * tComp = (*iter)->get<nstform_comp>();
+//        tComp->set_hidden_state(nstform_comp::hide_none, pState);
+//        ++iter;
+//    }
 }
 
 void Toolkit::on_actionSwitchMap_triggered()
@@ -509,12 +509,12 @@ TileView *  Toolkit::tile_view()
 
 void Toolkit::on_actionSwapTiles_triggered()
 {
-    nsentity * newTile = nse.system<nsbuild_system>()->tile_build_ent();
-	if (newTile == NULL)
-		return;
+//    nsentity * newTile = nse.system<nsbuild_system>()->tile_build_ent();
+//	if (newTile == NULL)
+//		return;
 
-    nse.system<nsselection_system>()->tile_swap(newTile);
-    m_ui.mMapView->setFocus();
+//    nse.system<nsselection_system>()->tile_swap(newTile);
+//    m_ui.mMapView->setFocus();
 }
 
 void Toolkit::on_actionResource_Browser_triggered()
@@ -532,14 +532,14 @@ void Toolkit::refresh_views()
 
 void Toolkit::on_debug_view(bool pNewVal)
 {
-    map()->make_current();
-    nse.system<nsrender_system>()->enable_debug_draw(pNewVal);
+//    map()->make_current();
+//    nse.system<nsrender_system>()->enable_debug_draw(pNewVal);
 }
 
 void Toolkit::on_actionDeleteSelection_triggered()
 {
-    nse.system<nsselection_system>()->del();
-    m_ui.mMapView->setFocus();
+//    nse.system<nsselection_system>()->del();
+//    m_ui.mMapView->setFocus();
 }
 
 void Toolkit::on_actionNewBrush_triggered()
@@ -627,32 +627,32 @@ void Toolkit::on_layer_index_change(const QString & pItem)
 
 void Toolkit::on_actionLayerMode_toggled(bool pVal)
 {
-    nsscene * scene = nse.current_scene();
-    if (scene == NULL)
-        return;
+//    nsscene * scene = nse.current_scene();
+//    if (scene == NULL)
+//        return;
 
-    int val = m_current_layer->value();
-    if (pVal)
-        m_layers_above_hidden = val;
-    else
-    {
-        val = m_layers_above_hidden;
-        m_layers_above_hidden = 0;
-    }
+//    int val = m_current_layer->value();
+//    if (pVal)
+//        m_layers_above_hidden = val;
+//    else
+//    {
+//        val = m_layers_above_hidden;
+//        m_layers_above_hidden = 0;
+//    }
 
-    if (m_layer_CB->currentText() == LAYER_ABOVE_TEXT)
-        scene->hide_layers_above(val, pVal);
-    else if (m_layer_CB->currentText() == LAYER_BELOW_TEXT)
-        scene->hide_layers_below(val, pVal);
-    else if (m_layer_CB->currentText() == LAYER_ALL_TEXT)
-    {
-        scene->hide_layers_above(val, pVal);
-        scene->hide_layers_below(val, pVal);
-    }
-    else
-        scene->hide_layer(val, pVal);
+//    if (m_layer_CB->currentText() == LAYER_ABOVE_TEXT)
+//        scene->hide_layers_above(val, pVal);
+//    else if (m_layer_CB->currentText() == LAYER_BELOW_TEXT)
+//        scene->hide_layers_below(val, pVal);
+//    else if (m_layer_CB->currentText() == LAYER_ALL_TEXT)
+//    {
+//        scene->hide_layers_above(val, pVal);
+//        scene->hide_layers_below(val, pVal);
+//    }
+//    else
+//        scene->hide_layer(val, pVal);
 
-    m_ui.mMapView->setFocus();
+//    m_ui.mMapView->setFocus();
 }
 
 void Toolkit::on_brush_double_click()
@@ -668,12 +668,12 @@ void Toolkit::on_actionStampMode_toggled(bool pVal)
 
 void Toolkit::on_actionHideSelection_triggered()
 {
-    nse.system<nsselection_system>()->set_hidden_state(nstform_comp::hide_object, true);
+    //nse.system<nsselection_system>()->set_hidden_state(nstform_comp::hide_object, true);
 }
 
 void Toolkit::on_actionUnhideSelection_triggered()
 {
-    nse.system<nsselection_system>()->set_hidden_state(nstform_comp::hide_object, false);
+   // nse.system<nsselection_system>()->set_hidden_state(nstform_comp::hide_object, false);
 }
 
 void Toolkit::on_actionCameraCenter_triggered(bool pVal)

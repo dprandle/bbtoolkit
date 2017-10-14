@@ -41,49 +41,49 @@ void NewResourceDialog::init()
 void NewResourceDialog::_setResourceType(const nsstring & manager_type, const nsstring & res_type)
 {
 	
-	// create new plugin with same name as the main context active plugin
-	auto fiter = mResWidgets.find(manager_type);
-	if (fiter == mResWidgets.end())
-		return;
-	mCurrentResWidget = fiter->second;
+//	// create new plugin with same name as the main context active plugin
+//	auto fiter = mResWidgets.find(manager_type);
+//	if (fiter == mResWidgets.end())
+//		return;
+//	mCurrentResWidget = fiter->second;
 	
-	// Remove all widgets from groub box layout
-	QLayoutItem * child = gbLayout->takeAt(0);
-	while (child != NULL)
-	{
-		delete child;
-		child = gbLayout->takeAt(0);
-	}
+//	// Remove all widgets from groub box layout
+//	QLayoutItem * child = gbLayout->takeAt(0);
+//	while (child != NULL)
+//	{
+//		delete child;
+//		child = gbLayout->takeAt(0);
+//	}
 
-	// Add the widget to the group box layout
-	gbLayout->addWidget(fiter->second);
+//	// Add the widget to the group box layout
+//	gbLayout->addWidget(fiter->second);
 
-	if (mContextID == 0)
-	{
-		mTmpResType = res_type;
-		mTmpManagerType = manager_type;
-		return;
-	}
+//	if (mContextID == 0)
+//	{
+//		mTmpResType = res_type;
+//		mTmpManagerType = manager_type;
+//		return;
+//	}
 
-	mUI.mPreviewWidget->ui().mPreview->makeCurrent();
-	nse.make_current(mContextID);
-	nsplugin * plug = nse.plugin("preview");
-	nsresource * res = plug->manager(manager_type)->create(res_type,mCurrentResWidget->defaultResName());
-	mCurrentResWidget->setResource(res);
+//	mUI.mPreviewWidget->ui().mPreview->makeCurrent();
+//	nse.make_current(mContextID);
+//	nsplugin * plug = nse.plugin("preview");
+//	nsresource * res = plug->manager(manager_type)->create(res_type,mCurrentResWidget->defaultResName());
+//	mCurrentResWidget->setResource(res);
 }
 
 void NewResourceDialog::onContextInitialized(uint32 id)
 {
-	if (mCurrentResWidget == NULL)
-		return;
+//	if (mCurrentResWidget == NULL)
+//		return;
 	
-	mContextID = id;
-	// Make the resource now that the engine has been initialized
-	mUI.mPreviewWidget->ui().mPreview->makeCurrent();
-	nse.make_current(mContextID);
-	nsplugin * plug = nse.plugin("preview");
-	nsresource * res = plug->manager(mTmpManagerType)->create(mTmpResType,mCurrentResWidget->defaultResName());
-	mCurrentResWidget->setResource(res);
+//	mContextID = id;
+//	// Make the resource now that the engine has been initialized
+//	mUI.mPreviewWidget->ui().mPreview->makeCurrent();
+//	nse.make_current(mContextID);
+//	nsplugin * plug = nse.plugin("preview");
+//	nsresource * res = plug->manager(mTmpManagerType)->create(mTmpResType,mCurrentResWidget->defaultResName());
+//	mCurrentResWidget->setResource(res);
 
 }
 
@@ -95,9 +95,9 @@ void NewResourceDialog::onCreate()
 
 void NewResourceDialog::onCancel()
 {
-	nsresource * res = mCurrentResWidget->resource();
-	mCurrentResWidget->setResource(NULL);
-	mCurrentResWidget = NULL;
-    nsplugin * plg = nse.plugin(res->plugin_id());
-	plg->destroy(res);
+//	nsresource * res = mCurrentResWidget->resource();
+//	mCurrentResWidget->setResource(NULL);
+//	mCurrentResWidget = NULL;
+//    nsplugin * plg = nse.plugin(res->plugin_id());
+//	plg->destroy(res);
 }

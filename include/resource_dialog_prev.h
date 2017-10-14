@@ -20,7 +20,7 @@ class component_selection_widget;
 class nsentity;
 class nsmaterial;
 class nsmesh;
-class nsresource;
+class nsasset;
 class mesh_widget;
 class entity_widget;
 class nsplugin;
@@ -59,7 +59,7 @@ public:
 
 public slots:
 
-    void edit_res_changed(nsresource * res);
+    void edit_res_changed(nsasset * res);
 
     void entity_edit_component(uint32 comp_type);
 
@@ -89,7 +89,7 @@ public slots:
 
 private:
 
-    bool _setup_resource_ui(nsresource * incoming);
+    bool _setup_resource_ui(nsasset * incoming);
 
     void _reset_fields();
 
@@ -99,7 +99,7 @@ private:
 
     Ui::resource_dialog_prev m_ui;
 
-    nsresource * m_editing_res;
+    nsasset * m_editing_res;
 
     texture_widget * m_tex_widget;
     mesh_widget * m_mesh_widget;

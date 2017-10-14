@@ -89,7 +89,7 @@ void component_selection_widget::on_tb_del_comp_pressed()
     auto item = items.first();
 
     m_prev->make_current();
-    m_edit_ent->del(item->data(Qt::UserRole).toUInt());
+    m_edit_ent->destroy(item->data(Qt::UserRole).toUInt());
     m_ui->tb_del_comp->setDown(false);
     refresh();
 }

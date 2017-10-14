@@ -13,7 +13,7 @@ This file contains all of the neccessary definitions for the MapView class.
 // Engine includes
 #include <nsdebug.h>
 #include <nsinput_system.h>
-#include <nsrender_system.h>
+#include <nstform_system.h>
 #include <nsbuild_system.h>
 #include <nsentity.h>
 #include <nsplugin.h>
@@ -56,19 +56,19 @@ void Preview::_connect()
 void Preview::make_current()
 {
     makeCurrent();
-    nse.make_current(m_glew_id);
+   // nse.make_current(m_glew_id);
 }
 
 void Preview::enterEvent(QEvent *)
 {
-    nse.make_current(m_glew_id);
+   // nse.make_current(m_glew_id);
     nse.system<nsinput_system>()->set_cursor_pos(platform_normalized_mpos());
     nse.system<nsbuild_system>()->to_cursor();
 }
 
 void Preview::keyReleaseEvent(QKeyEvent * kEvent)
 {
-    nse.make_current(m_glew_id);
+  //  nse.make_current(m_glew_id);
     if (kEvent->isAutoRepeat())
     {
         QOpenGLWidget::keyPressEvent(kEvent);
@@ -81,7 +81,7 @@ void Preview::keyReleaseEvent(QKeyEvent * kEvent)
 
 void Preview::keyPressEvent(QKeyEvent * kEvent)
 {
-    nse.make_current(m_glew_id);
+   // nse.make_current(m_glew_id);
     if (kEvent->isAutoRepeat())
     {
         QOpenGLWidget::keyPressEvent(kEvent);
@@ -260,21 +260,21 @@ bool Preview::_on_key(bool pressed, int key)
 
 void Preview::mouseMoveEvent(QMouseEvent * mevent)
 {
-    nse.make_current(m_glew_id);
+   // nse.make_current(m_glew_id);
     nse.event_dispatch()->push<nsmouse_move_event>(platform_normalized_mpos());
     QOpenGLWidget::mouseMoveEvent(mevent);
 }
 
 void Preview::mouseReleaseEvent(QMouseEvent * mevent)
 {
-    nse.make_current(m_glew_id);
+  //  nse.make_current(m_glew_id);
     if (!_on_mouse(false, mevent->button(), platform_normalized_mpos()))
         QOpenGLWidget::mousePressEvent(mevent);
 }
 
 void Preview::mousePressEvent(QMouseEvent * mevent)
 {
-    nse.make_current(m_glew_id);
+  // nse.make_current(m_glew_id);
     if (!_on_mouse(true, mevent->button(), platform_normalized_mpos()))
         QOpenGLWidget::mousePressEvent(mevent);
 }
@@ -319,7 +319,7 @@ uint32 Preview::glew_id()
 
 void Preview::wheelEvent(QWheelEvent * wevent)
 {
-    nse.make_current(m_glew_id);
+   // nse.make_current(m_glew_id);
     nse.event_dispatch()->push<nsmouse_scroll_event>(wevent->delta(), platform_normalized_mpos());
 }
 
@@ -330,35 +330,35 @@ void Preview::onIdle()
 
 void Preview::initializeGL()
 {	
-    bbtk.output_view()->writeToScreen("Initializing preview openGL");
-    m_glew_id = nse.create_context(false); // also sets context to current
+//    bbtk.output_view()->writeToScreen("Initializing preview openGL");
+//    m_glew_id = nse.create_context(false); // also sets context to current
 
-    nse.start();
+//    nse.start();
 
-#ifdef NSDEBUG
-    nse.debug()->set_message_callback(OutputView::debugCallback, bbtk.output_view());
-#else
-    bbtk.output_view()->hide();
-#endif
+//#ifdef NSDEBUG
+//    nse.debug()->set_message_callback(OutputView::debugCallback, bbtk.output_view());
+//#else
+//    bbtk.output_view()->hide();
+//#endif
 
-    emit opengl_initialized();
+//    emit opengl_initialized();
 }
 
 void Preview::resizeGL(int width, int height)
 {
-    nse.make_current(m_glew_id);
-    nsrender_system * rs = nse.system<nsrender_system>();
-    if (rs != NULL)
-    {
-        rs->set_screen_fbo(defaultFramebufferObject());
-        rs->resize_screen(ivec2(width,height));
-    }
-    emit opengl_resized();
+//    nse.make_current(m_glew_id);
+//    nsrender_system * rs = nse.system<nsrender_system>();
+//    if (rs != NULL)
+//    {
+//        rs->set_screen_fbo(defaultFramebufferObject());
+//        rs->resize_screen(ivec2(width,height));
+//    }
+//    emit opengl_resized();
 }
 
 void Preview::paintGL()
 {
-    nse.make_current(m_glew_id);
-    nse.update();
-    emit opengl_updated();
+//    nse.make_current(m_glew_id);
+//    nse.update();
+//    emit opengl_updated();
 }

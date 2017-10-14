@@ -160,10 +160,15 @@ FORMS += \
     ui/add_comp_dialog.ui \
     ui/component_selection_widget.ui
 
-CONFIG += qt debug_and_release c++14
+CONFIG += qt debug_and_release c++11
 INCLUDEPATH += $$PWD/include
 INCLUDEPATH += $$PWD/../nsengine/include/nsengine
-INCLUDEPATH += $$PWD/../nsengine/include
+INCLUDEPATH += $$PWD/../nsengine/include/nsengine/asset
+INCLUDEPATH += $$PWD/../nsengine/include/nsengine/component
+INCLUDEPATH += $$PWD/../nsengine/include/nsengine/nsmath
+INCLUDEPATH += $$PWD/../nsengine/include/nsengine/opengl
+INCLUDEPATH += $$PWD/../nsengine/include/nsengine/system
+
 UI_DIR = $$PWD/ui
 RESOURCES = $$PWD/toolkit.qrc
 QT += opengl gui
@@ -173,8 +178,6 @@ DEFINES += GLEW_STATIC GLEW_MX
 
 unix {
 QMAKE_CXXFLAGS += -pipe
-QMAKE_LFLAGS += -Wl,-rpath $$PWD/bin/x64
-system($$PWD/config.sh $$PWD)
 }
 
 win32 {
@@ -187,32 +190,37 @@ system(\"$$PWD/config.bat\" \"$$PWD\")
 }
 
 LIBS += -L$$PWD/../nsengine/lib/$$ARCH
-LIBS += -L$$PWD/../nsengine/deps/assimp-3.1.1/lib/$$ARCH
-LIBS += -L$$PWD/../nsengine/deps/devil-1.7.8/lib/$$ARCH
+
 DEFINES += NSDEBUG
 
 CONFIG(debug, debug|release){
-win32 {
-LIBS += -lOpenGL32 -lDbgHelp
-}
 
-LIBS += -lnsengined -lIL -lassimpd
-DCONFIG = Debug
-TARGET = bbtoolkitd
+win32 {
+LIBS += -lnsengined -lnsmathd -lassimp-vc140-mt -lglfw3ddll 
+LIBS += -llibsndfile-1 -lOpenAL32 -lDbgHelp -lfreetyped -lOpenGL32
+}
 
 unix {
+LIBS += -lnsengined -lnsmathd -lassimp -lglfwd -lsndfile -lopenal -lfreetyped -lGL
 QMAKE_CXXFLAGS += -O0
 }
+
+DCONFIG = Debug
+TARGET = bbtoolkitd
 
 }
 
 CONFIG(release, debug|release){
 
 win32 {
-LIBS += -lOpenGL32 -lDbgHelp
+LIBS += -lnsengine -lnsmath -lassimp-vc140-mt -lglfw3dll 
+LIBS += -llibsndfile-1 -lOpenAL32 -lDbgHelp -lfreetype -lOpenGL32
 }
 
-LIBS += -lnsengine -lIL -lassimp
+unix {
+LIBS += -lnsengine -lnsmath -lassimp -lglfw -lsndfile -lopenal -lfreetype -lGL
+}
+
 DCONFIG = Release
 TARGET = bbtoolkit
 }

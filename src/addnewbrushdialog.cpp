@@ -1,7 +1,7 @@
-#include <nsfile_os.h>
+#include <nsplatform.h>
 #include <nsplugin_manager.h>
 #include <nsrender_comp.h>
-#include <nsrender_system.h>
+#include <nstform_system.h>
 #include <nssel_comp.h>
 #include <nsscene_manager.h>
 #include <nsscene.h>
@@ -98,97 +98,97 @@ void AddNewBrushDialog::drawPolygons()
 
 void AddNewBrushDialog::setFromEngineSelection()
 {
-	uivec3 foc = nse.system<nsselection_system>()->center();
-	nsscene * scene = nse.current_scene();
+//    uivec2 foc = nse.system<nsselection_system>()->selection_center_entity_id();
+//	nsscene * scene =
 
-	if (scene == NULL)
-		return;
+//	if (scene == NULL)
+//		return;
 
-    nsentity * ent = scene->entity(foc.xy());
-	if (ent == NULL)
-		return;
+//    nsentity * ent = scene->entity(foc.xy());
+//	if (ent == NULL)
+//		return;
 
-	nssel_comp * selComp = ent->get<nssel_comp>();
-	nstform_comp * tComp = ent->get<nstform_comp>();
-	if (selComp == NULL || tComp == NULL)
-		return;
+//	nssel_comp * selComp = ent->get<nssel_comp>();
+//	nstform_comp * tComp = ent->get<nstform_comp>();
+//	if (selComp == NULL || tComp == NULL)
+//		return;
 
-    ivec3 centerPos = nstile_grid::grid(tComp->wpos(foc.z));
+//    ivec3 centerPos = nstile_grid::grid(tComp->wpos(foc.z));
 
-	auto selIter = selComp->begin();
-	while (selIter != selComp->end())
-	{
-		ivec3 currentPos = nstile_grid::grid(tComp->wpos(*selIter)) - centerPos;
+//	auto selIter = selComp->begin();
+//	while (selIter != selComp->end())
+//	{
+//		ivec3 currentPos = nstile_grid::grid(tComp->wpos(*selIter)) - centerPos;
 
-		float posX = currentPos.x * X_GRID * 2.0f * mNormX;
-		float posY = -currentPos.y * Y_GRID * mNormY;
-		if (currentPos.y % 2 != 0 && centerPos.y % 2 == 0)
-			posX += X_GRID * mNormX;
-		else if (currentPos.y % 2)
-			posX -= X_GRID * mNormX;
+//		float posX = currentPos.x * X_GRID * 2.0f * mNormX;
+//		float posY = -currentPos.y * Y_GRID * mNormY;
+//		if (currentPos.y % 2 != 0 && centerPos.y % 2 == 0)
+//			posX += X_GRID * mNormX;
+//		else if (currentPos.y % 2)
+//			posX -= X_GRID * mNormX;
 
-		QGraphicsItem * item = mScene->itemAt(QPointF(posX, posY),QTransform());
-		if (item != NULL)
-			item->setSelected(true);
+//		QGraphicsItem * item = mScene->itemAt(QPointF(posX, posY),QTransform());
+//		if (item != NULL)
+//			item->setSelected(true);
 
-		++selIter;
-	}
+//		++selIter;
+//	}
 }
 
 void AddNewBrushDialog::onAddBrush()
 {
-	nsstring name = mUI.mObjectNameLE->text().toStdString();
-	nsstring iconFileName = mUI.mIconLE->text().toStdString();
-	nsplugin * act = nse.active();
+//	nsstring name = mUI.mObjectNameLE->text().toStdString();
+//	nsstring iconFileName = mUI.mIconLE->text().toStdString();
+//	nsplugin * act = nse.();
 
-	if (name.empty())
-	{
-		QMessageBox mb(QMessageBox::Warning, "Object Name Error", "Enter a name for the brush", QMessageBox::NoButton, this);
-		mb.exec();
-		return;
-	}
+//	if (name.empty())
+//	{
+//		QMessageBox mb(QMessageBox::Warning, "Object Name Error", "Enter a name for the brush", QMessageBox::NoButton, this);
+//		mb.exec();
+//		return;
+//	}
 
-	if (act->contains<nsentity>(name))
-	{
-		QMessageBox mb(QMessageBox::Warning, "Object Name Error", "An object already has this name - all game objects (including brushes) must have distinct names.", QMessageBox::NoButton, this);
-		mb.exec();
-		return;
-	}
+//	if (act->contains<nsentity>(name))
+//	{
+//		QMessageBox mb(QMessageBox::Warning, "Object Name Error", "An object already has this name - all game objects (including brushes) must have distinct names.", QMessageBox::NoButton, this);
+//		mb.exec();
+//		return;
+//	}
 
-	nsentity * tileBrush = act->create<nsentity>(name);
+//	nsentity * tileBrush = act->create<nsentity>(name);
 
-	if (tileBrush == NULL)
-	{
-		QMessageBox mb(QMessageBox::Warning, "Object Creation Error", "An error has occured in trying to make this brush - check the engine log for details.", QMessageBox::NoButton, this);
-		mb.exec();
-		return;
-	}
+//	if (tileBrush == NULL)
+//	{
+//		QMessageBox mb(QMessageBox::Warning, "Object Creation Error", "An error has occured in trying to make this brush - check the engine log for details.", QMessageBox::NoButton, this);
+//		mb.exec();
+//		return;
+//	}
 
-	nstile_brush_comp * tBComp = tileBrush->create<nstile_brush_comp>();
-	nsrender_comp * rComp = tileBrush->create<nsrender_comp>();
-	nssel_comp * sComp = tileBrush->create<nssel_comp>();
+//	nstile_brush_comp * tBComp = tileBrush->create<nstile_brush_comp>();
+//	nsrender_comp * rComp = tileBrush->create<nsrender_comp>();
+//	nssel_comp * sComp = tileBrush->create<nssel_comp>();
 
-    rComp->set_mesh_id(nse.resource<nsmesh>(ENGINE_PLUG, MESH_FULL_TILE)->full_id());
-    sComp->set_default_sel_color(fvec4(0.0f, 1.0f, 0.0f, 0.8f));
+//    rComp->set_mesh_id(nse.resource<nsmesh>(ENGINE_PLUG, MESH_FULL_TILE)->full_id());
+//    sComp->set_default_sel_color(fvec4(0.0f, 1.0f, 0.0f, 0.8f));
 
-	auto items = mScene->selectedItems();
-	auto iter = items.begin();
-	while (iter != items.end())
-	{
-		HexTileItem * curItem = (HexTileItem*)*iter;
-		tBComp->add(curItem->getEnginePos());
-		++iter;
-	}
+//	auto items = mScene->selectedItems();
+//	auto iter = items.begin();
+//	while (iter != items.end())
+//	{
+//		HexTileItem * curItem = (HexTileItem*)*iter;
+//		tBComp->add(curItem->getEnginePos());
+//		++iter;
+//	}
 
-	if (mUI.mGenIconCB->isChecked())
-        iconFileName = _generateIcon(name,"icons/");
+//	if (mUI.mGenIconCB->isChecked())
+//        iconFileName = _generateIcon(name,"icons/");
 
-	if (!iconFileName.empty())
-        tileBrush->set_icon_path(iconFileName);
+//	if (!iconFileName.empty())
+//        tileBrush->set_icon_path(iconFileName);
 
-    nse.system<nsbuild_system>()->set_tile_brush(tileBrush);
-    bbtk.refresh_views();
-	accept();
+//    nse.system<nsbuild_system>()->set_tile_brush(tileBrush);
+//    bbtk.refresh_views();
+//	accept();
 }
 
 void AddNewBrushDialog::onIconBrowse()
@@ -227,13 +227,13 @@ nsstring AddNewBrushDialog::_generateIcon(const nsstring & pObjName,const nsstri
 
 	QPixmap pixMap = QPixmap::grabWidget(mUI.mBrushView, r);
 	
-    nsstring savePath = nse.active()->manager<nstex_manager>()->res_dir() +
-            nse.active()->manager<nstex_manager>()->local_dir() +
-            pSubdir + pObjName + ".png";
+//    nsstring savePath = nse.active()->manager<nstex_manager>()->res_dir() +
+//            nse.active()->manager<nstex_manager>()->local_dir() +
+//            pSubdir + pObjName + ".png";
 
-    nsfile_os::create_dir(savePath);
-    pixMap.save(savePath.c_str());
-    return savePath;
+//    nsfile_os::create_dir(savePath);
+//    pixMap.save(savePath.c_str());
+//    return savePath;
 }
 
 

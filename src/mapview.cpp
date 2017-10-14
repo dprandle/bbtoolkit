@@ -14,7 +14,7 @@ This file contains all of the neccessary definitions for the MapView class.
 #include <nsrender_comp.h>
 #include <nsdebug.h>
 #include <nsinput_system.h>
-#include <nsrender_system.h>
+#include <nstform_system.h>
 #include <nsbuild_system.h>
 #include <nsentity.h>
 #include <nsplugin.h>
@@ -67,14 +67,14 @@ void map_view::_connect()
 
 void map_view::enterEvent(QEvent *)
 {
-    nse.make_current(m_glew_id);
-    nse.system<nsinput_system>()->set_cursor_pos(platform_normalized_mpos());
-    nse.system<nsbuild_system>()->to_cursor();
+//    nse.make_current(m_glew_id);
+    //nse.system<nsinput_system>()->set_cursor_pos(platform_normalized_mpos());
+   // nse.system<nsbuild_system>()->to_cursor();
 }
 
 void map_view::keyReleaseEvent(QKeyEvent * kEvent)
 {
-    nse.make_current(m_glew_id);
+//    nse.make_current(m_glew_id);
     if (kEvent->isAutoRepeat())
     {
         QOpenGLWidget::keyPressEvent(kEvent);
@@ -87,7 +87,7 @@ void map_view::keyReleaseEvent(QKeyEvent * kEvent)
 
 void map_view::keyPressEvent(QKeyEvent * kEvent)
 {
-    nse.make_current(m_glew_id);
+ //   nse.make_current(m_glew_id);
     if (kEvent->isAutoRepeat())
     {
         QOpenGLWidget::keyPressEvent(kEvent);
@@ -266,23 +266,23 @@ bool map_view::_on_key(bool pressed, int key)
 
 void map_view::mouseMoveEvent(QMouseEvent * mevent)
 {
-    nse.make_current(m_glew_id);
-    nse.event_dispatch()->push<nsmouse_move_event>(platform_normalized_mpos());
-    QOpenGLWidget::mouseMoveEvent(mevent);
+//    nse.make_current(m_glew_id);
+    //nse.event_dispatch()->push<nsmouse_move_event>(platform_normalized_mpos());
+   // QOpenGLWidget::mouseMoveEvent(mevent);
 }
 
 void map_view::mouseReleaseEvent(QMouseEvent * mevent)
 {
-    nse.make_current(m_glew_id);
-    if (!_on_mouse(false, mevent->button(), platform_normalized_mpos()))
-        QOpenGLWidget::mousePressEvent(mevent);
+//    nse.make_current(m_glew_id);
+ //   if (!_on_mouse(false, mevent->button(), platform_normalized_mpos()))
+ //       QOpenGLWidget::mousePressEvent(mevent);
 }
 
 void map_view::mousePressEvent(QMouseEvent * mevent)
 {
-    nse.make_current(m_glew_id);
-    if (!_on_mouse(true, mevent->button(), platform_normalized_mpos()))
-        QOpenGLWidget::mousePressEvent(mevent);
+//    nse.make_current(m_glew_id);
+//    if (!_on_mouse(true, mevent->button(), platform_normalized_mpos()))
+//        QOpenGLWidget::mousePressEvent(mevent);
 }
 
 bool map_view::_on_mouse(bool pressed, int mbutton, const fvec2 & norm_mpos)
@@ -321,8 +321,8 @@ void map_view::mouseDoubleClickEvent(QMouseEvent *)
 
 void map_view::wheelEvent(QWheelEvent * wevent)
 {
-    nse.make_current(m_glew_id);
-    nse.event_dispatch()->push<nsmouse_scroll_event>(wevent->delta(), platform_normalized_mpos());
+//    nse.make_current(m_glew_id);
+//    nse.event_dispatch()->push<nsmouse_scroll_event>(wevent->delta(), platform_normalized_mpos());
 }
 
 fvec2 platform_normalized_mpos()
@@ -344,90 +344,90 @@ void map_view::on_idle()
 
 void map_view::initializeGL()
 {
-    bbtk.output_view()->writeToScreen("Initializing mapview opengL");
+//    bbtk.output_view()->writeToScreen("Initializing mapview opengL");
 
-    m_glew_id = nse.create_context();
+//    m_glew_id = nse.create_context();
 
-#ifdef NSDEBUG
-    nse.debug()->set_message_callback(OutputView::debugCallback, bbtk.output_view());
-#else
-    bbtk.output_view()->hide();
-#endif
+//#ifdef NSDEBUG
+//    nse.debug()->set_message_callback(OutputView::debugCallback, bbtk.output_view());
+//#else
+//    bbtk.output_view()->hide();
+//#endif
 
-    nse.start();
+//    nse.start();
 
-    nsplugin * plg = nse.load_plugin("testplug.bbp");
-    plg->bind();
-    nse.set_active(plg);
+//    nsplugin * plg = nse.load_plugin("testplug.bbp");
+//    plg->bind();
+//    nse.set_active(plg);
 
-    nsentity * tile = plg->create_tile("water","./import/diffuseWater.png",
-                                       "./import/normalWater.png",
-                                       fvec3(),
-                                       4.0f,
-                                       0.3f,
-                                       fvec3(),
-                                       true,
-                                       nsplugin::tile_half);
+//    nsentity * tile = plg->create_tile("water","./import/diffuseWater.png",
+//                                       "./import/normalWater.png",
+//                                       fvec3(),
+//                                       4.0f,
+//                                       0.3f,
+//                                       fvec3(),
+//                                       true,
+//                                       nsplugin::tile_half);
 
-    nsentity * ent = plg->get<nsentity>("tree");
-    nsoccupy_comp * occ_comp = ent->get<nsoccupy_comp>();
-    occ_comp->build(plg->get<nsmesh>(ent->get<nsrender_comp>()->mesh_id().y)->aabb());
+//    nsentity * ent = plg->get<nsentity>("tree");
+//    nsoccupy_comp * occ_comp = ent->get<nsoccupy_comp>();
+//    occ_comp->build(plg->get<nsmesh>(ent->get<nsrender_comp>()->mesh_id().y)->aabb());
 
-    // Setup build brush (simple one)
-    nsinput_map * imap = plg->get<nsinput_map>("bb_toolkit");
-    nse.set_current_scene("mainscene", false, false);
-    nse.system<nsrender_system>()->set_fog_factor(uivec2(60,110));
-    nse.system<nsrender_system>()->set_fog_color(nse.current_scene()->bg_color());
-    nse.system<nsinput_system>()->set_input_map(imap->full_id());
-    nse.system<nsinput_system>()->push_context("Main");
+//    // Setup build brush (simple one)
+//    nsinput_map * imap = plg->get<nsinput_map>("bb_toolkit");
+//    nse.set_current_scene("mainscene", false, false);
+//    nse.system<nsrender_system>()->set_fog_factor(uivec2(60,110));
+//    nse.system<nsrender_system>()->set_fog_color(nse.current_scene()->bg_color());
+//    nse.system<nsinput_system>()->set_input_map(imap->full_id());
+//    nse.system<nsinput_system>()->push_context("Main");
 
-    nsentity * dwarf = plg->load_model("dwarf", "dwarf.x",true);
-    nsmesh * dwarf_mesh = plg->get<nsmesh>(dwarf->get<nsrender_comp>()->mesh_id().y);
-    dwarf_mesh->bake_node_scaling(fvec3(0.1f, 0.1f, 0.1f));
-    dwarf_mesh->bake_node_rotation(orientation(fvec4(1,0,0,-90)));
-    dwarf->get<nsoccupy_comp>()->build(dwarf_mesh->aabb());
-    dwarf->get<nsoccupy_comp>()->enable_draw(true);
-    dwarf->get<nsanim_comp>()->set_loop(true);
-    dwarf->get<nsanim_comp>()->set_current_animation(
-        plg->get<nsanim_set>(
-            dwarf->get<nsanim_comp>()->anim_set_id().y)->begin()->first);
-    dwarf->get<nsanim_comp>()->set_animate(true);
-    nse.current_scene()->add(dwarf, fvec3(-10,-10,0));
+//    nsentity * dwarf = plg->load_model("dwarf", "dwarf.x",true);
+//    nsmesh * dwarf_mesh = plg->get<nsmesh>(dwarf->get<nsrender_comp>()->mesh_id().y);
+//    dwarf_mesh->bake_node_scaling(fvec3(0.1f, 0.1f, 0.1f));
+//    dwarf_mesh->bake_node_rotation(orientation(fvec4(1,0,0,-90)));
+//    dwarf->get<nsoccupy_comp>()->build(dwarf_mesh->aabb());
+//    dwarf->get<nsoccupy_comp>()->enable_draw(true);
+//    dwarf->get<nsanim_comp>()->set_loop(true);
+//    dwarf->get<nsanim_comp>()->set_current_animation(
+//        plg->get<nsanim_set>(
+//            dwarf->get<nsanim_comp>()->anim_set_id().y)->begin()->first);
+//    dwarf->get<nsanim_comp>()->set_animate(true);
+//    nse.current_scene()->add(dwarf, fvec3(-10,-10,0));
 
-	// Load from file all plugins - dont actually call load unless checked in load plugins screen
-    bbtk.load_plugin_files(QDir(nse.plugin_dir().c_str()));
+//	// Load from file all plugins - dont actually call load unless checked in load plugins screen
+//    bbtk.load_plugin_files(QDir(nse.plugin_dir().c_str()));
 
-    bbtk.refresh_views();
-    bbtk.statusBar()->setSizeGripEnabled(false);
-    bbtk.statusBar()->showMessage("Ready");
+//    bbtk.refresh_views();
+//    bbtk.statusBar()->setSizeGripEnabled(false);
+//    bbtk.statusBar()->showMessage("Ready");
 
-    // Initialize stuff that needs to be initialized after the engine
-    bbtk.res_browser()->init();
-    bbtk.res_dialog()->init();
-    bbtk.res_dialog_prev()->init();
-    bbtk.res_dialog_prev_lighting()->init();
+//    // Initialize stuff that needs to be initialized after the engine
+//    bbtk.res_browser()->init();
+//    bbtk.res_dialog()->init();
+//    bbtk.res_dialog_prev()->init();
+//    bbtk.res_dialog_prev_lighting()->init();
 }
 
 void map_view::make_current()
 {
-    makeCurrent();
-    nse.make_current(m_glew_id);
+//    makeCurrent();
+//    nse.make_current(m_glew_id);
 }
 
 void map_view::resizeGL(int width, int height)
 {
-    nse.make_current(m_glew_id);
-    nsrender_system * rs = nse.system<nsrender_system>();
-    if (rs != NULL)
-    {
-        rs->set_screen_fbo(defaultFramebufferObject());
-        rs->resize_screen(ivec2(width,height));
-    }
+//    nse.make_current(m_glew_id);
+//    nsrender_system * rs = nse.system<nsrender_system>();
+//    if (rs != NULL)
+//    {
+//        rs->set_screen_fbo(defaultFramebufferObject());
+//        rs->resize_screen(ivec2(width,height));
+//    }
 }
 
 void map_view::paintGL()
 {
-    nse.make_current(m_glew_id);
-    nse.update();
-    bbtk.update_ui();
+//    nse.make_current(m_glew_id);
+//    nse.update();
+//    bbtk.update_ui();
 }

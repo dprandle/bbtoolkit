@@ -1,5 +1,4 @@
 
-#include <myGL/glew.h>
 #include <entityeditordialog.h>
 #include <toolkit.h>
 #include <nsengine.h>
@@ -124,7 +123,7 @@ void EntityEditorDialog::onRemoveComp()
 		return;
 	auto item = items.first();
     bbtk.map()->makeCurrent();
-	mEnt->del(item->text().toStdString());
+    mEnt->destroy(item->text().toStdString());
 	setEntity(mEnt);
     bbtk.map()->update();
 }

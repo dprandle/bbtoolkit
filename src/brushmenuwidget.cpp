@@ -50,73 +50,73 @@ nsentity * BrushMenuWidget::selectedItem()
 	if (!items.isEmpty())
 		item = items.first();
 
-	if (item != NULL)
-		return nse.resource<nsentity>(uivec2(item->data(VIEW_WIDGET_ITEM_PLUG).toUInt(), item->data(VIEW_WIDGET_ITEM_ENT).toUInt()));
+//	if (item != NULL)
+//		return nse.resource<nsentity>(uivec2(item->data(VIEW_WIDGET_ITEM_PLUG).toUInt(), item->data(VIEW_WIDGET_ITEM_ENT).toUInt()));
 
 	return NULL;
 }
 
 void BrushMenuWidget::setupLW()
 {
-	QListWidgetItem * curItem = mUI.mBrushedLW->currentItem();
-	QString itemName;
-	if (curItem != NULL)
-		itemName = curItem->text();
+//	QListWidgetItem * curItem = mUI.mBrushedLW->currentItem();
+//	QString itemName;
+//	if (curItem != NULL)
+//		itemName = curItem->text();
 
-	mUI.mBrushedLW->clear();
-
-
-	auto plugiter = nse.plugins()->begin();
-	while (plugiter != nse.plugins()->end())
-	{
-		nsplugin * plg = nse.plugin(plugiter->first);
-
-		nsentity_manager * ents = plg->manager<nsentity_manager>();
-
-		auto iter = ents->begin();
-		while (iter != ents->end())
-		{
-			nsentity * curEnt = ents->get(iter->first);
-
-			if (curEnt->has<nstile_brush_comp>())
-			{
-				QListWidgetItem * item = new QListWidgetItem(curEnt->name().c_str());
-                item->setData(VIEW_WIDGET_ITEM_PLUG, curEnt->plugin_id());
-				item->setData(VIEW_WIDGET_ITEM_ENT, curEnt->id());
-
-				// make else case to give default icon in case no icon assigned
-                if (!curEnt->icon_path().empty())
-                    item->setIcon(QIcon(curEnt->icon_path().c_str()));
-                else
-                    item->setIcon(QIcon(":/ResourceIcons/icons/default_brush.png"));
-
-				mUI.mBrushedLW->addItem(item);
-			}
-			++iter;
-		}
+//	mUI.mBrushedLW->clear();
 
 
-		++plugiter;
-	}
+//	auto plugiter = nse.plugins()->begin();
+//	while (plugiter != nse.plugins()->end())
+//	{
+//		nsplugin * plg = nse.plugin(plugiter->first);
 
-	// Set the selected brush back to whatever was selected before remaking the brush list
-	auto fItems = mUI.mBrushedLW->findItems(itemName, Qt::MatchCaseSensitive);
+//		nsentity_manager * ents = plg->manager<nsentity_manager>();
 
-	if (!fItems.isEmpty() && fItems.first() != NULL)
-	{
-		mUI.mBrushedLW->setCurrentItem(fItems.first());
-		mUI.mBrushedLW->setItemSelected(fItems.first(),true);
-	}
-	else if (mUI.mBrushedLW->count() > 0)
-	{
-		QListWidgetItem * item = mUI.mBrushedLW->item(0);
-		mUI.mBrushedLW->setCurrentItem(item);
-		mUI.mBrushedLW->setItemSelected(item, true);
-	}
-	else
-	{
-		mUI.mBrushedLW->setCurrentItem(NULL);
-	}
+//		auto iter = ents->begin();
+//		while (iter != ents->end())
+//		{
+//			nsentity * curEnt = ents->get(iter->first);
+
+//			if (curEnt->has<nstile_brush_comp>())
+//			{
+//				QListWidgetItem * item = new QListWidgetItem(curEnt->name().c_str());
+//                item->setData(VIEW_WIDGET_ITEM_PLUG, curEnt->plugin_id());
+//				item->setData(VIEW_WIDGET_ITEM_ENT, curEnt->id());
+
+//				// make else case to give default icon in case no icon assigned
+//                if (!curEnt->icon_path().empty())
+//                    item->setIcon(QIcon(curEnt->icon_path().c_str()));
+//                else
+//                    item->setIcon(QIcon(":/ResourceIcons/icons/default_brush.png"));
+
+//				mUI.mBrushedLW->addItem(item);
+//			}
+//			++iter;
+//		}
+
+
+//		++plugiter;
+//	}
+
+//	// Set the selected brush back to whatever was selected before remaking the brush list
+//	auto fItems = mUI.mBrushedLW->findItems(itemName, Qt::MatchCaseSensitive);
+
+//	if (!fItems.isEmpty() && fItems.first() != NULL)
+//	{
+//		mUI.mBrushedLW->setCurrentItem(fItems.first());
+//		mUI.mBrushedLW->setItemSelected(fItems.first(),true);
+//	}
+//	else if (mUI.mBrushedLW->count() > 0)
+//	{
+//		QListWidgetItem * item = mUI.mBrushedLW->item(0);
+//		mUI.mBrushedLW->setCurrentItem(item);
+//		mUI.mBrushedLW->setItemSelected(item, true);
+//	}
+//	else
+//	{
+//		mUI.mBrushedLW->setCurrentItem(NULL);
+//	}
 }
 
 void BrushMenuWidget::onDeleteBrush()

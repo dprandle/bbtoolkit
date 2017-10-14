@@ -24,7 +24,7 @@ public:
         return static_cast<res_type*>(selected_resource(guid));
     }
 
-    nsresource * selected_resource(uint32 guid_);
+    nsasset * selected_resource(uint32 guid_);
 
     template<class res_type>
     void show_type()

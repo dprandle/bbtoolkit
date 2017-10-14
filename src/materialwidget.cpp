@@ -16,12 +16,13 @@ MaterialWidget::~MaterialWidget()
 
 void MaterialWidget::setResource(nsresource * res)
 {
-	mMat = dynamic_cast<nsmaterial*>(res);
+    //mMat = dynamic_cast<nsmaterial*>(res);
 }
 
 nsresource * MaterialWidget::resource()
 {
-	return  mMat;
+    //return  mMat;
+    return nullptr;
 }
 
 nsstring MaterialWidget::defaultResName()
